@@ -1,10 +1,12 @@
-import { AtmosphericComponent, BoxColliderShape, Camera3D, CameraUtil, ColliderComponent, Color, View3D, DirectLight, Engine3D, LitMaterial, HoverCameraController, KelvinUtil, MeshRenderer, Object3D, PointerEvent3D, Scene3D, SphereGeometry, Vector3 } from '@orillusion/core';
+import { AtmosphericComponent, BoxColliderShape, UnLitTexArrayMaterial, Camera3D, CameraUtil, ColliderComponent, Color, View3D, DirectLight, Engine3D, LitMaterial, HoverCameraController, KelvinUtil, MeshRenderer, Object3D, PointerEvent3D, Scene3D, SphereGeometry, Vector3, Material } from '@orillusion/core';
 
 export default class Sample_MousePick {
     lightObj: Object3D;
     cameraObj: Camera3D;
     scene: Scene3D;
     hover: HoverCameraController;
+    mat1: Material;
+    isMove: boolean;
 
     constructor() {}
 
@@ -46,11 +48,14 @@ export default class Sample_MousePick {
 
         // listen all mouse events
         view.pickFire.addEventListener(PointerEvent3D.PICK_UP, this.onUp, this);
-        view.pickFire.addEventListener(PointerEvent3D.PICK_DOWN, this.onDow, this);
+        view.pickFire.addEventListener(PointerEvent3D.PICK_DOWN, this.onDown, this);
         view.pickFire.addEventListener(PointerEvent3D.PICK_CLICK, this.onPick, this);
         view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, this.onOver, this);
         view.pickFire.addEventListener(PointerEvent3D.PICK_OUT, this.onOut, this);
-        view.pickFire.addEventListener(PointerEvent3D.PICK_MOVE, this.onMove, this);
+        view.pickFire.addEventListener(PointerEvent3D.PICK_MOVE, this.onMove, this, null, 999);
+    
+        // this.mat1 = new LitMaterial();
+        // this.mat1.baseColor = new Color(5, 5, 5, 1.0);
     }
 
     private initPickObject(scene: Scene3D): void {
@@ -96,11 +101,13 @@ export default class Sample_MousePick {
         // mr.material.baseColor = Color.random();
     }
 
-    private onDow(e: PointerEvent3D) {
+    private onDown(e: PointerEvent3D) {
         console.log('onDown', e.target.name, e.data.pickInfo);
         let obj = e.target as Object3D;
-        let mr = obj.getComponent(MeshRenderer);
-        // mr.material.baseColor = Color.random();
+        if (e.mouseCode === 2) {
+            e.stopImmediatePropagation();
+            this.isMove = true;
+        }
     }
 
     private onPick(e: PointerEvent3D) {
@@ -114,18 +121,26 @@ export default class Sample_MousePick {
         console.log('onOver', e.target.name, e.data.pickInfo);
         let obj = e.target as Object3D;
         let mr = obj.getComponent(MeshRenderer);
-        // mr.material.baseColor = Color.random();
+        this.mat1 = mr.material;
+        let colorMat = new LitMaterial();
+        colorMat.baseColor = new Color(5, 5, 5, 0.5);
+        mr.material = colorMat;
     }
 
     private onOut(e: PointerEvent3D) {
         console.log('onOut', e.target.name, e.data.pickInfo);
         let obj = e.target as Object3D;
         let mr = obj.getComponent(MeshRenderer);
-        // mr.material.baseColor = Color.random();
+        mr.material = this.mat1;
     }
 
     private onMove(e: PointerEvent3D) {
         console.log('onMove', e.target.name, e.data.pickInfo);
+        if(!this.isMove) return;
+        e.stopImmediatePropagation();
+        let obj = e.target as Object3D;
+        obj.transform.x = e.mouseX;
+        obj.transform.y = e.mouseX;
     }
 }
 // new Sample_MousePick().run();

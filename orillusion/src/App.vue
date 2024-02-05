@@ -7,8 +7,8 @@
   import Sample_AddRemove from './test2';
 
   onMounted(()=>{
-    new ImportFloor().run();
-    // new Sample_MousePick().run();
+    // new ImportFloor().run();
+    new Sample_MousePick().run();
     // new Sample_AddRemove().run();
   })
 </script>

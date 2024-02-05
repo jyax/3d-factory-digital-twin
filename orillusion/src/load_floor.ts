@@ -1,4 +1,4 @@
-import { AtmosphericComponent, Engine3D, Scene3D, Object3D, Camera3D, DirectLight, PointLight, HoverCameraController, View3D, Vector3, Color, ColliderComponent, PointerEvent3D, MeshRenderer, UnLitTexArrayMaterial, }
+import { AtmosphericComponent, Engine3D, Scene3D, CameraUtil, Object3D, Camera3D, DirectLight, PointLight, HoverCameraController, View3D, Vector3, Color, ColliderComponent, PointerEvent3D, MeshRenderer, UnLitTexArrayMaterial, }
     from "@orillusion/core";
  
 export default class ImportFloor {
@@ -15,19 +15,15 @@ export default class ImportFloor {
 
         // add atmospheric sky
         let sky = scene.addComponent(AtmosphericComponent);
-        sky.sunY = 50;
+        sky.sunY = .6;
 
         // Create camera
-        let cameraObj: Object3D = new Object3D();
-        cameraObj.y = 50000
-        let camera = cameraObj.addComponent(Camera3D);
+        let cameraObj = CameraUtil.createCamera3DObject(scene);
         // Set camera perspective
-        camera.perspective(60, window.innerWidth / window.innerHeight, .1, 5000.0);
+        cameraObj.perspective(60, Engine3D.aspect, 1, 5000.0);
         // Set camera controller
-        let controller = cameraObj.addComponent(HoverCameraController);
-        controller.setCamera(150, -15, 1500, new Vector3(0, 0, 0));
-        // Add camera to the scene
-        scene.addChild(cameraObj);
+        let controller = cameraObj.object3D.addComponent(HoverCameraController);
+        controller.setCamera(-30, -15, 1200);
 
         // Load glb model
         let floor = await Engine3D.res.loadGltf('./../glb_models/factory_floor_sample_1.glb');
@@ -36,6 +32,7 @@ export default class ImportFloor {
         // Load glb model
         let table = await Engine3D.res.loadGltf('./../glb_models/assembly_warehouse_table.glb');
         table.addComponent(ColliderComponent);
+        table.transform.y = 10;
         scene.addChild(table);
 
         // add direct light component
@@ -58,7 +55,7 @@ export default class ImportFloor {
         // Create view
         let view = new View3D();
         view.scene = scene;
-        view.camera = camera;
+        view.camera = cameraObj;
         
         // Render
         Engine3D.startRenderView(view);
