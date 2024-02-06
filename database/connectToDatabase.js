@@ -25,6 +25,7 @@ const { GridFSBucket } = require('mongodb');
 const database = client.db('test');
 const gridFSBucket = new GridFSBucket(database);
 const fs = require('fs');
+const path = require('path');
 
 /**
  * upload file
@@ -47,6 +48,27 @@ async function uploadFile(filePath, fileName) {
 // replace this with file needed
 const filePath = 'C:\\A College\\d senior year\\2nd semester\\capstone\\code\\factory-digital-twin\\troisjs\\glb_models\\Assembly Warehouse Table.glb';
 const fileName = 'Assembly Warehouse Table';
+
+const modelPath = 'C:\\A College\\d senior year\\2nd semester\\capstone\\code\\factory-digital-twin\\troisjs\\glb_models\\';
+
+// Get a list of all files in the directory
+const files = fs.readdirSync(modelPath);
+
+// Filter out only the GLB files
+const glbFiles = files.filter(file => path.extname(file).toLowerCase() === '.glb');
+
+// Loop through each GLB file and upload
+glbFiles.forEach(async (file) => {
+    const filePath = path.join(modelPath, file);
+    const fileName = path.basename(file, path.extname(file));
+
+    try {
+        await uploadFile(filePath, fileName);
+        console.log(`File "${fileName}" uploaded successfully`);
+    } catch (err) {
+        console.error(`Error uploading file "${fileName}"`, err);
+    }
+});
 
 // upload file
 uploadFile(filePath, fileName)
