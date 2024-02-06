@@ -1,8 +1,15 @@
+/**
+ * class to connect to MongoDB database and upload GLB files
+ */
 const { MongoClient } = require('mongodb');
 
-const uri = 'mongodb://localhost:27017'; // Update with MongoDB connection string
+// replace this with connection string
+const uri = 'mongodb://localhost:27017/';
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
+/**
+ * connect to database
+ */
 async function connectToDatabase() {
     try {
         await client.connect();
@@ -19,6 +26,12 @@ const database = client.db('test');
 const gridFSBucket = new GridFSBucket(database);
 const fs = require('fs');
 
+/**
+ * upload file
+ * @param filePath path of the file to add
+ * @param fileName name of the file to add
+ * @returns {Promise<unknown>}
+ */
 async function uploadFile(filePath, fileName) {
     const fileStream = fs.createReadStream(filePath);
     const uploadStream = gridFSBucket.openUploadStream(fileName);
@@ -31,13 +44,15 @@ async function uploadFile(filePath, fileName) {
     });
 }
 
-const filePath = 'path/to/your/file.glb';
-const fileName = 'example.glb';
+// replace this with file needed
+const filePath = 'C:\\A College\\d senior year\\2nd semester\\capstone\\code\\factory-digital-twin\\troisjs\\glb_models\\Assembly Warehouse Table.glb';
+const fileName = 'Assembly Warehouse Table';
 
+// upload file
 uploadFile(filePath, fileName)
     .then(() => console.log('File uploaded successfully'))
     .catch((err) => console.error('Error uploading file', err));
-const { GridFSBucket } = require('mongodb');
+//const { GridFSBucket } = require('mongodb');
 
-const database = client.db('test');
-const gridFSBucket = new GridFSBucket(database);
+//const database = client.db('test');
+//const gridFSBucket = new GridFSBucket(database);
