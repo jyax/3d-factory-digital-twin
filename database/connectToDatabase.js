@@ -74,7 +74,3 @@ glbFiles.forEach(async (file) => {
 uploadFile(filePath, fileName)
     .then(() => console.log('File uploaded successfully'))
     .catch((err) => console.error('Error uploading file', err));
-//const { GridFSBucket } = require('mongodb');
-
-//const database = client.db('test');
-//const gridFSBucket = new GridFSBucket(database);
