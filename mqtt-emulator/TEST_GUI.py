@@ -15,8 +15,10 @@ entries = []
 
 def main(client):
     
-    def handle_entry_change(event,index,unpacked, AssetID, col):
-                
+    def handle_entry_change(event,AssetID,row,col):
+            
+            unpacked = AssetID.unpacked()
+            index =(row-1)*len(unpacked)+col
             unpacked[col] = entries[index].get()
             AssetID.UpdateSelf(*unpacked)
             print(index)
@@ -33,10 +35,8 @@ def main(client):
     
     for row, AssetID in enumerate(assetList):
         row+=1 #offset for column headers 
-        
-        unpacked = AssetID.unpacked()
 
-        for col, attribute in enumerate(unpacked):
+        for col, attribute in enumerate(AssetID.unpacked()):
             header_label = tk.Label(root, text=attributes[col])
             header_label.grid(row=0, column=col, padx=5, pady=5)
             
@@ -44,8 +44,8 @@ def main(client):
             entry.grid(row=row, column=col, padx=5, pady=5)
             entry.insert(0, str(attribute))
             entries.append(entry)
-            entry.bind("<FocusOut>", lambda event, col=col, unpacked=unpacked, AssetID=AssetID,index =(row-1)*len(unpacked)+col:
-                        handle_entry_change(event,index, unpacked, AssetID, col))
+            entry.bind("<FocusOut>", lambda event, col=col, AssetID=AssetID,row= row:
+                        handle_entry_change(event,AssetID,row,col))
             
             
 
