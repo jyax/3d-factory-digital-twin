@@ -1,6 +1,6 @@
 const mysql = require('mysql');
-class Database {
-    contructor(host, user, pass) {
+class Database_sql {
+    constructor(host, user, pass) {
         this.host = host;
         this.user = user;
         this.password = pass;
