@@ -1,12 +1,10 @@
 
 import random
 import time
-
 import TEST_GUI 
-
 from paho.mqtt import client as mqtt_client
 
-
+    
 broker = 'broker.emqx.io'
 port = 1883
 topic = "python/mqtt"
@@ -30,7 +28,6 @@ def connect_mqtt():
 
 
 def publish(client, msg):
-
     result = client.publish(topic, msg)
     # result: [0, 1]
     status = result[0]
