@@ -23,6 +23,9 @@ class Asset:
 
     def toMsg(self):
         return str(self.id)+","+ str(self.x)+","+ str(self.y)+","+ str(self.z)+","+str(self.temp)
+    
+    def unpacked(self):
+        return [self.id,self.x, self.y, self.z, self.temp]
 
 
 

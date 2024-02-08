@@ -4,7 +4,7 @@ import time
 import TEST_GUI 
 from paho.mqtt import client as mqtt_client
 
-    
+
 broker = 'broker.emqx.io'
 port = 1883
 topic = "python/mqtt"
@@ -37,17 +37,11 @@ def publish(client, msg):
         print(f"Failed to send message to topic {topic}")
         
 
-
-
-
 def run():
-    
     client = connect_mqtt()
     client.loop_start()
     TEST_GUI.main(client)
-    
     client.loop_stop()
-
 
 if __name__ == '__main__':
     run()
