@@ -1,8 +1,7 @@
 import {
-    AtmosphericScatteringSky,
     Camera3D, Color,
-    Engine3D,
-    Object3D, OrbitController, PointerEvent3D, PointLight,
+    Engine3D, LitMaterial, MeshRenderer,
+    Object3D, OrbitController,
     Scene3D, SkyRenderer, SolidColorSky, Vector3, View3D
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
@@ -32,11 +31,10 @@ class SceneManager {
 
         this.camera = null;
 
-        this._nextID = 0;
-        this.objects = new Map();
-        this._revMap = new Map();
-
+        this.objects = new Set();
         this._selected = new Set();
+
+        this.ids = new Map();
 
         this._cameraController = null;
 
@@ -55,6 +53,9 @@ class SceneManager {
         Engine3D.setting.pick.enable = true;
         Engine3D.setting.pick.mode = "bound";
 
+        this.targetObj = null;
+        this.matList = [];
+
         Engine3D.init({
             canvasConfig:  { canvas }
         }).then(() => {
@@ -63,12 +64,7 @@ class SceneManager {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
 
-            //let colorSky = new SolidColorSky(this._skyColor);
             this.scene.envMap = new SolidColorSky(new Color(200, 200, 200));
-            //this.sky = this.scene.addComponent(SkyRenderer);
-            //this.sky.map = colorSky;
-
-            //this.scene.envMap = colorSky;
 
             let camObj = new Object3D();
             let cam = camObj.addComponent(Camera3D);
@@ -79,30 +75,27 @@ class SceneManager {
             this._cameraController.panFactor = 0.025;
             this._cameraController.wheelStep = 0.01;
 
-            camObj.localPosition = new Vector3(0, 0, 15);
+            camObj.localPosition = new Vector3(0, 0, 4);
 
-            cam.perspective(60, window.innerWidth / window.innerHeight, 0.1, 5000);
+            cam.perspective(60, canvas.width / canvas.height, 1, 5000);
 
             this.scene.addChild(camObj);
 
             this.createNewObject(new Vector3());
 
-            //const light = new Object3D();
-            //const lightComp = light.addComponent(PointLight);
-            //lightComp.intensity = 2;
-            //light.localPosition = new Vector3(0, 10, 0);
-            //this.scene.addChild(light);
-
             let view = new View3D();
             view.scene = this.scene;
             view.camera = cam;
-            view.enablePick = true;
+            Engine3D.startRenderView(view);
 
             document.addEventListener("keydown", (event) => {
                 if (event.key === "r")
                     this.createNewObject();
 
                 else if (event.key === "Tab") {
+                    if (document.querySelector(":focus"))
+                        return;
+
                     this.clearSelection();
                     event.preventDefault();
                 }
@@ -120,13 +113,23 @@ class SceneManager {
                 if (event.key === "Control")
                     this._ctrlPressed = false;
             });
-
-            Engine3D.startRenderView(view);
         });
     }
 
 
     // Getters
+
+    /**
+     * Get an object in the manager by its global ID.
+     * @param {string} id Global ID
+     * @returns {SceneObject|null} Object with specified ID, or null if it doesn't exist.
+     */
+    getObjectById(id) {
+        if (!this.ids.has(id))
+            return null;
+
+        return this.ids.get(id);
+    }
 
     /**
      * Get the event handler.
@@ -189,7 +192,15 @@ class SceneManager {
 
     // User Interface
 
-    alert(title = "", description = "") {}
+    /**
+     * Signal an alert to the event listener.
+     * Used for displaying UI alert messages.
+     * @param {string} title Title/topic of alert
+     * @param {string} description Description of alert
+     */
+    alert(title = "", description = "") {
+        this.events.do("alert", title, description);
+    }
 
 
     // Objects - Access
@@ -219,11 +230,11 @@ class SceneManager {
 
     /**
      * Create a new basic object and add it to the scene.
-     * @param {Vector3} pos Initial position of object
+     * @param {Vector3} pos Initial position of object (optional)
      */
     createNewObject(pos = null) {
         if (pos === null)
-            pos = this.getCameraForward().mul(16).add(this.camera.localPosition);
+            pos = this.getCameraForward().mul(8).add(this.camera.localPosition);
 
         const object = new SceneObject({
             manager: this,
@@ -238,27 +249,11 @@ class SceneManager {
      * @param {SceneObject} object Object to add
      */
     addObject(object) {
-        const id = this._nextID;
-
-        this.objects.set(id, object);
-        this._revMap.set(object.getObject3D(), object);
-
-        object.id = id;
+        this.objects.add(object);
 
         this.scene.addChild(object.getObject3D());
 
-        this._findNextID();
-
         this.events.do("add", object);
-    }
-
-    /**
-     * Increment the next available object ID until it is available.
-     * @private
-     */
-    _findNextID() {
-        while (this.objects.has(this._nextID))
-            this._nextID++;
     }
 
 
@@ -269,15 +264,12 @@ class SceneManager {
      * @param {SceneObject} object Object to remove
      */
     removeObject(object) {
-        this.objects.delete(object.id);
+        this.objects.delete(object);
 
         if (this._selected.has(object))
             this.deselect(object);
 
         this.events.do("delete", object);
-
-        if (object.id !== -1 && object.id < this._nextID)
-            this._nextID = object.id;
     }
 
     /**
@@ -346,6 +338,77 @@ class SceneManager {
      */
     isSelected(object) {
         return this._selected.has(object);
+    }
+
+
+    // Objects - Interaction (OLD, do not remove yet)
+
+    /**
+     * (OLD) Handles when the mouse hovers over an object.
+     * @param e Event
+     * @private
+     */
+    _onOver(e) {
+        console.log('onOver: Name-', e.target.name, e.data.pickInfo);
+        // console.log('onOver: Parent-', e.target.parent.object3D.name, e.data.pickInfo);
+        let node = e.target;
+        while(node.parent.parent != null)
+        {
+            // console.log('parent', node.name);
+            node = node.parent.object3D;
+            // console.log('parent', node.name);
+        }
+        this.targetObj = node;
+        // console.log("target object", this.targetObj.name);
+        if(this.targetObj.numChildren > 0){
+            this.targetObj.forChild((n) => {
+                if (n.hasComponent(MeshRenderer)) {
+                    let mr = n.getComponent(MeshRenderer);
+                    this.mat1 = mr.material;
+                    this.matList.push(mr.material);
+                    let colorMat = new LitMaterial();
+                    colorMat.baseColor = new Color(5, 5, 5, 0.5);
+                    mr.material = colorMat;
+                }
+            });
+        }
+        else{
+            let mr = this.targetObj.getComponent(MeshRenderer);
+            this.mat1 = mr.material;
+            let colorMat = new LitMaterial();
+            colorMat.baseColor = new Color(5, 5, 5, 0.5);
+            mr.material = colorMat;
+        }
+    }
+
+    /**
+     * (OLD) Handles when the mouse is no longer hovering over an object.
+     * @param e Event
+     * @private
+     */
+    _onOut(e) {
+        console.log('onOut', e.target.name, e.data.pickInfo);
+        if(this.targetObj.numChildren > 0){
+            let i  = this.matList.length - 1;
+            this.targetObj.forChild((n) => {
+                if (n.hasComponent(MeshRenderer)) {
+                    console.log("node", n.name);
+                    let mr = n.getComponent(MeshRenderer);
+                    let colorMat1 = new LitMaterial();
+                    colorMat1.baseColor = Color.COLOR_BLUE;
+                    // mr.material = this.mat1;
+                    mr.material = this.matList[i];
+                    i = i - 1;
+                }
+            });
+        }
+        else{
+            let obj = e.target;
+            let mr = obj.getComponent(MeshRenderer);
+            let colorMat1 = new LitMaterial();
+            colorMat1.baseColor = Color.COLOR_RED;
+            mr.material = this.mat1;
+        }
     }
 }
 

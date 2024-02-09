@@ -2,6 +2,8 @@
 
 import ObjectInfoText from "./info/ObjectInfoText.vue";
 import ObjectInfoPosition from "./info/ObjectInfoPosition.vue";
+import ObjectInfoID from "./info/ObjectInfoID.vue";
+import ObjectInfoInput from "./info/ObjectInfoInput.vue";
 </script>
 
 <template>
@@ -13,7 +15,7 @@ import ObjectInfoPosition from "./info/ObjectInfoPosition.vue";
       </div>
       <div class="section-inner">
 
-        <object-info-text name="ID" :value="mgr.getFirstSelected().id"/>
+        <object-info-i-d :mgr="mgr" label="ID" placeholder="Optional"/>
         <object-info-text name="Type" value="Object"/>
 
         <object-info-position :mgr="mgr"/>
@@ -122,7 +124,11 @@ export default {
   },
 
   created() {
-    this.mgr.events.on("select", s => this.selected = s);
+    this.mgr.events.on("select", s => {
+      this.selected = s;
+
+      this.$forceUpdate();
+    });
   }
 }
 </script>
