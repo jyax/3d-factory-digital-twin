@@ -104,40 +104,6 @@ export default class ImportFloor {
     }
 
     private onOver(e: PointerEvent3D) {
-        // console.log('onOver: Name-', e.target.name, e.data.pickInfo);
-        // // console.log('onOver: Parent-', e.target.parent.object3D.name, e.data.pickInfo);
-        // let node = e.target;
-        // while(node.parent.parent != null)
-        // {
-        //     // console.log('parent', node.name);
-        //     node = node.parent.object3D;
-        //     // console.log('parent', node.name);
-        // }
-        // this.targetObj = node;
-        // // console.log("target object", this.targetObj.name);
-        // if(this.targetObj.numChildren > 0){
-        //     this.targetObj.forChild((n) => {
-        //         if (n.hasComponent(MeshRenderer)) {
-        //             let mr = n.getComponent(MeshRenderer);
-        //             this.mat1 = mr.material;
-        //             this.matList.push(mr.material);
-        //             let colorMat = new LitMaterial();
-        //             colorMat.baseColor = new Color(5, 5, 5, 0.5);
-        //             mr.material = colorMat;
-        //         }
-        //     });
-        // }
-        // else{
-        //     let mr = this.targetObj.getComponent(MeshRenderer);
-        //     this.mat1 = mr.material;
-        //     let colorMat = new LitMaterial();
-        //     colorMat.baseColor = new Color(5, 5, 5, 0.5);
-        //     mr.material = colorMat;
-        // }
-    }
-
-    private onUp(e: PointerEvent3D) {
-        // console.log('onUp', e.target.name, e.data.pickInfo);
         console.log('onOver: Name-', e.target.name, e.data.pickInfo);
         // console.log('onOver: Parent-', e.target.parent.object3D.name, e.data.pickInfo);
         let node = e.target;
@@ -168,6 +134,40 @@ export default class ImportFloor {
             colorMat.baseColor = new Color(5, 5, 5, 0.5);
             mr.material = colorMat;
         }
+    }
+
+    private onUp(e: PointerEvent3D) {
+        // console.log('onUp', e.target.name, e.data.pickInfo);
+    //     console.log('onOver: Name-', e.target.name, e.data.pickInfo);
+    //     // console.log('onOver: Parent-', e.target.parent.object3D.name, e.data.pickInfo);
+    //     let node = e.target;
+    //     while(node.parent.parent != null)
+    //     {
+    //         // console.log('parent', node.name);
+    //         node = node.parent.object3D;
+    //         // console.log('parent', node.name);
+    //     }
+    //     this.targetObj = node;
+    //     // console.log("target object", this.targetObj.name);
+    //     if(this.targetObj.numChildren > 0){
+    //         this.targetObj.forChild((n) => {
+    //             if (n.hasComponent(MeshRenderer)) {
+    //                 let mr = n.getComponent(MeshRenderer);
+    //                 this.mat1 = mr.material;
+    //                 this.matList.push(mr.material);
+    //                 let colorMat = new LitMaterial();
+    //                 colorMat.baseColor = new Color(5, 5, 5, 0.5);
+    //                 mr.material = colorMat;
+    //             }
+    //         });
+    //     }
+    //     else{
+    //         let mr = this.targetObj.getComponent(MeshRenderer);
+    //         this.mat1 = mr.material;
+    //         let colorMat = new LitMaterial();
+    //         colorMat.baseColor = new Color(5, 5, 5, 0.5);
+    //         mr.material = colorMat;
+    //     }
     }
 
     private onDown(e: PointerEvent3D) {
