@@ -1,5 +1,5 @@
 <template>
-  <p class="input-vector-label">Position</p>
+  <p class="input-label">Position</p>
   <div class="input-vector">
 
     <input class="input-vector-comp c-x" v-model="xVal" type="text" placeholder="x"
@@ -16,7 +16,7 @@
 
 <style scoped>
 
-.input-vector-label {
+.input-label {
   margin: 16px 0 4px;
 
   text-align: left;

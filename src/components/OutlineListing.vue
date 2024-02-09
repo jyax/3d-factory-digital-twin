@@ -1,6 +1,6 @@
 <template>
   <div class="listing" @click="this.object.select()" :class="dynamicStyle">
-    <p class="listing-name">{{object.name}}</p>
+    <p class="listing-name">Object</p>
     <div class="listing-buttons">
       <img class="listing-button" src="../../icon/lock-slash.svg" alt="Lock">
       <img class="listing-button" src="../../icon/trash.svg" alt="Delete" @click.stop="object.delete()">
