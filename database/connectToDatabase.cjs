@@ -46,10 +46,10 @@ async function uploadFile(filePath, fileName) {
 }
 
 // replace this with file needed
-const filePath = 'C:\\A College\\d senior year\\2nd semester\\capstone\\code\\factory-digital-twin\\troisjs\\glb_models\\Assembly Warehouse Table.glb';
+const filePath = 'C:\\A College\\d senior year\\2nd semester\\capstone\\code\\factory-digital-twin\\glb_models\\Assembly Warehouse Table.glb';
 const fileName = 'Assembly Warehouse Table';
 
-const modelPath = 'C:\\A College\\d senior year\\2nd semester\\capstone\\code\\factory-digital-twin\\troisjs\\glb_models\\';
+const modelPath = 'C:\\A College\\d senior year\\2nd semester\\capstone\\code\\factory-digital-twin\\glb_models\\';
 
 // Get a list of all files in the directory
 const files = fs.readdirSync(modelPath);
