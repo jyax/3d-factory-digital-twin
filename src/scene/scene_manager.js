@@ -1,4 +1,5 @@
 import {
+    AtmosphericComponent,
     Camera3D, Color,
     Engine3D, LitMaterial, MeshRenderer,
     Object3D, OrbitController,
@@ -66,6 +67,9 @@ class SceneManager {
 
             this.scene.envMap = new SolidColorSky(new Color(200, 200, 200));
 
+            //let sky = this.scene.addComponent(AtmosphericComponent);
+            //sky.sunY = 1;
+
             let camObj = new Object3D();
             let cam = camObj.addComponent(Camera3D);
             this.camera = camObj;
@@ -77,7 +81,7 @@ class SceneManager {
 
             camObj.localPosition = new Vector3(0, 0, 4);
 
-            cam.perspective(60, canvas.width / canvas.height, 1, 5000);
+            cam.perspective(60, canvas.width / canvas.height, 0.1, 5000);
 
             this.scene.addChild(camObj);
 
@@ -195,11 +199,11 @@ class SceneManager {
     /**
      * Signal an alert to the event listener.
      * Used for displaying UI alert messages.
-     * @param {string} title Title/topic of alert
      * @param {string} description Description of alert
+     * @param {string} id Object Identifier
      */
-    alert(title = "", description = "") {
-        this.events.do("alert", title, description);
+    alert(description = "", id = "") {
+        this.events.do("alert", description, id);
     }
 
 

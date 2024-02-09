@@ -18,8 +18,8 @@ export default class ImportFloor {
         let scene: Scene3D = new Scene3D();
 
         // add atmospheric sky
-        let sky = scene.addComponent(AtmosphericComponent);
-        sky.sunY = .6;
+        //let sky = scene.addComponent(AtmosphericComponent);
+        //sky.sunY = .6;
 
         // Create camera
         let cameraObj = CameraUtil.createCamera3DObject(scene);

@@ -17,7 +17,8 @@ import ObjectInfoText from "./info/ObjectInfoText.vue";
 
       <div class="alert-main">
 
-        <h3>Issue detected at the following: <object-info-text name="Type:" value="Object"/></h3>
+        <h3>Issue Detected at the following:</h3>
+        <h3 class="desc" >{{ desc }}</h3>
 
         <button @click="alerted = false">Ok</button>
       </div>
@@ -85,6 +86,7 @@ export default {
   data() {
     return {
       alerted: true,
+      desc: 'Temperature above critical threshold',
     }
   },
   props: {
@@ -99,7 +101,7 @@ export default {
     }
   },
   created() {
-    this.mgr.events.on("alert", s=> this.selected = s);
+    this.mgr.events.on("alert", s=> this.desc = s);
   }
 }
 </script>
