@@ -8,7 +8,7 @@ import ObjectInfoPosition from "./info/ObjectInfoPosition.vue";
   <div id="info-parent" v-if="selected.length === 1">
     <div class="section" id="info">
       <div class="section-header">
-        <img class="section-header-icon" src="../../icon/info-circle.svg" alt="Info">
+        <img class="section-header-icon" src="../assets/icon/info-circle.svg" alt="Info">
         <h1 class="section-title">Object Info</h1>
       </div>
       <div class="section-inner">
