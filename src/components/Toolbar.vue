@@ -1,20 +1,20 @@
 <template>
   <div class="section" id="tools">
-    <img class="section-header-icon" id="tools-icon" src="../../icon/wrench.svg" alt="Wrench" draggable="false">
+    <img class="section-header-icon" id="tools-icon" src="../assets/icon/wrench.svg" alt="Wrench" draggable="false">
     <div class="section-inner" id="tools-inner">
 
       <div class="tool" @click="mgr.createNewObject()">
-        <img src="../../icon/plus.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/plus.svg" alt="Plus" draggable="false">
         <span class="tooltip">New Object <span class="soft">[R]</span></span>
       </div>
 
       <div class="tool" @click="mgr.clearSelection()">
-        <img src="../../icon/xmark.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/xmark.svg" alt="Plus" draggable="false">
         <span class="tooltip">Deselect <span class="soft">[Tab]</span></span>
       </div>
 
       <div class="tool" @click="mgr.deleteSelected()">
-        <img src="../../icon/trash.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/trash.svg" alt="Plus" draggable="false">
         <span class="tooltip">Delete <span class="soft">[Del]</span></span>
       </div>
 

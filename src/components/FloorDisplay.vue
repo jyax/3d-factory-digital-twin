@@ -1,8 +1,9 @@
 <script setup>
 import {onMounted, ref} from "vue";
   import SceneManager from "../scene/scene_manager.js";
-import ObjectInfo from "./ObjectInfo.vue";
-import Toolbar from "./Toolbar.vue";
+  import ObjectInfo from "./ObjectInfo.vue";
+  import Toolbar from "./Toolbar.vue";
+  import Alert from "./Alert.vue";
 
   let mgr = new SceneManager();
 
@@ -22,6 +23,7 @@ import Toolbar from "./Toolbar.vue";
   <object-info :mgr="mgr"/>
   <toolbar :mgr="mgr"/>
   <outline :mgr="mgr"/>
+  <alert :mgr="mgr"/>
 
 </template>
 
