@@ -1,6 +1,6 @@
 <script setup>
 import {onMounted, ref} from "vue";
-  import SceneManager from "../scene/scene_manager.js";
+import SceneManager from "../scene/scene_manager.js";
 import ObjectInfo from "./ObjectInfo.vue";
 import Toolbar from "./Toolbar.vue";
 
@@ -12,6 +12,7 @@ import Toolbar from "./Toolbar.vue";
     mgr.init({
       canvas: canvas.value
     });
+
   });
 </script>
 

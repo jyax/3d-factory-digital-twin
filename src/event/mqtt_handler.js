@@ -2,30 +2,54 @@ import SceneManager from "../scene/scene_manager";
 import SceneObject from "../scene/scene_object";
 
 // MQTT Broker Configurations
-var broker = "localhost:1883/mqtt"; // Update with your EMQ X broker WebSocket URL
-var topic = "python/mqtt"; // Update with your MQTT topic
+var broker = 'ws://broker.emqx.io:8083/mqtt'; // Update with your EMQ X broker WebSocket URL
+var topic = 'python/mqtt'; // Update with your MQTT topic
 
 // Create a client instance
-var client = new Paho.MQTT.Client(broker, "clientId_" + Math.random());
+const options = {
+    // Clean session
+    clean: true,
+    connectTimeout: 4000,
+    // Authentication
+    clientId: 'emqx_test',
+    username: 'emqx_test',
+    password: 'emqx_test',
+  }
+
+const client = mqtt.connect(broker, options);
+
 
 // set callback handlers
-client.onConnectionLost = onConnectionLost;
-client.onMessageArrived = onMessageArrived;
+// client.onConnectionLost = onConnectionLost;
+// client.onMessageArrived = onMessageArrived;
 
 // connect the client
-client.connect({ onSuccess: onConnect });
-
+client.on('connect', () => onConnect());
+// client.on('message', (topic, message)  => onMessageArrived(message));
+client.on('message', (topic, message) => {
+    console.log('receive message：', topic, message.toString())
+  })
+  client.on('error', (error) => {
+    console.log('Connection failed:', error)
+})
 // called when the client connects
 function onConnect() {
     console.log("Connected");
     // subscribe to a topic
-    client.subscribe(topic);
+    //client.subscribe(topic);
+    client.subscribe(topic, { qos: 0 }, function (error, granted) {
+        if (error) {
+          console.log(error)
+        } else {
+          console.log(granted)
+          console.log(client)
+        }
+      })
 }
 
 // called when a message arrives
 function onMessageArrived(message) {
-    console.log("Message Arrived: " + message.payloadString);
-    message = message.substring(1,message.length -1);
+    console.log("Message Arrived: " + message);
     parse = message.split(',');
     id = parse[0];
     parse.remove(0);
@@ -37,11 +61,6 @@ function onMessageArrived(message) {
             //SceneObject.setTemp(floats[3]);
         }
     });
-
-    x = parse[1];
-    x = parse[1];
-    x = parse[1];
-    x = parse[1];
 }
 
 // called when the client loses its connection
@@ -50,3 +69,15 @@ function onConnectionLost(responseObject) {
         console.log("Connection Lost: " + responseObject.errorMessage);
     }
 }
+
+export default{
+    onConnect:onConnect,
+    onMessageArrived:onMessageArrived,
+    onConnectionLost:onConnectionLost,
+    client:client,
+    broker:broker,
+    options:options
+
+
+
+};
