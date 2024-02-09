@@ -45,32 +45,35 @@ async function uploadFile(filePath, fileName) {
     });
 }
 
-// replace this with file needed
-const filePath = 'C:\\A College\\d senior year\\2nd semester\\capstone\\code\\factory-digital-twin\\glb_models\\Assembly Warehouse Table.glb';
+// replace this with file if needed
+const filePath = '../glb_models/Assembly Warehouse Table.glb';
 const fileName = 'Assembly Warehouse Table';
 
-const modelPath = 'C:\\A College\\d senior year\\2nd semester\\capstone\\code\\factory-digital-twin\\glb_models\\';
+const modelPath = '../glb_models';
 
-// Get a list of all files in the directory
-const files = fs.readdirSync(modelPath);
-
-// Filter out only the GLB files
-const glbFiles = files.filter(file => path.extname(file).toLowerCase() === '.glb');
-
-// Loop through each GLB file and upload
-glbFiles.forEach(async (file) => {
-    const filePath = path.join(modelPath, file);
-    const fileName = path.basename(file, path.extname(file));
-
+(async () => {
     try {
-        await uploadFile(filePath, fileName);
-        console.log(`File "${fileName}" uploaded successfully`);
-    } catch (err) {
-        console.error(`Error uploading file "${fileName}"`, err);
-    }
-});
+        // Get a list of all files in the directory
+        const files = fs.readdirSync(modelPath);
 
-// upload file
-uploadFile(filePath, fileName)
-    .then(() => console.log('File uploaded successfully'))
-    .catch((err) => console.error('Error uploading file', err));
+        // Filter out only the GLB files
+        const glbFiles = files.filter(file => path.extname(file).toLowerCase() === '.glb');
+
+        // Loop through each GLB file and upload
+        for (const file of glbFiles) {
+            const filePath = path.join(modelPath, file);
+            const fileName = path.basename(file, path.extname(file));
+            await uploadFile(filePath, fileName);
+            console.log(`File "${fileName}" uploaded successfully`);
+        }
+
+        // upload specific file
+        await uploadFile(filePath, fileName);
+        console.log('File uploaded successfully');
+    } catch (err) {
+        console.error('Error uploading files', err);
+    } finally {
+        // Close the connection
+        await client.close();
+    }
+})();
