@@ -10,6 +10,8 @@
 .object-info-text {
   display: flex;
   flex-direction: row;
+
+  margin: 0 0 8px;
 }
 
 .object-info-text p {

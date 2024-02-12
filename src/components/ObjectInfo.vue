@@ -4,6 +4,7 @@ import ObjectInfoText from "./info/ObjectInfoText.vue";
 import ObjectInfoPosition from "./info/ObjectInfoPosition.vue";
 import ObjectInfoID from "./info/ObjectInfoID.vue";
 import ObjectInfoInput from "./info/ObjectInfoInput.vue";
+import ObjectInfoModel from "./info/ObjectInfoModel.vue";
 </script>
 
 <template>
@@ -15,8 +16,11 @@ import ObjectInfoInput from "./info/ObjectInfoInput.vue";
       </div>
       <div class="section-inner">
 
-        <object-info-i-d :mgr="mgr" label="ID" placeholder="Optional"/>
         <object-info-text name="Type" value="Object"/>
+
+        <object-info-i-d :mgr="mgr" label="ID" placeholder="Optional"/>
+
+        <object-info-model :mgr="mgr"/>
 
         <object-info-position :mgr="mgr"/>
 
@@ -124,11 +128,7 @@ export default {
   },
 
   created() {
-    this.mgr.events.on("select", s => {
-      this.selected = s;
-
-      this.$forceUpdate();
-    });
+    this.mgr.events.on("select", sel => this.selected = sel);
   }
 }
 </script>
