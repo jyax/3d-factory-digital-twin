@@ -1,26 +1,20 @@
-<script setup>
-function closeAlert() {}
-
-import ObjectInfoText from "./info/ObjectInfoText.vue";
-</script>
-
 <template>
-  <div class="alert-menu-parent" v-if="alerted">
+  <div class="alert-menu-parent" v-if="visible">
     <div class="alert-menu">
 
       <div class="alert-header">
 
         <img class="alert-icon" src="../assets/icon/alert-icon.svg" alt="Alert Icon">
-        <h1 class="alert-title">Alert!</h1>
+        <h1 class="alert-title">Alert</h1>
 
       </div>
 
       <div class="alert-main">
 
         <h3>Issue Detected at the following:</h3>
-        <h3 class="desc" >{{ desc }}</h3>
+        <h3 class="desc" >{{ description }}</h3>
 
-        <button @click="alerted = false">Ok</button>
+        <button @click="visible=false">Ok</button>
       </div>
 
     </div>
@@ -30,8 +24,9 @@ import ObjectInfoText from "./info/ObjectInfoText.vue";
 <style scoped>
 .alert-menu-parent {
   position: absolute;
-  bottom: 40%;
-  left: 40%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   height: 25%;
   width: 25%;
   max-width: 40%;
@@ -48,8 +43,8 @@ import ObjectInfoText from "./info/ObjectInfoText.vue";
   padding: 12px;
   border-radius: 8px;
 
-  background-color: rgba(37, 37, 37, 0.67);
-  backdrop-filter: blur(4px);
+  background-color: rgba(24, 24, 24, 0.67);
+  backdrop-filter: blur(8px);
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
 }
 .object-info-text{
@@ -77,6 +72,20 @@ import ObjectInfoText from "./info/ObjectInfoText.vue";
   filter: invert();
   width: 24px;
 }
+
+button {
+  background-color: rgba(140, 140, 140, 0.25);
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+
+  border: none;
+  outline: none;
+}
+
+button:hover {
+  background-color: rgba(114, 114, 114, 0.25);
+}
+
 </style>
 
 <script>
@@ -85,23 +94,28 @@ import SceneManager from "../scene/scene_manager.js";
 export default {
   data() {
     return {
-      alerted: true,
-      desc: 'Temperature above critical threshold',
+      visible: false,
+      description: ""
     }
   },
+
   props: {
     mgr: {
       type: SceneManager,
       required: true
+    },
+    desc: {
+      default: 'Temperature above critical threshold.'
     }
   },
-  methods: {
-    closeAlert() {
-      this.isAlertVisible = false;
-    }
-  },
+
   created() {
-    this.mgr.events.on("alert", s=> this.desc = s);
+    this.mgr.events.on("alert", s => {
+      this.description = s;
+      this.visible = true;
+    });
+
+    this.description = this.desc;
   }
 }
 </script>

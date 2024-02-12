@@ -115,11 +115,9 @@ export default {
 
     blurInput(e) {
       e.target.blur();
-    }
-  },
+    },
 
-  created() {
-    this.mgr.events.on("select", selected => {
+    update(selected) {
       if (selected.length !== 1)
         this.pos = new Vector3();
       else
@@ -128,7 +126,13 @@ export default {
       this.xVal = Math.floor(this.pos.x * 100) / 100;
       this.yVal = Math.floor(this.pos.y * 100) / 100;
       this.zVal = Math.floor(this.pos.z * 100) / 100;
-    });
+    }
+  },
+
+  created() {
+    this.mgr.events.on("select", selected => this.update(selected));
+
+    this.update(this.mgr.getSelected());
   }
 }
 </script>

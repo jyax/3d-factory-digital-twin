@@ -19,7 +19,10 @@
 }
 
 .input-label {
-  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+
+  margin: 0;
 
   text-align: left;
   font-weight: bold;
