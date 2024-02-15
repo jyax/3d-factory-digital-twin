@@ -2,7 +2,7 @@ import SceneManager from "../scene/scene_manager";
 import SceneObject from "../scene/scene_object";
 
 // MQTT Broker Configurations
-var broker = 'ws://broker.emqx.io:8083/mqtt'; // Update with your EMQ X broker WebSocket URL
+var broker = 'ws://35.9.22.105:8083/mqtt'; // Update with your EMQ X broker WebSocket URL
 var topic = 'python/mqtt'; // Update with your MQTT topic
 
 // Create a client instance
@@ -12,8 +12,8 @@ const options = {
     connectTimeout: 4000,
     // Authentication
     clientId: 'emqx_test',
-    username: 'emqx_test',
-    password: 'emqx_test',
+    username: 'root',
+    password: 'M0nG0$$w0rd',
   }
 
 const client = mqtt.connect(broker, options);
