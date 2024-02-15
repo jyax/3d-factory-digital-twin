@@ -10,9 +10,7 @@ import {onMounted, ref} from "vue";
   const canvas = ref("canvas");
 
   onMounted(() => {
-    mgr.init({
-      canvas: canvas.value
-    });
+    mgr.init();
 
   });
 </script>
