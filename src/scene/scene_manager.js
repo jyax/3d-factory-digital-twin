@@ -67,9 +67,7 @@ class SceneManager {
      * Initialize the scene manager.
      * @param canvas Reference to desired HTML canvas
      */
-    async init({
-        canvas
-    } = {}) {
+    async init() {
         Engine3D.setting.pick.enable = true;
         Engine3D.setting.pick.mode = "bound";
 
@@ -79,9 +77,11 @@ class SceneManager {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        await Engine3D.init({
-            canvasConfig:  { canvas }
-        });
+        await Engine3D.init();
+
+        const c  = Engine3D.inputSystem.canvas;
+        c.remove();
+        document.querySelector("body").prepend(c);
 
         this.scene = new Scene3D();
 
