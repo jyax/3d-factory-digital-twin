@@ -13,6 +13,7 @@ import {onMounted, ref} from "vue";
     mgr.init({
       canvas: canvas.value
     });
+
   });
 </script>
 
