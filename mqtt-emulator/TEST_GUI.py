@@ -6,9 +6,9 @@ from asset import Asset
 # TODO change from global to item specific and create topic subscribers
 data = [0.0] *4
 
-TestItem1 = Asset("0001",0,12.0,0,25.0)
-TestItem2 = Asset("0002",0,12.0,0,25.0)
-TestItem3 = Asset("0003",0,12.0,0,25.0)
+TestItem1 = Asset("0",0,12.0,0,25.0)
+TestItem2 = Asset("1",0,12.0,0,25.0)
+TestItem3 = Asset("2",0,12.0,0,25.0)
 
 assetList = [TestItem1,TestItem2, TestItem3]
 entries = []
