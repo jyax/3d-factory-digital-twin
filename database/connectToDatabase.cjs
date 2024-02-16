@@ -1,5 +1,5 @@
 /**
- * class to connect to MongoDB database and upload GLB files
+ * connect to MongoDB database and upload GLB files
  */
 const { MongoClient } = require('mongodb');
 
