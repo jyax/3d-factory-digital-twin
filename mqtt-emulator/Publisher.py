@@ -5,7 +5,7 @@ import TEST_GUI
 from paho.mqtt import client as mqtt_client
 
 
-broker = 'broker.emqx.io'
+broker = 'localhost'
 port = 1883
 topic = "python/mqtt"
 # Generate a Client ID with the publish prefix.
