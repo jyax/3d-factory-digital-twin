@@ -1,50 +1,89 @@
 /**
  * add to directory using mongodb
  */
-const { MongoClient, GridFSBucket } = require('mongodb');
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 const fs = require('fs');
+const path = require('path');
+const { MongoClient, GridFSBucket } = require('mongodb');
 
-// Connection URI
 const uri = 'mongodb://localhost:27017/';
 const dbName = 'test';
+const localDirectory = '../glb_models';
 
-// Path where you want to save the GLB file locally
-const localFilePath = '../glb_models';
-
-async function downloadGLBFileFromMongoDB(filename) {
-    // Create a new MongoClient
-    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-
+async function ConnectToDatabase() {
+    const client = new MongoClient(uri);
     try {
-        // Connect to the MongoDB server
         await client.connect();
-
-        // Access the database
-        const db = client.db(dbName);
-
-        // Create a GridFSBucket instance
-        const bucket = new GridFSBucket(db);
-
-        // Find the GLB file in the GridFSBucket by filename
-        const cursor = bucket.find({ filename: filename });
-
-        // Iterate over the cursor
-        await cursor.forEach(async function(file) {
-            // Create a write stream to save the GLB file locally
-            const writeStream = fs.createWriteStream(localFilePath + '/' + file.filename + '.glb');
-
-            // Pipe the file data from MongoDB to the write stream
-            await bucket.openDownloadStreamByName(file.filename).pipe(writeStream);
-
-            console.log(`GLB file "${file.filename}.glb" downloaded successfully to "${localFilePath}"`);
-        });
-    } catch (error) {
-        console.error('Error downloading GLB file:', error);
-    } finally {
-        // Close the MongoDB connection
-        await client.close();
+        console.log('Connected to MongoDB');
+        return client.db(dbName);
+    } catch (err) {
+        console.error('Error connecting to MongoDB', err);
+        throw err;
     }
 }
 
-// Call the function to download the GLB file
-downloadGLBFileFromMongoDB('Assembly Warehouse Table');
+async function ConvertToGLB(inputFilePath, outputFilePath) {
+    const { stdout, stderr } = await exec(`obj2gltf -i ${inputFilePath} -o ${outputFilePath}`);
+    if (stderr) {
+        throw new Error(stderr);
+    }
+    console.log(stdout);
+}
+
+async function DownloadAndConvertFiles() {
+    const db = await ConnectToDatabase();
+    try {
+        console.log('MongoDB connection established');
+
+        const bucket = new GridFSBucket(db);
+        const filesCursor = bucket.find();
+
+        const fileList = await filesCursor.toArray();
+        console.log('File list:', fileList);
+
+        const downloadAndConvertPromises = [];
+        for (const file of fileList) {
+            const fileName = file.filename;
+            const inputFilePath = path.join(localDirectory, fileName);
+            const outputFileName = fileName.replace(/\.[^/.]+$/, ".glb");
+            const outputFilePath = path.join(localDirectory, outputFileName);
+            const downloadPromise = new Promise((resolve, reject) => {
+                const downloadStream = bucket.openDownloadStream(file._id);
+                const fileStream = fs.createWriteStream(inputFilePath);
+                downloadStream.pipe(fileStream);
+                downloadStream.on('error', reject);
+                downloadStream.on('end', () => {
+                    // Check if the file exists and has data before attempting conversion
+                    fs.readFile(inputFilePath, 'utf8', (err, data) => {
+                        if (err) {
+                            console.error(`Error accessing file "${fileName}":`, err);
+                            resolve(); // Resolve promise without attempting conversion
+                        } else {
+                            // Check if the file contains expected geometry data
+                            if (data.includes('"primitives":') && data.includes('"vertices":')) {
+                                ConvertToGLB(`"${inputFilePath}"`, `"${outputFilePath}"`) // Add double quotes around file paths
+                                    .then(resolve)
+                                    .catch(reject);
+                            } else {
+                                console.error(`File "${fileName}" does not contain valid geometry data`);
+                                resolve(); // Resolve promise without attempting conversion
+                            }
+                        }
+                    });
+                });
+            });
+            downloadAndConvertPromises.push(downloadPromise);
+        }
+
+        await Promise.all(downloadAndConvertPromises);
+        console.log('All files downloaded and converted successfully');
+    } catch (err) {
+        console.error('Error downloading and converting files', err);
+    } finally {
+        await db.client.close();
+    }
+}
+
+
+DownloadAndConvertFiles();
