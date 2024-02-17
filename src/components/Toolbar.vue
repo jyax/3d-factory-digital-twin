@@ -1,20 +1,47 @@
 <template>
   <div class="section" id="tools">
-    <img class="section-header-icon" id="tools-icon" src="../../icon/wrench.svg" alt="Wrench" draggable="false">
-    <div class="section-inner" id="tools-inner">
+    <div class="tools-icon">
+      <img class="section-header-icon" id="tools-icon" src="../assets/icon/wrench.svg" alt="Wrench" draggable="false">
+      <span class="tooltip">
+
+        <span class="shortcuts">More Shortcuts</span>
+
+        <span>Select all - <span class="soft">Ctrl + A</span></span>
+        <span>Invert selection - <span class="soft">Ctrl + I</span></span>
+
+      </span>
+    </div>
+    <div class="section-inner tools-inner">
+
+      <div class="tool" @click="mgr.resetCamera()">
+        <img src="../assets/icon/square3d-from-center.svg" alt="Plus" draggable="false">
+        <span class="tooltip">Reset Camera <span class="soft">[Ctrl+R]</span></span>
+      </div>
+
+      <div class="tool" @click="mgr.focusOnSelected()" v-if="selected.length !== 0">
+        <img src="../assets/icon/cube.svg" alt="Plus" draggable="false">
+        <span class="tooltip">Focus on Selection <span class="soft">[F]</span></span>
+      </div>
+
+      <div class="tool-spacing"></div>
 
       <div class="tool" @click="mgr.createNewObject()">
-        <img src="../../icon/plus.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/plus.svg" alt="Plus" draggable="false">
         <span class="tooltip">New Object <span class="soft">[R]</span></span>
       </div>
 
-      <div class="tool" @click="mgr.clearSelection()">
-        <img src="../../icon/xmark.svg" alt="Plus" draggable="false">
+      <div class="tool" @click="mgr.clearSelection()" v-if="selected.length !== 0">
+        <img src="../assets/icon/xmark.svg" alt="Plus" draggable="false">
         <span class="tooltip">Deselect <span class="soft">[Tab]</span></span>
       </div>
 
-      <div class="tool" @click="mgr.deleteSelected()">
-        <img src="../../icon/trash.svg" alt="Plus" draggable="false">
+      <div class="tool" @click="mgr.duplicateSelected()" v-if="selected.length !== 0">
+        <img src="../assets/icon/copy.svg" alt="Plus" draggable="false">
+        <span class="tooltip">Duplicate <span class="soft">[Ctrl+D]</span></span>
+      </div>
+
+      <div class="tool" @click="mgr.deleteSelected()" v-if="selected.length !== 0">
+        <img src="../assets/icon/trash.svg" alt="Plus" draggable="false">
         <span class="tooltip">Delete <span class="soft">[Del]</span></span>
       </div>
 
@@ -49,15 +76,22 @@
   user-select: none;
 }
 
-#tools-inner {
+.tools-inner {
   flex-direction: row;
   margin-top: 0;
   overflow: visible;
+
+  display: flex;
+  align-items: center;
 }
 
-#tools-icon {
-  padding-left: 6px;
-  padding-right: 6px;
+.tools-icon {
+  display: flex;
+  align-items: center;
+
+  position: relative;
+
+  padding: 6px;
 }
 
 .section-header {
@@ -126,7 +160,7 @@
   justify-content: center;
 }
 
-.tool .tooltip {
+.tool .tooltip, .tools-icon .tooltip {
   display: none;
 
   width: auto;
@@ -150,7 +184,16 @@
   z-index: 1;
 }
 
-.tool .tooltip .soft {
+.tools-icon .tooltip {
+  flex-direction: column;
+}
+
+.shortcuts {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.soft {
   color: rgba(255, 255, 255, 0.4);
   font-style: italic;
 }
@@ -159,8 +202,17 @@
   display: inherit;
 }
 
-#canvas {
-  display: block;
+.tools-icon:hover .tooltip {
+  display: flex;
+}
+
+.tool-spacing {
+  margin-left: 12px;
+  margin-right: 4px;
+
+  width: 1px;
+  height: 16px;
+  background-color: rgba(255, 255, 255, 0.5);
 }
 
 </style>
@@ -174,6 +226,16 @@
         type: SceneManager,
         required: true
       }
+    },
+
+    data() {
+      return {
+        selected: []
+      }
+    },
+
+    created() {
+      this.mgr.events.on("select", sel => this.selected = [...sel]);
     }
   }
 </script>

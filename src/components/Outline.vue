@@ -6,12 +6,12 @@
   <div id="outline-parent">
     <div class="section" id="outline">
       <div class="section-header">
-        <img class="section-header-icon" src="../../icon/list.svg" alt="List" draggable="false">
+        <img class="section-header-icon" src="../assets/icon/list.svg" alt="List" draggable="false">
         <h1 class="section-title">{{ title }}</h1>
         <div class="section-header-button">
-          <img class="section-header-icon" src="../../icon/nav-arrow-up.svg" alt="Arrow"
+          <img class="section-header-icon" src="../assets/icon/nav-arrow-up.svg" alt="Arrow"
                draggable="false" v-if="!collapsed" @click="collapsed = true">
-          <img class="section-header-icon" src="../../icon/nav-arrow-down.svg" alt="Arrow"
+          <img class="section-header-icon" src="../assets/icon/nav-arrow-down.svg" alt="Arrow"
                draggable="false" v-else @click="collapsed = false">
         </div>
       </div>

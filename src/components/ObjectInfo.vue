@@ -2,19 +2,25 @@
 
 import ObjectInfoText from "./info/ObjectInfoText.vue";
 import ObjectInfoPosition from "./info/ObjectInfoPosition.vue";
+import ObjectInfoID from "./info/ObjectInfoID.vue";
+import ObjectInfoInput from "./info/ObjectInfoInput.vue";
+import ObjectInfoModel from "./info/ObjectInfoModel.vue";
 </script>
 
 <template>
   <div id="info-parent" v-if="selected.length === 1">
     <div class="section" id="info">
       <div class="section-header">
-        <img class="section-header-icon" src="../../icon/info-circle.svg" alt="Info">
+        <img class="section-header-icon" src="../assets/icon/info-circle.svg" alt="Info">
         <h1 class="section-title">Object Info</h1>
       </div>
       <div class="section-inner">
 
-        <object-info-text name="ID" :value="mgr.getFirstSelected().id"/>
         <object-info-text name="Type" value="Object"/>
+
+        <object-info-i-d :mgr="mgr" label="ID" placeholder="Optional"/>
+
+        <object-info-model :mgr="mgr"/>
 
         <object-info-position :mgr="mgr"/>
 
@@ -122,7 +128,7 @@ export default {
   },
 
   created() {
-    this.mgr.events.on("select", s => this.selected = s);
+    this.mgr.events.on("select", sel => this.selected = sel);
   }
 }
 </script>
