@@ -1,5 +1,6 @@
-import SceneManager from "../scene/scene_manager";
-import SceneObject from "../scene/scene_object";
+import SceneManager from "../scene/scene_manager.js";
+import SceneObject from "../scene/scene_object.js";
+
 
 // MQTT Broker Configurations
 var broker = 'ws://35.9.22.105:8083/mqtt'; // Update with your EMQ X broker WebSocket URL
@@ -22,46 +23,46 @@ const client = mqtt.connect(broker, options);
 // set callback handlers
 // client.onConnectionLost = onConnectionLost;
 // client.onMessageArrived = onMessageArrived;
-
 // connect the client
 client.on('connect', () => onConnect());
 // client.on('message', (topic, message)  => onMessageArrived(message));
 client.on('message', (topic, message) => {
-    console.log('receive message：', topic, message.toString())
+   // console.log('received message：', topic, message.toString())
+    onMessageArrived(message.toString())
+    
   })
   client.on('error', (error) => {
     console.log('Connection failed:', error)
 })
+
+
+
 // called when the client connects
 function onConnect() {
-    console.log("Connected");
+    //console.log("Connected");
     // subscribe to a topic
     //client.subscribe(topic);
     client.subscribe(topic, { qos: 0 }, function (error, granted) {
         if (error) {
           console.log(error)
         } else {
-          console.log(granted)
-          console.log(client)
+          //console.log(granted)
+          //console.log(client)
+          console.log('Connected to:'+ broker)
         }
       })
 }
 
 // called when a message arrives
-function onMessageArrived(message) {
-    console.log("Message Arrived: " + message);
-    parse = message.split(',');
-    id = parse[0];
-    parse.remove(0);
-    floats = parse.split(',').map(item => parseFloat(item.trim()));
-    SceneManager.forEach(SceneObject => {
-        if(SceneObject.id == id){
-            SceneObject.setPos(floats[0],floats[1],floats[2])
+function onMessageArrived(message) {  
+    console.log("Parsing: " + message);
+    let parse = message.split(',');
+    //mgr.getObjectFromID(parse[0]).setPos(Number(parse[1]),Number(parse[2]),Number(parse[3]))
             //SET TEMP
             //SceneObject.setTemp(floats[3]);
         }
-    });
-}
+    
+
 
 // called when the client loses its connection
 function onConnectionLost(responseObject) {
