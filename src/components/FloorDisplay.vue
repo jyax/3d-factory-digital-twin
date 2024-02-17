@@ -4,6 +4,7 @@ import SceneManager from "../scene/scene_manager.js";
 import ObjectInfo from "./ObjectInfo.vue";
 import Toolbar from "./Toolbar.vue";
 
+
   let mgr = new SceneManager();
 
   const canvas = ref("canvas");
