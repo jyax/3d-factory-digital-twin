@@ -6,6 +6,7 @@ import mqtt_handler  from "./event/mqtt_handler"
 <template>
   <FloorDisplay></FloorDisplay>
   <mqtt_handler></mqtt_handler>
+  
 </template>
 
 <style scoped>
