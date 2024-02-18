@@ -10,19 +10,21 @@ def getTime():
     return time.perf_counter() - START_TIME
 
 def calc_val(start_val, end_val, start_time, duration):
-    
-    if(start_time <= getTime()  and  start_time + duration >= getTime()):
+    ##print(getTime())
+    if(start_time <= getTime() and start_time+duration >= getTime()):
         frac = getTime()-start_time
         delta = ((end_val-start_val)*frac)
-        return start_val+delta
-    elif start_time > getTime():
+        return round(start_val+delta,2)
+    elif(start_time > getTime()):
         return start_val
     else:
-        pass
+        return end_val
+
+
 
 def animate():
-    while getTime()<2:
-        print(calc_val(0,1,1,2))
+    while (getTime()<3):
+        print(calc_val(0,1.0,1.0,1))
         time.sleep(CYCLE_TIME)
 
 animate()
