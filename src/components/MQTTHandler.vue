@@ -1,6 +1,10 @@
 <script setup>
+  import {onMounted, inject, ref} from "vue";
   import SceneManager from "../scene/scene_manager.js";
   import SceneObject from "../scene/scene_object.js";
+
+  const mgr = inject('sceneManager')
+
 </script>
 
 <template>
@@ -63,7 +67,7 @@
   function onMessageArrived(message) {
     console.log("Parsing: " + message);
     let parse = message.split(',');
-    //mgr.getObjectFromID(parse[0]).setPos(Number(parse[1]),Number(parse[2]),Number(parse[3]))
+    mgr.getObjectFromID(parse[0]).setPos(Number(parse[1]),Number(parse[2]),Number(parse[3]))
     //SET TEMP
     //SceneObject.setTemp(floats[3]);
   }
@@ -77,17 +81,6 @@
     }
   }
 
-  export default{
-    onConnect:onConnect,
-    onMessageArrived:onMessageArrived,
-    onConnectionLost:onConnectionLost,
-    client:client,
-    broker:broker,
-    options:options
-  }
-
-
-}
 </script>
 <style scoped>
 
