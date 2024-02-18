@@ -20,26 +20,21 @@ def calc_val(start_val, end_val, start_time, duration):
     else:
         return end_val
 
-
-
-
-
-
-
 class Asset:
 
-    def __init__(self,id,x,y,z,temp):
+    def __init__(self,id='FFFFF',x=0,y=0,z=0,temp=25):
        
         ## Unique Asset ID
-        self.id = "FFFFF"
+        self.id = id
 
         #Position data in inches
-        self.x = 0.0
-        self.y = 12.0
-        self.z = 0.0
+        self.x = x
+        self.y = y
+        self.z = z
 
         # Tempurature in celcius
-        self.temp = 25.0
+        self.temp = temp
+
 
     def UpdateSelf(self,id,x,y,z,temp):
         self.id = id
@@ -70,15 +65,15 @@ class Asset:
 
         for i in range(1,len(keys)):
             curr.update({keys[i]:calc_val(vals[i],end[keys[i]],start_time,duration)})
-        
+            # print(calc_val(vals[i],end[keys[i]],start_time,duration))
         self.UpdateSelf(curr['id'], curr['x'],curr['y'],curr['z'],curr['temp'])
-        print(curr)
-
+        
 def animate():
     TestItem = Asset("00001",0,0,0,25.0)
     TestItemFinal = Asset("00001",10,10,10,25.0)
     while (getTime()<3):
         time.sleep(CYCLE_TIME)
         TestItem.animateSelf(TestItemFinal,0,2)
+        print(TestItem.asDict())
 
 animate()
