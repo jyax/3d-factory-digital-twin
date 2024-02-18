@@ -8,7 +8,7 @@ var broker;
 //////TOGGLES TEST MODE//////
 /////////////////////////////
 /***************************/
-/***/var server = true ;/***/
+/***/var server = false;/***/
 /***************************/
 /////////////////////////////
 
@@ -16,7 +16,7 @@ var broker;
 if(server){
   broker  = 'ws://35.9.22.105:8083/mqtt'; // Update w/EMQX WebSocket URL
 }else{
-  broker = 'localhost';
+  broker = 'ws://localhost:8083/mqtt';
 }
 var topic = 'python/mqtt'; //Test topic if changing we need to attach subscribers to objects
 
@@ -28,8 +28,8 @@ const options = {
     clientId: 'emqx_test',
     username: 'root',
     password: 'M0nG0$$w0rd',
-  }
-
+      }
+  
 const client = mqtt.connect(broker, options);
 
 // connect the client
