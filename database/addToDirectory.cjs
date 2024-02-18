@@ -9,7 +9,7 @@ const { MongoClient, GridFSBucket } = require('mongodb');
 
 const uri = 'mongodb://localhost:27017/';
 const dbName = 'test';
-const localDirectory = '../glb_models';
+const localDirectory = '../glb_models_2';
 
 async function ConnectToDatabase() {
     const client = new MongoClient(uri);
@@ -24,11 +24,13 @@ async function ConnectToDatabase() {
 }
 
 async function ConvertToGLB(inputFilePath, outputFilePath) {
-    const { stdout, stderr } = await exec(`obj2gltf -i ${inputFilePath} -o ${outputFilePath}`);
+    const outputFileName = outputFilePath.replace(/\.[^/.]+$/, ".glb"); // Change file extension to .glb
+    const { stdout, stderr } = await exec(`obj2gltf -i ${inputFilePath} -o ${outputFileName}`);
     if (stderr) {
         throw new Error(stderr);
     }
     console.log(stdout);
+    return outputFileName; // Return the new file name with .glb extension
 }
 
 async function DownloadAndConvertFiles() {
@@ -63,7 +65,11 @@ async function DownloadAndConvertFiles() {
                             // Check if the file contains expected geometry data
                             if (data.includes('"primitives":') && data.includes('"vertices":')) {
                                 ConvertToGLB(`"${inputFilePath}"`, `"${outputFilePath}"`) // Add double quotes around file paths
-                                    .then(resolve)
+                                    .then(() => {
+                                        // Rename the file with .glb extension after conversion
+                                        fs.renameSync(inputFilePath, outputFilePath);
+                                        resolve();
+                                    })
                                     .catch(reject);
                             } else {
                                 console.error(`File "${fileName}" does not contain valid geometry data`);
@@ -84,6 +90,5 @@ async function DownloadAndConvertFiles() {
         await db.client.close();
     }
 }
-
 
 DownloadAndConvertFiles();
