@@ -2,7 +2,7 @@ import {
     BoundingBox,
     Camera3D, Color,
     Engine3D, LitMaterial, MeshRenderer,
-    Object3D, OrbitController,
+    Object3D, OrbitController, PointerEvent3D,
     Scene3D, SkyRenderer, SolidColorSky, Vector3, View3D
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
@@ -50,6 +50,7 @@ class SceneManager {
         this.camera = null;
 
         this.objects = new Set();
+        this.revObjects = new Map();
         this._selected = new Set();
 
         this.models = new Map();
@@ -65,11 +66,10 @@ class SceneManager {
 
     /**
      * Initialize the scene manager.
-     * @param canvas Reference to desired HTML canvas
      */
     async init() {
         Engine3D.setting.pick.enable = true;
-        Engine3D.setting.pick.mode = "bound";
+        Engine3D.setting.pick.mode = "pixel";
 
         this.targetObj = null;
         this.matList = [];
@@ -98,7 +98,7 @@ class SceneManager {
 
         camObj.localPosition = new Vector3(0, 0, 4);
 
-        cam.perspective(60, canvas.width / canvas.height, 0.1, 5000);
+        cam.perspective(60, c.width / c.height, 0.1, 5000);
 
         this.scene.addChild(camObj);
 
@@ -188,6 +188,21 @@ class SceneManager {
         });
 
         Engine3D.startRenderView(this.view);
+
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_CLICK, e => {
+            const object = this.revObjects.get(e.target);
+            object.click();
+        }, this);
+
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, e => {
+            const object = this.revObjects.get(e.target);
+            object.mouseOver();
+        }, this);
+
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_OUT, e => {
+            const object = this.revObjects.get(e.target);
+            object.mouseOff();
+        }, this);
     }
 
 
@@ -337,6 +352,7 @@ class SceneManager {
         this.objects.add(object);
 
         this.scene.addChild(object.getObject3D());
+        this.revObjects.set(object.getObject3D(), object);
 
         this.events.do("add", object);
     }
@@ -350,6 +366,7 @@ class SceneManager {
      */
     removeObject(object) {
         this.objects.delete(object);
+        this.revObjects.delete(object.getObject3D());
 
         if (this._selected.has(object))
             this.deselect(object);
