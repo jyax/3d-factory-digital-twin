@@ -10,7 +10,7 @@ const dbName = 'test';
 const modelPath = '../glb_models';
 
 async function ConnectToDatabase() {
-    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    const client = new MongoClient(uri);
     try {
         await client.connect();
         console.log('Connected to MongoDB');
