@@ -7,10 +7,10 @@
   
 
   let mgr = new SceneManager();
+
+  //really jank way to pass instance to the mqtt_handler.js script
   window.manager = mgr;
   
-
-
   const canvas = ref("canvas");
 
   onMounted(() => {
