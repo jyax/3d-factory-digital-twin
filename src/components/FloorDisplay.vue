@@ -1,11 +1,15 @@
 <script setup>
-import {onMounted, ref} from "vue";
+  import {onMounted, ref} from "vue";
   import SceneManager from "../scene/scene_manager.js";
   import ObjectInfo from "./ObjectInfo.vue";
   import Toolbar from "./Toolbar.vue";
   import Alert from "./Alert.vue";
+  
 
   let mgr = new SceneManager();
+  window.manager = mgr;
+  
+
 
   const canvas = ref("canvas");
 
@@ -32,7 +36,7 @@ import {onMounted, ref} from "vue";
 
 <script>
   import Outline from "./Outline.vue";
-
+  
   export default {
     components: {
       Outline
