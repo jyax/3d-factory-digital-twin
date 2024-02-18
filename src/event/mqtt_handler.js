@@ -1,7 +1,7 @@
 import SceneManager from "../scene/scene_manager.js";
 import SceneObject from "../scene/scene_object.js";
-
-
+// import { mgrRef } from "../components/FloorDisplay.vue"
+// console.log(mgrRef)
 // MQTT Broker Configurations
 var broker = 'ws://35.9.22.105:8083/mqtt'; // Update with your EMQ X broker WebSocket URL
 var topic = 'python/mqtt'; // Update with your MQTT topic
@@ -57,7 +57,10 @@ function onConnect() {
 function onMessageArrived(message) {  
     console.log("Parsing: " + message);
     let parse = message.split(',');
-    //mgr.getObjectFromID(parse[0]).setPos(Number(parse[1]),Number(parse[2]),Number(parse[3]))
+    let obj = window.manager.getObjectById(parse[0].toString());
+    if(obj != null){
+      obj.setX(parse[1]);
+    }
             //SET TEMP
             //SceneObject.setTemp(floats[3]);
         }

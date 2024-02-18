@@ -199,9 +199,10 @@ class SceneManager {
      * @returns {SceneObject|null} Object with specified ID, or null if it doesn't exist.
      */
     getObjectById(id) {
-        if (!this.ids.has(id))
+        if (!this.ids.has(id)){
+            console.log('not an object');
             return null;
-
+        }
         return this.ids.get(id);
     }
 
