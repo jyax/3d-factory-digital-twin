@@ -74,6 +74,8 @@ class SceneManager {
         this.ObjectToMove = undefined;
 
         this.canMove = false;
+
+        this._dragMult = 100;
     }
 
     /**
@@ -667,8 +669,10 @@ class SceneManager {
             console.log("Scene click down");
             this.lastTime = Date.now();
             this.canMove = true;
-            this.lastX = e.mouseX;
-            this.lastY = e.mouseY;
+            const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, 0);
+            this.lastX = pos.x;
+            this.lastY = pos.y;
+            this.lastZ = pos.z;
         }
     }
 
@@ -684,15 +688,16 @@ class SceneManager {
             const now = Date.now();
             if (now - this.lastTime > this.moveInterval) {
                 this.lastTime = now;
-                this.cam.worldToScreenPoint(this._cameraController.target, Vector3.HELP_0);
-                const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, -50);
-                console.log("Enter loop");
-                // console.log("Position: ", pos.x, ", ", pos.y, ", ", pos.z);
-                this.ObjectToMove.setX(pos.x);
-                this.ObjectToMove.setY(pox.y);
-                this.ObjectToMove.setZ(pos.z);
-                this.lastX = e.mouseX;
-                this.lastY = e.mouseY;
+                const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, 0);
+                // delta = pos - Vector3(this.lastX, this.lastY, this.lastZ);
+                console.log("Position: ", e.mouseX, ", ", e.mouseY);
+                console.log("Position: ", pos.x, ", ", pos.y, ", ", pos.z);
+                this.ObjectToMove.setX(this.ObjectToMove.getObject3D().x + (pos.x - this.lastX) * this._dragMult);
+                this.ObjectToMove.setY(this.ObjectToMove.getObject3D().y + (pos.y - this.lastY) * this._dragMult);
+                this.ObjectToMove.setZ(this.ObjectToMove.getObject3D().z + (pos.z - this.lastZ) * this._dragMult);
+                this.lastX = pos.x;
+                this.lastY = pos.y;
+                this.lastZ = pos.z;
             }
         }
     }
