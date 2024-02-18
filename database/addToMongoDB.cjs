@@ -23,7 +23,10 @@ async function ConnectToDatabase() {
 
 async function UploadFile(db, filePath, fileName) {
     const bucket = new GridFSBucket(db);
-    const contentType = 'model/gltf-binary'; // GLB file content type
+
+    const metadata = {
+        contentType: 'model/gltf-binary' // GLB file content type
+    };
 
     const fileStream = fs.createReadStream(filePath);
 
@@ -34,7 +37,7 @@ async function UploadFile(db, filePath, fileName) {
         return;
     }
 
-    const uploadStream = bucket.openUploadStream(fileName, { contentType });
+    const uploadStream = bucket.openUploadStream(fileName, { metadata });
 
     return new Promise((resolve, reject) => {
         fileStream.pipe(uploadStream);
@@ -49,6 +52,9 @@ async function UploadFile(db, filePath, fileName) {
     });
 }
 
+const { gltfToGlb } = require('gltf-pipeline');
+const { readFileSync } = require('fs');
+
 async function UploadGLBFiles() {
     const db = await ConnectToDatabase();
     try {
@@ -58,7 +64,19 @@ async function UploadGLBFiles() {
         for (const glbFile of glbFiles) {
             const filePath = path.join(modelPath, glbFile);
             const fileName = path.basename(glbFile, path.extname(glbFile));
-            await UploadFile(db, filePath, fileName);
+
+            // Read the GLB file
+            const glbBuffer = readFileSync(filePath);
+
+            try {
+                // Attempt to parse the GLB file
+                await gltfToGlb(glbBuffer);
+
+                // If parsing is successful, upload the file
+                await UploadFile(db, filePath, fileName);
+            } catch (error) {
+                console.error(`File "${fileName}" is not a valid GLB file. Skipping upload.`, error);
+            }
         }
     } catch (err) {
         console.error('Error uploading files', err);
