@@ -121,7 +121,7 @@ class SceneManager {
 
         this.view = new View3D();
         this.view.scene = this.scene;
-        this.view.camera = cam;
+        this.view.camera = this.cam;
         //
         // HARDCODING THE SCENE
         //
