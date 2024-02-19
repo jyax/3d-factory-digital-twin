@@ -52,6 +52,7 @@ class SceneManager {
         this.camera = null;
 
         this.objects = new Set();
+        this.revObjects = new Map();
         this._selected = new Set();
 
         this.models = new Map();
@@ -63,15 +64,28 @@ class SceneManager {
         this._events = new EventHandler();
 
         this._ctrlPressed = false;
+        
+        this.moveInterval = 30;     
+        
+        this.depth = 0;
+        
+        this.lastX = -1;
+        
+        this.lastY = -1;
+
+        this.ObjectToMove = undefined;
+
+        this.canMove = false;
+
+        this._dragMult = 100;
     }
 
     /**
      * Initialize the scene manager.
-     * @param canvas Reference to desired HTML canvas
      */
     async init() {
         Engine3D.setting.pick.enable = true;
-        Engine3D.setting.pick.mode = "bound";
+        Engine3D.setting.pick.mode = "pixel";
 
         this.targetObj = null;
         this.matList = [];
@@ -90,7 +104,7 @@ class SceneManager {
         this.scene.envMap = new SolidColorSky(this._skyColor);
 
         let camObj = new Object3D();
-        let cam = camObj.addComponent(Camera3D);
+        this.cam = camObj.addComponent(Camera3D);
         this.camera = camObj;
 
         this._cameraController = this.camera.addComponent(FlyCameraController);
@@ -101,7 +115,7 @@ class SceneManager {
         this._cameraController.moveSpeed = 20;
         camObj.localPosition = new Vector3(0, 0, 4);
 
-        cam.perspective(60, canvas.width / canvas.height, 0.1, 5000);
+        this.cam.perspective(60, c.width / c.height, 0.1, 5000);
 
         this.scene.addChild(camObj);
 
@@ -544,6 +558,35 @@ class SceneManager {
         });
 
         Engine3D.startRenderView(this.view);
+
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_CLICK, e => {
+            const object = this.revObjects.get(e.target);
+            object.click();
+        }, this);
+
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, e => {
+            const object = this.revObjects.get(e.target);
+            object.mouseOver();
+        }, this);
+
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_OUT, e => {
+            const object = this.revObjects.get(e.target);
+            object.mouseOff();
+        }, this);
+            
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_DOWN, e => {
+            const object = this.revObjects.get(e.target);
+            object.mouseDown();
+        }, this);
+
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_UP, e => {
+            const object = this.revObjects.get(e.target);
+            object.mouseUp();
+        }, this);
+
+        Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_DOWN, this._onMouseDown, this, null, 999);
+        Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_MOVE, this._onMouseMove, this);
+        Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_UP, this._onMouseUp, this);
     }
 
 
@@ -600,7 +643,6 @@ class SceneManager {
         this.sky = this.scene.addComponent(SkyRenderer);
         this.sky.map = colorSky;
     }
-
 
     // Input
 
@@ -693,6 +735,7 @@ class SceneManager {
         this.objects.add(object);
 
         this.scene.addChild(object.getObject3D());
+        this.revObjects.set(object.getObject3D(), object);
 
         this.events.do("add", object);
 
@@ -710,6 +753,7 @@ class SceneManager {
      */
     removeObject(object) {
         this.objects.delete(object);
+        this.revObjects.delete(object.getObject3D());
 
         if (this._selected.has(object))
             this.deselect(object);
