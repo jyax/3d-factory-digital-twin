@@ -1,12 +1,16 @@
 <script setup>
-import {onMounted, ref} from "vue";
+  import {onMounted, ref} from "vue";
   import SceneManager from "../scene/scene_manager.js";
   import ObjectInfo from "./ObjectInfo.vue";
   import Toolbar from "./Toolbar.vue";
   import Alert from "./Alert.vue";
+  
 
   let mgr = new SceneManager();
 
+  //really jank way to pass instance to the mqtt_handler.js script
+  window.manager = mgr;
+  
   const canvas = ref("canvas");
 
   onMounted(() => {
@@ -32,7 +36,7 @@ import {onMounted, ref} from "vue";
 
 <script>
   import Outline from "./Outline.vue";
-
+  
   export default {
     components: {
       Outline

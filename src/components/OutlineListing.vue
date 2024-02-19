@@ -1,5 +1,6 @@
 <template>
-  <div class="listing" @click="this.object.select()" :class="dynamicStyle">
+  <div class="listing" @click="this.object.select()" :class="dynamicStyle" @mouseover="this.object.mouseOver()"
+       @mouseout="this.object.mouseOff()">
     <p class="listing-name anonymous" v-if="name === ''">Object</p>
     <p class="listing-name" v-if="name !== ''">{{name}}</p>
     <div class="listing-buttons">
