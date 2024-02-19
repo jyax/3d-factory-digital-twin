@@ -1,12 +1,22 @@
 import {
     BoundingBox,
-    Camera3D, Color,
-    Engine3D, LitMaterial, MeshRenderer,
-    Object3D, OrbitController, PointerEvent3D,
-    Scene3D, SkyRenderer, SolidColorSky, Vector3, View3D
+    Camera3D,
+    Color,
+    Engine3D,
+    LitMaterial,
+    MeshRenderer,
+    Object3D,
+    OrbitController,
+    PointerEvent3D,
+    Scene3D,
+    SkyRenderer,
+    SolidColorSky,
+    Vector3,
+    View3D
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
+import Util from "../util/Util.js";
 
 /**
  * @module SceneManager
@@ -19,15 +29,15 @@ import EventHandler from "../event/event_handler.js";
  */
 class SceneManager {
     static MODELS = {
-        "dragon": "https://cdn.orillusion.com/PBR/DragonAttenuation/DragonAttenuation.gltf",
-        "table": "/glb_models/Assembly Warehouse Table.glb",
-        "cart": "/glb_models/trolley cart for warehouse.glb",
-        "rack": "/glb_models/JM_Rack_A.glb",
-        "wall": "/glb_models/Slatwall_Bin_5.5in.glb",
-        "floor": "/glb_models/factory_floor_sample_1.glb",
-        "workstation1": "/glb_models/workstation.glb",
-        "workstation1_whole": "/glb_models/workstation_whole.glb",
-        "workstation2": "/glb_models/Station 10x Layout v31.glb",
+        //"dragon": "https://cdn.orillusion.com/PBR/DragonAttenuation/DragonAttenuation.gltf",
+        //"table": "/glb_models/Assembly Warehouse Table.glb",
+        //"cart": "/glb_models/trolley cart for warehouse.glb",
+        //"rack": "/glb_models/JM_Rack_A.glb",
+        //"wall": "/glb_models/Slatwall_Bin_5.5in.glb",
+        //"floor": "/glb_models/factory_floor_sample_1.glb",
+        //"workstation1": "/glb_models/workstation.glb",
+        //"workstation1_whole": "/glb_models/workstation_whole.glb",
+        //"workstation2": "/glb_models/Station 10x Layout v31.glb",
 
         // Hidden models for editor use only
 
@@ -92,8 +102,8 @@ class SceneManager {
         this.camera = camObj;
 
         this._cameraController = this.camera.addComponent(OrbitController);
-        this._cameraController.smooth = false;
-        this._cameraController.panFactor = 0.025;
+        this._cameraController.smooth = 0;
+        this._cameraController.panFactor = 0.01;
         this._cameraController.wheelStep = 0.01;
 
         camObj.localPosition = new Vector3(0, 0, 4);
@@ -106,10 +116,27 @@ class SceneManager {
         this.view.scene = this.scene;
         this.view.camera = cam;
 
+        const promises = [];
+        const total = Object.keys(SceneManager.MODELS).length;
+        let i = 0;
+
         for (const id of Object.keys(SceneManager.MODELS)) {
-            const model = await Engine3D.res.loadGltf(SceneManager.MODELS[id]);
-            this.models.set(id, model);
+            const model = Engine3D.res.loadGltf(SceneManager.MODELS[id]);
+            promises.push(model);
+
+            model.then(object => {
+                this.models.set(id, object)
+
+                i++;
+
+                let progress = 0;
+                if (total !== 0)
+                    progress = i / total;
+                this.events.do("load_models", progress);
+            });
         }
+
+        await Promise.all(promises);
 
         this.createNewObject(new Vector3(), false);
 
@@ -282,7 +309,14 @@ class SceneManager {
      * Reset the camera position and target the center (0, 0, 0) of the scene.
      */
     resetCamera() {
-        this._cameraController.target = new Vector3(0, 0, 0);
+        const bounds = this._getAllBounds();
+        const pos = bounds.min.add(bounds.max).div(2);
+        this._cameraController.target = pos;
+
+        const mag = Util.getBoundingBoxScale(bounds);
+        const dir = this.camera.transform.localPosition.subtract(pos).normalize();
+
+        this.camera.localPosition = pos.add(dir.mul(mag));
     }
 
 
@@ -331,7 +365,7 @@ class SceneManager {
      */
     createNewObject(pos = null, select = true) {
         if (pos === null)
-            pos = this.getCameraForward().mul(8).add(this.camera.localPosition);
+            pos = this.getCameraForward().mul(8).add(this.camera.transform.worldPosition);
 
         const object = new SceneObject({
             manager: this,
@@ -340,8 +374,10 @@ class SceneManager {
 
         this.addObject(object);
 
-        if (select)
+        if (select) {
             object.select();
+            this.focusOnSelected();
+        }
     }
 
     /**
@@ -512,7 +548,14 @@ class SceneManager {
         if (this.selectedCount === 0)
             return;
 
-        this._cameraController.target = this._getSelectedBounds().center.clone();
+        const bounds = this._getSelectedBounds();
+        const pos = bounds.min.add(bounds.max).div(2);
+        this._cameraController.target = pos;
+
+        const mag = Util.getBoundingBoxScale(bounds) * 2;
+        const dir = this.camera.transform.localPosition.subtract(pos).normalize();
+
+        this.camera.localPosition = pos.add(dir.mul(mag));
     }
 
     /**
@@ -546,6 +589,27 @@ class SceneManager {
         let bb = null;
 
         for (const object of this._selected.values()) {
+            if (bb === null)
+                bb = object.getBoundingBox();
+            else
+                bb.merge(object.getBoundingBox());
+        }
+
+        if (bb === null)
+            return new BoundingBox();
+
+        return bb;
+    }
+
+    /**
+     * Get the bounding box containing all the bounding boxes of all objects in the scene.
+     * @returns {BoundingBox} Total bounding box
+     * @private
+     */
+    _getAllBounds() {
+        let bb = null;
+
+        for (const object of this.objects.values()) {
             if (bb === null)
                 bb = object.getBoundingBox();
             else

@@ -7,7 +7,6 @@ import {
     LitMaterial,
     MeshRenderer,
     Object3D,
-    PointerEvent3D,
     Vector3
 } from "@orillusion/core";
 import EventHandler from "../event/event_handler.js";
@@ -43,13 +42,15 @@ class SceneObject {
      * @param {string} id Global ID (optional)
      * @param {string} name Name of object (optional)
      * @param {string} modelID ID of model/mesh to use (optional)
+     * @param {boolean} locked Whether user edits of the objects should be prevented
      */
     constructor({
         manager,
         pos = new Vector3(),
         id = "",
         name = "",
-        model: modelID = ""
+        model: modelID = "",
+        locked = false
     } = {}) {
         this._manager = manager;
 
@@ -58,6 +59,8 @@ class SceneObject {
             this.mgr.ids.set(this._id, this);
 
         this.name = name;
+
+        this._locked = locked;
 
         this.modelID = modelID;
 
@@ -133,6 +136,23 @@ class SceneObject {
     }
 
     /**
+     * Check if the object is blocking user edits.
+     * @returns {boolean} Whether object is blocking user edits
+     */
+    get locked() {
+        return this._locked;
+    }
+
+    /**
+     * Toggle the locked status of the object.
+     */
+    toggleLock() {
+        this._locked = !this._locked;
+
+        this.events.do("lock", this._locked);
+    }
+
+    /**
      * Get the Orillusion Object3D.
      * @returns {Object3D} Orillusion Object3D
      */
@@ -157,6 +177,7 @@ class SceneObject {
         this.forAll(obj => {
             if (obj.hasComponent(MeshRenderer)) {
                 const bounds = obj.getComponent(MeshRenderer).geometry.bounds.clone();
+
                 if (bb === null)
                     bb = bounds;
                 else
@@ -189,6 +210,16 @@ class SceneObject {
 
         if (val !== "")
             this.mgr.ids.set(this._id, this);
+    }
+
+    /**
+     * Set the locked status of the object.
+     * @param val Whether object should block user edits
+     */
+    set locked(val) {
+        this._locked = val;
+
+        this.events.do("lock", val);
     }
 
     /**
@@ -265,6 +296,17 @@ class SceneObject {
             this.mgr.updateSelectBox();
 
         this.modelID = id;
+    }
+
+    /**
+     * Set the color for every part of the object.
+     * @param {Color} color New solid color
+     */
+    setSolidColor(color) {
+        this.forAll(obj => {
+            if (obj.hasComponent(MeshRenderer))
+                obj.getComponent(MeshRenderer).material.baseColor = color;
+        });
     }
 
 
@@ -358,7 +400,7 @@ class SceneObject {
         const bb = this.getBoundingBox();
 
         this._hoverPreview = String(Math.floor(Math.random() * 4096));
-        this.mgr.view.graphic3D.drawBox(this._hoverPreview, bb.min, bb.max, new Color(0.7, 0.7, 0.7));
+        this.mgr.view.graphic3D.drawBoundingBox(this._hoverPreview, bb, new Color(0.7, 0.7, 0.7));
     }
 
     /**

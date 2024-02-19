@@ -4,14 +4,15 @@ import {onMounted, ref} from "vue";
   import ObjectInfo from "./ObjectInfo.vue";
   import Toolbar from "./Toolbar.vue";
   import Alert from "./Alert.vue";
+import LoadBar from "./LoadBar.vue";
 
   let mgr = new SceneManager();
+  window.manager = mgr;
 
   const canvas = ref("canvas");
 
   onMounted(() => {
     mgr.init();
-
   });
 </script>
 
@@ -23,6 +24,8 @@ import {onMounted, ref} from "vue";
   <toolbar :mgr="mgr"/>
   <outline :mgr="mgr"/>
   <alert :mgr="mgr"/>
+
+  <load-bar :mgr="mgr"/>
 
 </template>
 
