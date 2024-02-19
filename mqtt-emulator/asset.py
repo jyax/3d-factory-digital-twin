@@ -93,4 +93,4 @@ def animate():
         TestItem3.animateSelf(TestItemFinal3,0,10)
         Publisher.publish(client,TestItem3.toMsg())
 
-animate()
+# animate()
