@@ -25,7 +25,8 @@ async function UploadFile(db, filePath, fileName) {
     const bucket = new GridFSBucket(db);
 
     const metadata = {
-        contentType: 'model/gltf-binary' // GLB file content type
+        contentType: 'model/gltf-binary', // GLB file content type
+        filename: `${fileName}.glb` // Append the .glb extension to the file name
     };
 
     const fileStream = fs.createReadStream(filePath);
@@ -37,7 +38,7 @@ async function UploadFile(db, filePath, fileName) {
         return;
     }
 
-    const uploadStream = bucket.openUploadStream(fileName, { metadata });
+    const uploadStream = bucket.openUploadStream(`${fileName}.glb`, { metadata }); // Use the updated file name
 
     return new Promise((resolve, reject) => {
         fileStream.pipe(uploadStream);
@@ -52,9 +53,6 @@ async function UploadFile(db, filePath, fileName) {
     });
 }
 
-const { gltfToGlb } = require('gltf-pipeline');
-const { readFileSync } = require('fs');
-
 async function UploadGLBFiles() {
     const db = await ConnectToDatabase();
     try {
@@ -65,13 +63,13 @@ async function UploadGLBFiles() {
             const filePath = path.join(modelPath, glbFile);
             const fileName = path.basename(glbFile, path.extname(glbFile));
 
-            // Read the GLB file
-            const glbBuffer = readFileSync(filePath);
+            // Check if the file extension is .glb
+            if (path.extname(glbFile).toLowerCase() !== '.glb') {
+                console.error(`File "${fileName}" does not have a .glb extension. Skipping upload.`);
+                continue;
+            }
 
             try {
-                // Attempt to parse the GLB file
-                await gltfToGlb(glbBuffer);
-
                 // If parsing is successful, upload the file
                 await UploadFile(db, filePath, fileName);
             } catch (error) {
