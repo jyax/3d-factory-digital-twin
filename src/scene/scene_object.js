@@ -4,10 +4,12 @@ import {
     BoxGeometry,
     ColliderComponent,
     Color,
+    Engine3D,
     LitMaterial,
     MeshRenderer,
     Object3D,
     PointerEvent3D,
+    Scene3D,
     Vector3
 } from "@orillusion/core";
 import EventHandler from "../event/event_handler.js";
@@ -53,12 +55,15 @@ class SceneObject {
         this._object = new Object3D();
 
         if (modelID === "") {
-            mesh = this._object.addComponent(MeshRenderer);
-            mesh.geometry = new BoxGeometry();
-            mesh.material = new LitMaterial();
-            mesh.material.baseColor = new Color(0.2, 0.5, 1);
-            mesh.material.roughness = 1;
-            mesh.material.metallic = 0;
+            //let data = Engine3D.res.loadGltf('./src/assets/glb_models/downloadsGLB/desk_lathe.glb');
+            //this._object.addChild(data);
+            //mesh = this._object.addComponent(MeshRenderer);
+            // mesh.geometry = new BoxGeometry();
+            // mesh.material = new LitMaterial();
+            // mesh.material.baseColor = new Color(0.2, 0.5, 1);
+            // mesh.material.roughness = 1;
+            // mesh.material.metallic = 0;
+            
         } else {
             this._object.addChild(this.mgr.models.get(modelID).clone());
         }
@@ -73,6 +78,7 @@ class SceneObject {
             obj.addEventListener(PointerEvent3D.PICK_MOVE, this._mouseOver, this);
             obj.addEventListener(PointerEvent3D.PICK_OUT, this._mouseOff, this);
             obj.addEventListener(PointerEvent3D.PICK_CLICK, this._click, this);
+            
         });
 
         this._events = new EventHandler();
@@ -293,6 +299,7 @@ class SceneObject {
      * Select this actor.
      */
     select() {
+        console.log('onClick');
         this.mgr.select(this);
     }
 
