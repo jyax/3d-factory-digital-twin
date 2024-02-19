@@ -1,7 +1,7 @@
 import {
     BoundingBox,
     Camera3D, Color,
-    Engine3D, LitMaterial, MeshRenderer,
+    Engine3D, HoverCameraController, LitMaterial, MeshRenderer,
     Object3D, OrbitController, PointerEvent3D,
     Scene3D, SkyRenderer, SolidColorSky, Vector3, View3D
 } from "@orillusion/core";
@@ -62,6 +62,20 @@ class SceneManager {
         this._events = new EventHandler();
 
         this._ctrlPressed = false;
+        
+        this.moveInterval = 30;     
+        
+        this.depth = 0;
+        
+        this.lastX = -1;
+        
+        this.lastY = -1;
+
+        this.ObjectToMove = undefined;
+
+        this.canMove = false;
+
+        this._dragMult = 100;
     }
 
     /**
@@ -88,8 +102,16 @@ class SceneManager {
         this.scene.envMap = new SolidColorSky(this._skyColor);
 
         let camObj = new Object3D();
-        let cam = camObj.addComponent(Camera3D);
+        this.cam = camObj.addComponent(Camera3D);
         this.camera = camObj;
+        
+        // Create camera
+        // this.camera = CameraUtil.createCamera3DObject(this.scene);
+
+        // this._cameraController = this.camera.object3D.addComponent(OrbitController);
+        // this._cameraController.smooth = false;
+        // this._cameraController.panFactor = 0.025;
+        // this._cameraController.wheelStep = 0.01;
 
         this._cameraController = this.camera.addComponent(OrbitController);
         this._cameraController.smooth = false;
@@ -98,13 +120,13 @@ class SceneManager {
 
         camObj.localPosition = new Vector3(0, 0, 4);
 
-        cam.perspective(60, c.width / c.height, 0.1, 5000);
+        this.cam.perspective(60, c.width / c.height, 0.1, 5000);
 
         this.scene.addChild(camObj);
 
         this.view = new View3D();
         this.view.scene = this.scene;
-        this.view.camera = cam;
+        this.view.camera = this.cam;
 
         for (const id of Object.keys(SceneManager.MODELS)) {
             const model = await Engine3D.res.loadGltf(SceneManager.MODELS[id]);
@@ -203,6 +225,20 @@ class SceneManager {
             const object = this.revObjects.get(e.target);
             object.mouseOff();
         }, this);
+            
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_DOWN, e => {
+            const object = this.revObjects.get(e.target);
+            object.mouseDown();
+        }, this);
+
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_UP, e => {
+            const object = this.revObjects.get(e.target);
+            object.mouseUp();
+        }, this);
+
+        Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_DOWN, this._onMouseDown, this, null, 999);
+        Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_MOVE, this._onMouseMove, this);
+        Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_UP, this._onMouseUp, this);
     }
 
 
@@ -214,10 +250,9 @@ class SceneManager {
      * @returns {SceneObject|null} Object with specified ID, or null if it doesn't exist.
      */
     getObjectById(id) {
-        if (!this.ids.has(id)){
-            console.log('not an object');
+        if (!this.ids.has(id))
             return null;
-        }
+
         return this.ids.get(id);
     }
 
@@ -260,7 +295,6 @@ class SceneManager {
         this.sky = this.scene.addComponent(SkyRenderer);
         this.sky.map = colorSky;
     }
-
 
     // Input
 
@@ -628,6 +662,50 @@ class SceneManager {
             colorMat1.baseColor = Color.COLOR_RED;
             mr.material = this.mat1;
         }
+    }
+
+    _onMouseDown(e) {
+        if (e.mouseCode === 2) {
+            console.log("Scene click down");
+            this.lastTime = Date.now();
+            this.canMove = true;
+            const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, 0);
+            this.lastX = pos.x;
+            this.lastY = pos.y;
+            this.lastZ = pos.z;
+        }
+    }
+
+    _onMouseMove(e){
+        // If right mouse is being clicked on a moveable object then continue else return
+        if (this.canMove && this.ObjectToMove != undefined){
+            // console.log("Dragging", this.ObjectToMove.getObject3D().x, ", ", this.ObjectToMove.getObject3D().y, ", ", this.ObjectToMove.getObject3D().z);
+            // console.log(this.lastX, this.lastY);
+            // Stop camera movement with mouse
+            e.stopImmediatePropagation();
+
+            // Update the position of the selected object to the mouse position
+            const now = Date.now();
+            if (now - this.lastTime > this.moveInterval) {
+                this.lastTime = now;
+                const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, 0);
+                // delta = pos - Vector3(this.lastX, this.lastY, this.lastZ);
+                console.log("Position: ", e.mouseX, ", ", e.mouseY);
+                console.log("Position: ", pos.x, ", ", pos.y, ", ", pos.z);
+                this.ObjectToMove.setX(this.ObjectToMove.getObject3D().x + (pos.x - this.lastX) * this._dragMult);
+                this.ObjectToMove.setY(this.ObjectToMove.getObject3D().y + (pos.y - this.lastY) * this._dragMult);
+                this.ObjectToMove.setZ(this.ObjectToMove.getObject3D().z + (pos.z - this.lastZ) * this._dragMult);
+                this.lastX = pos.x;
+                this.lastY = pos.y;
+                this.lastZ = pos.z;
+            }
+        }
+    }
+
+    _onMouseUp(e){
+        console.log("Up");
+        this.ObjectToMove = undefined;
+        this.canMove = false;
     }
 }
 

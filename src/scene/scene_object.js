@@ -346,6 +346,7 @@ class SceneObject {
      * @param e Event
      */
     mouseOver(e) {
+        console.log("Object over");
         document.body.style.cursor = "pointer";
 
         if (this.isSelected())
@@ -374,12 +375,31 @@ class SceneObject {
     }
 
     /**
+     * Handle when the mouse is no longer hovering over the object.
+     * @param e Event
+     */
+    mouseUp(e) {
+        // console.log("Up");
+        // this.mgr.ObjectToMove = undefined;
+        // this.mgr.canMove = false;
+    }
+
+    /**
+     * Handle when the mouse is no longer hovering over the object.
+     * @param e Event
+     */
+    mouseDown(e) {
+        console.log("Down");
+        this.mgr.ObjectToMove = this;
+    }
+
+    /**
      * Handle when the mouse clicks on the object.
      * @param e Event
      */
     click(e) {
         this.select();
-
+        console.log("undrag");
         if (this._hoverPreview !== "")
             this.mgr.view.graphic3D.Clear(this._hoverPreview);
         this._hoverPreview = "";
