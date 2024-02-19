@@ -1,16 +1,16 @@
 
 import random
-import time
-import TEST_GUI
-
+import TEST_GUI as GUI
+from asset import animate
 from paho.mqtt import client as mqtt_client
 
-###TOGGLE TEST MODE###
-######################
-serverless  =  True###
-######################
+###TOGGLE TEST MODES###
+#######################
+SERVERLESS  =   True###
+ANIMATE     =  False###
+#######################
 
-if not serverless:
+if not SERVERLESS:
     broker = '35.9.22.105'
 else:
     broker = 'localhost'
@@ -51,7 +51,10 @@ def publish(client, msg):
 def run():
     client = connect_mqtt()
     client.loop_start()
-    TEST_GUI.main(client)
+    if not ANIMATE: 
+        GUI.main(client)
+    else:
+        animate(client)
     client.loop_stop()
 
 
