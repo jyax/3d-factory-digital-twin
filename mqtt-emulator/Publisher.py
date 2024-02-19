@@ -1,7 +1,8 @@
 
 import random
 import time
-import TEST_GUI 
+#import TEST_GUI
+
 from paho.mqtt import client as mqtt_client
 
 ###TOGGLE TEST MODE###
@@ -50,7 +51,7 @@ def publish(client, msg):
 def run():
     client = connect_mqtt()
     client.loop_start()
-    TEST_GUI.main(client)
+    # TEST_GUI.main(client)
     client.loop_stop()
 
 

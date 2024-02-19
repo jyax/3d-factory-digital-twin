@@ -1,8 +1,9 @@
 
 import time
+import Publisher
 
 #constants
-CYCLE_TIME = 0.25 # in seconds
+CYCLE_TIME = 0.05 # in seconds
 START_TIME = time.perf_counter()
 
 
@@ -13,7 +14,7 @@ def calc_val(start_val, end_val, start_time, duration):
     ##print(getTime())
     if(start_time <= getTime() and start_time+duration >= getTime()):
         frac = getTime()-start_time
-        delta = ((end_val-start_val)*frac)
+        delta = ((end_val-start_val)*frac)/duration
         return round(start_val+delta,2)
     elif(start_time > getTime()):
         return start_val
@@ -69,11 +70,27 @@ class Asset:
         self.UpdateSelf(curr['id'], curr['x'],curr['y'],curr['z'],curr['temp'])
         
 def animate():
+
+    client = Publisher.connect_mqtt()
+
     TestItem = Asset("00001",0,0,0,25.0)
-    TestItemFinal = Asset("00001",10,10,10,25.0)
-    while (getTime()<3):
+    TestItemFinal = Asset("00001",0,3,0,25.0)
+    TestItem2 = Asset("00002",0,0,0,25.0)
+    TestItemFinal2 = Asset("00002",3,0,0,25.0)
+    TestItem3 = Asset("00003",0,0,0,25.0)
+    TestItemFinal3 = Asset("00003",0,0,3,25.0)
+    
+
+    while (getTime()<10):
         time.sleep(CYCLE_TIME)
-        TestItem.animateSelf(TestItemFinal,0,2)
-        print(TestItem.asDict())
+        # print(TestItem.asDict())
+        TestItem.animateSelf(TestItemFinal,0,10)
+        Publisher.publish(client,TestItem.toMsg())
+        
+        TestItem2.animateSelf(TestItemFinal2,0,10)
+        Publisher.publish(client,TestItem2.toMsg())
+
+        TestItem3.animateSelf(TestItemFinal3,0,10)
+        Publisher.publish(client,TestItem3.toMsg())
 
 animate()
