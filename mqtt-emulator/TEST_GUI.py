@@ -1,5 +1,5 @@
 import tkinter as tk
-import Publisher
+from Publisher import publish
 from asset import Asset
 
 # Initialize data
@@ -23,7 +23,7 @@ def main(client):
             AssetID.UpdateSelf(*unpacked)
             print(index)
 
-            Publisher.publish(client, AssetID.toMsg())
+            publish(client, AssetID.toMsg())
 
     # Create the main window
     root = tk.Tk()
