@@ -1,9 +1,10 @@
 import tkinter as tk
-from Publisher import publish
+import Publisher
 from asset import Asset
 
 # Initialize data
 # TODO change from global to item specific and create topic subscribers
+
 
 TestItem1 = Asset("0",0,12.0,0,25.0)
 TestItem2 = Asset("1",0,12.0,0,25.0)
@@ -22,7 +23,7 @@ def main(client):
             AssetID.UpdateSelf(*unpacked)
             print(index)
 
-            publish(client, AssetID.toMsg())
+            Publisher.publish(client, AssetID.toMsg())
 
     # Create the main window
     root = tk.Tk()
