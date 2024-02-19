@@ -9,6 +9,11 @@ const uri = 'mongodb://localhost:27017/';
 const dbName = 'test';
 const modelPath = '../glb_models';
 
+/**
+ * connect to mongodb
+ * @returns {Promise<Db>}
+ * @constructor
+ */
 async function ConnectToDatabase() {
     const client = new MongoClient(uri);
     try {
@@ -21,6 +26,14 @@ async function ConnectToDatabase() {
     }
 }
 
+/**
+ * upload a file
+ * @param db database to add to
+ * @param filePath file path to add to
+ * @param fileName file name to add
+ * @returns {Promise<unknown>}
+ * @constructor
+ */
 async function UploadFile(db, filePath, fileName) {
     const bucket = new GridFSBucket(db);
 
@@ -53,6 +66,11 @@ async function UploadFile(db, filePath, fileName) {
     });
 }
 
+/**
+ * filter only glb files and upload
+ * @returns {Promise<void>}
+ * @constructor
+ */
 async function UploadGLBFiles() {
     const db = await ConnectToDatabase();
     try {

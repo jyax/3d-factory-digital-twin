@@ -11,6 +11,11 @@ const uri = 'mongodb://localhost:27017/';
 const dbName = 'test';
 const localDirectory = '../glb_models_2';
 
+/**
+ * connect to mongodb
+ * @returns {Promise<Db>}
+ * @constructor
+ */
 async function ConnectToDatabase() {
     const client = new MongoClient(uri);
     try {
@@ -23,17 +28,12 @@ async function ConnectToDatabase() {
     }
 }
 
-async function ConvertToGLB(inputFilePath, outputFilePath) {
-    const outputFileName = outputFilePath.replace(/\.[^/.]+$/, ".glb"); // Change file extension to .glb
-    const { stdout, stderr } = await exec(`obj2gltf -i ${inputFilePath} -o ${outputFileName}`);
-    if (stderr) {
-        throw new Error(stderr);
-    }
-    console.log(stdout);
-    return outputFileName; // Return the new file name with .glb extension
-}
-
-async function DownloadAndConvertFiles() {
+/**
+ * download files to local computer
+ * @returns {Promise<void>}
+ * @constructor
+ */
+async function DownloadFiles() {
     const db = await ConnectToDatabase();
     try {
         console.log('MongoDB connection established');
@@ -47,37 +47,14 @@ async function DownloadAndConvertFiles() {
         const downloadAndConvertPromises = [];
         for (const file of fileList) {
             const fileName = file.filename;
-            const inputFilePath = path.join(localDirectory, fileName);
-            const outputFileName = fileName.replace(/\.[^/.]+$/, ".glb");
-            const outputFilePath = path.join(localDirectory, outputFileName);
+            const outputFilePath = path.join(localDirectory, fileName);
+
             const downloadPromise = new Promise((resolve, reject) => {
                 const downloadStream = bucket.openDownloadStream(file._id);
-                const fileStream = fs.createWriteStream(inputFilePath);
+                const fileStream = fs.createWriteStream(outputFilePath);
                 downloadStream.pipe(fileStream);
                 downloadStream.on('error', reject);
-                downloadStream.on('end', () => {
-                    // Check if the file exists and has data before attempting conversion
-                    fs.readFile(inputFilePath, 'utf8', (err, data) => {
-                        if (err) {
-                            console.error(`Error accessing file "${fileName}":`, err);
-                            resolve(); // Resolve promise without attempting conversion
-                        } else {
-                            // Check if the file contains expected geometry data
-                            if (data.includes('"primitives":') && data.includes('"vertices":')) {
-                                ConvertToGLB(`"${inputFilePath}"`, `"${outputFilePath}"`) // Add double quotes around file paths
-                                    .then(() => {
-                                        // Rename the file with .glb extension after conversion
-                                        fs.renameSync(inputFilePath, outputFilePath);
-                                        resolve();
-                                    })
-                                    .catch(reject);
-                            } else {
-                                console.error(`File "${fileName}" does not contain valid geometry data`);
-                                resolve(); // Resolve promise without attempting conversion
-                            }
-                        }
-                    });
-                });
+                downloadStream.on('end', resolve);
             });
             downloadAndConvertPromises.push(downloadPromise);
         }
@@ -91,4 +68,4 @@ async function DownloadAndConvertFiles() {
     }
 }
 
-DownloadAndConvertFiles();
+DownloadFiles();
