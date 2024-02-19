@@ -4,7 +4,6 @@ from asset import Asset
 
 # Initialize data
 # TODO change from global to item specific and create topic subscribers
-data = [0.0] *4
 
 TestItem1 = Asset("0",0,12.0,0,25.0)
 TestItem2 = Asset("1",0,12.0,0,25.0)
