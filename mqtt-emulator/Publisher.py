@@ -7,7 +7,7 @@ from paho.mqtt import client as mqtt_client
 
 ###TOGGLE TEST MODE###
 ######################
-serverless  =  True###
+serverless  =  False###
 ######################
 
 if not serverless:
