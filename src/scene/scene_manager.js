@@ -17,6 +17,7 @@ import {
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
 import Util from "../util/Util.js";
+import MQTTHandler from "../event/mqtt_handler_new.js";
 
 /**
  * @module SceneManager
@@ -72,6 +73,10 @@ class SceneManager {
         this._events = new EventHandler();
 
         this._ctrlPressed = false;
+
+        this._mqttHandler = new MQTTHandler({
+            mgr: this
+        });
     }
 
     /**
