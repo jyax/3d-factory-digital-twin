@@ -1,10 +1,11 @@
 import tkinter as tk
-from Publisher import publish
+import json
+import Publisher
 from asset import Asset
 
 # Initialize data
 # TODO change from global to item specific and create topic subscribers
-data = [0.0] *4
+
 
 TestItem1 = Asset("0",0,12.0,0,25.0)
 TestItem2 = Asset("1",0,12.0,0,25.0)
@@ -22,8 +23,8 @@ def main(client):
             unpacked[col] = entries[index].get()
             AssetID.UpdateSelf(*unpacked)
             print(index)
-
-            publish(client, AssetID.toMsg())
+            json_obj = json.dumps(AssetID.asDict())
+            Publisher.publish(client, json_obj)
 
     # Create the main window
     root = tk.Tk()

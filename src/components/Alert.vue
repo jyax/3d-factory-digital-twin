@@ -12,6 +12,9 @@
       <div class="alert-main">
 
         <h3>Issue Detected at the following:</h3>
+
+        <object-info-text name="ID" :value="objectID" style="margin: 0 128px 0 128px"/>
+
         <h3 class="desc" >{{ description }}</h3>
 
         <button @click="visible=false">Ok</button>
@@ -27,8 +30,6 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  height: 25%;
-  width: 25%;
   max-width: 40%;
   max-height: 50%;
 }
@@ -90,12 +91,15 @@ button:hover {
 
 <script>
 import SceneManager from "../scene/scene_manager.js";
+import ObjectInfoText from "./info/ObjectInfoText.vue";
 
 export default {
+  components: {ObjectInfoText},
   data() {
     return {
       visible: false,
-      description: ""
+      description: "",
+      objectID: ""
     }
   },
 
@@ -110,8 +114,10 @@ export default {
   },
 
   created() {
-    this.mgr.events.on("alert", s => {
-      this.description = s;
+    this.mgr.events.on("alert", (desc, id) => {
+      this.description = desc;
+      this.objectID = id;
+
       this.visible = true;
     });
 

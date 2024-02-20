@@ -1,11 +1,10 @@
 <template>
 
   <div class="model-parent">
-    <p class="label">Model</p>
+    <p class="label">Data Type</p>
 
     <select class="dropdown" v-model="current" @change="doChange()">
-      <option value="">Default</option>
-      <option v-for="id of options" :value="id">{{id}}</option>
+      <option v-for="id of options" :value="id.toLowerCase()">{{id}}</option>
     </select>
   </div>
 
@@ -65,44 +64,26 @@ export default {
     mgr: {
       type: SceneManager,
       required: true
+    },
+    onChange: {
+      default: val => {}
     }
   },
 
   data() {
     return {
-      options: Array.from(this.mgr.models.keys()).filter(id => id[0] !== '.'),
-      current: this.mgr.getFirstSelected().modelID,
-
-      listener: null
+      options: ["Single Value", "Position", "Rotation"],
+      current: "single value"
     }
   },
 
   methods: {
     doChange() {
       this.mgr.getFirstSelected().setModel(this.current);
+      this.onChange(this.current);
     },
 
-    update() {
-      const s = this.mgr.getFirstSelected();
-
-      if (s === null) {
-        this.current = "";
-        return;
-      }
-
-      this.current = s.modelID;
-    }
-  },
-
-  created() {
-    this.listener = this.mgr.events.on("select", sel => this.update());
-
-    this.update();
-  },
-
-  destroyed() {
-    if (this.listener !== null)
-      this.mgr.events.remove(this.listener);
+    update() {}
   }
 }
 
