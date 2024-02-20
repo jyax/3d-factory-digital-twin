@@ -70,14 +70,12 @@ class SceneObject {
         this._hoverPreview = "";
 
         if (modelID === "") {
-            //let data = Engine3D.res.loadGltf('./src/assets/glb_models/downloadsGLB/desk_lathe.glb');
-            //this._object.addChild(data);
-            //mesh = this._object.addComponent(MeshRenderer);
-            // mesh.geometry = new BoxGeometry();
-            // mesh.material = new LitMaterial();
-            // mesh.material.baseColor = new Color(0.2, 0.5, 1);
-            // mesh.material.roughness = 1;
-            // mesh.material.metallic = 0;
+            mesh = this._object.addComponent(MeshRenderer);
+            mesh.geometry = new BoxGeometry();
+            mesh.material = new LitMaterial();
+            mesh.material.baseColor = new Color(0.2, 0.5, 1);
+            mesh.material.roughness = 1;
+            mesh.material.metallic = 0;
             
         } else {
             this._object.addChild(this.mgr.models.get(modelID).clone());
@@ -96,6 +94,8 @@ class SceneObject {
         });
 
         this._events = new EventHandler();
+
+        this.liveUpdateOn = true;
     }
 
 
@@ -310,7 +310,7 @@ class SceneObject {
      * Select this actor.
      */
     select() {
-        console.log('onClick');
+        // console.log('onClick');
         this.mgr.select(this);
     }
 
@@ -352,7 +352,7 @@ class SceneObject {
      * @param e Event
      */
     mouseOver(e) {
-        console.log("Object over");
+        console.log("Object over", this);
         document.body.style.cursor = "pointer";
 
         if (this.isSelected())
@@ -384,18 +384,8 @@ class SceneObject {
      * Handle when the mouse is no longer hovering over the object.
      * @param e Event
      */
-    mouseUp(e) {
-        // console.log("Up");
-        // this.mgr.ObjectToMove = undefined;
-        // this.mgr.canMove = false;
-    }
-
-    /**
-     * Handle when the mouse is no longer hovering over the object.
-     * @param e Event
-     */
     mouseDown(e) {
-        console.log("Down");
+        // console.log("Down");
         this.mgr.ObjectToMove = this;
     }
 
@@ -405,7 +395,7 @@ class SceneObject {
      */
     click(e) {
         this.select();
-        console.log("undrag");
+        // console.log("undrag");
         if (this._hoverPreview !== "")
             this.mgr.view.graphic3D.Clear(this._hoverPreview);
         this._hoverPreview = "";
