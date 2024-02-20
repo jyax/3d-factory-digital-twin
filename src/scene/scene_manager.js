@@ -1,15 +1,23 @@
 import {
     BoundingBox,
-    BoxColliderShape,
-    Camera3D, ColliderComponent, Color,
-    ComponentBase,
-    Engine3D, FlyCameraController, KeyEvent, LitMaterial, MeshRenderer,
-    Object3D, OrbitController,
+    Camera3D,
+    Color,
+    Engine3D,
+    LitMaterial,
+    MeshRenderer,
+    Object3D,
+    OrbitController,
     PointerEvent3D,
-    Scene3D, SkyRenderer, SolidColorSky, Vector3, View3D, PlaneGeometry
+    Scene3D,
+    SkyRenderer,
+    SolidColorSky,
+    Vector3,
+    View3D
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
+import Util from "../util/Util.js";
+import MQTTHandler from "../event/mqtt_handler.js";
 
 /**
  * @module SceneManager
@@ -49,6 +57,7 @@ class SceneManager {
         this.sky = null;
         this.scene = null;
         this.view = null;
+
         this.camera = null;
 
         this.objects = new Set();
@@ -80,6 +89,11 @@ class SceneManager {
         this._dragMult = 200;
 
         this.count = 0;
+
+        this._mqttHandler = new MQTTHandler({
+            mgr: this,
+            server: true
+        });
     }
 
     /**
@@ -92,38 +106,65 @@ class SceneManager {
         this.targetObj = null;
         this.matList = [];
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
         await Engine3D.init();
 
         const c  = Engine3D.inputSystem.canvas;
         c.remove();
         document.querySelector("body").prepend(c);
 
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
+
         this.scene = new Scene3D();
 
         this.scene.envMap = new SolidColorSky(this._skyColor);
 
         let camObj = new Object3D();
-        this.cam = camObj.addComponent(Camera3D);
+        let cam = camObj.addComponent(Camera3D);
         this.camera = camObj;
 
         this._cameraController = this.camera.addComponent(OrbitController);
-        this._cameraController.smooth = false;
-        this._cameraController.panFactor = 0.025;
+        this._cameraController.smooth = 0;
+        this._cameraController.panFactor = 0.01;
         this._cameraController.wheelStep = 0.01;
 
         camObj.localPosition = new Vector3(0, 0, 4);
 
-        this.cam.perspective(60, c.width / c.height, 0.1, 5000);
-        this.cam.perspective(60, c.width / c.height, 0.1, 5000);
+        this.cam.perspective(60, c.width / c.height, 0.1, 5000);\
 
         this.scene.addChild(camObj);
 
 
         this.view = new View3D();
         this.view.scene = this.scene;
+        this.view.camera = cam;
+
+        const promises = [];
+        const total = Object.keys(SceneManager.MODELS).length;
+        let i = 0;
+
+        for (const id of Object.keys(SceneManager.MODELS)) {
+            const model = Engine3D.res.loadGltf(SceneManager.MODELS[id]);
+            promises.push(model);
+
+            model.then(object => {
+                this.models.set(id, object)
+
+                i++;
+
+                let progress = 0;
+                if (total !== 0)
+                    progress = i / total;
+                this.events.do("load_models", progress);
+            });
+        }
+
+        await Promise.all(promises);
+
+        this.createNewObject({
+            pos: new Vector3(),
+            select: false
+        });
         this.view.camera = this.cam;
         //
         // HARDCODING THE SCENE
@@ -645,6 +686,7 @@ class SceneManager {
         this.sky.map = colorSky;
     }
 
+
     // Input
 
     /**
@@ -666,11 +708,18 @@ class SceneManager {
      * Reset the camera position and target the center (0, 0, 0) of the scene.
      */
     resetCamera() {
-        this._cameraController.target = new Vector3(0, 0, 0);
+        const bounds = this._getAllBounds();
+        const pos = bounds.min.add(bounds.max).div(2);
+        this._cameraController.target = pos;
+
+        const mag = Util.getBoundingBoxScale(bounds);
+        const dir = this.camera.transform.localPosition.subtract(pos).normalize();
+
+        this.camera.localPosition = pos.add(dir.mul(mag));
     }
 
 
-    // User Interface
+    // User Interfaces
 
     /**
      * Signal an alert to the event listener.
@@ -712,15 +761,21 @@ class SceneManager {
      * Create a new basic object and add it to the scene.
      * @param {Vector3} pos Initial position of object (optional)
      * @param {boolean} select Whether to select object after adding
+     * @param {string} model ID/name of mesh to use
      */
-    createNewObject(pos = null, select = true) {
+    createNewObject({
+        pos = null,
+        select = true,
+        model = ""
+    } = {}) {
         if (pos === null)
-            pos = this.getCameraForward().mul(8).add(this.camera.localPosition);
+            pos = this.getCameraForward().mul(8).add(this.camera.transform.worldPosition);
 
         const object = new SceneObject({
             manager: this,
             pos: pos,
-            id: this.count.toString()
+            id: this.count.toString(),
+            model: model
         });
 
         object.getObject3D().name = this.count.toString();
@@ -729,8 +784,10 @@ class SceneManager {
 
         this.addObject(object);
 
-        if (select)
+        if (select) {
             object.select();
+            this.focusOnSelected();
+        }
     }
 
     /**
@@ -744,10 +801,6 @@ class SceneManager {
         this.revObjects.set(object.getObject3D(), object);
 
         this.events.do("add", object);
-
-        // let collider = object.addComponent(ColliderComponent);
-        // collider.shape = new BoxColliderShape().setFromCenterAndSize(new Vector3(0, 0, 0), new Vector3(15, 15, 15));
-        //this.view.pickFire.addEventListener(PointerEvent3D.PICK_CLICK, onPick, this);
     }
 
 
@@ -841,6 +894,9 @@ class SceneManager {
      * @returns {SceneObject} First selected object
      */
     getFirstSelected() {
+        if (this.selectedCount === 0)
+            return null;
+
         return Array.from(this._selected.values())[0];
     }
 
@@ -905,7 +961,14 @@ class SceneManager {
         if (this.selectedCount === 0)
             return;
 
-        this._cameraController.target = this._getSelectedBounds().center.clone();
+        const bounds = this._getSelectedBounds();
+        const pos = bounds.min.add(bounds.max).div(2);
+        this._cameraController.target = pos;
+
+        const mag = Util.getBoundingBoxScale(bounds) * 2;
+        const dir = this.camera.transform.localPosition.subtract(pos).normalize();
+
+        this.camera.localPosition = pos.add(dir.mul(mag));
     }
 
     /**
@@ -951,14 +1014,26 @@ class SceneManager {
         return bb;
     }
 
-
-    // Objects - Interaction (OLD, do not remove yet)
-
     /**
-     * (OLD) Handles when the mouse hovers over an object.
-     * @param e Event
+     * Get the bounding box containing all the bounding boxes of all objects in the scene.
+     * @returns {BoundingBox} Total bounding box
      * @private
      */
+    _getAllBounds() {
+        let bb = null;
+
+        for (const object of this.objects.values()) {
+            if (bb === null)
+                bb = object.getBoundingBox();
+            else
+                bb.merge(object.getBoundingBox());
+        }
+
+        if (bb === null)
+            return new BoundingBox();
+
+        return bb;
+    }    
     _onOver(e) {
         console.log('onOver: Name-', this.revObjects);
         // console.log('onOver: Parent-', e.target.parent.object3D.name, e.data.pickInfo);
@@ -1106,6 +1181,5 @@ class keyboardScript extends ComponentBase
         if(this.right) trans.rotationY += 5;
     }
 }
-
 
 export default SceneManager;

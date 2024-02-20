@@ -4,18 +4,15 @@
   import ObjectInfo from "./ObjectInfo.vue";
   import Toolbar from "./Toolbar.vue";
   import Alert from "./Alert.vue";
-  
+  import LoadBar from "./LoadBar.vue";
 
   let mgr = new SceneManager();
-
-  //really jank way to pass instance to the mqtt_handler.js script
   window.manager = mgr;
   
   const canvas = ref("canvas");
 
   onMounted(() => {
     mgr.init();
-
   });
 </script>
 
@@ -27,6 +24,8 @@
   <toolbar :mgr="mgr"/>
   <outline :mgr="mgr"/>
   <alert :mgr="mgr"/>
+
+  <load-bar :mgr="mgr"/>
 
 </template>
 
