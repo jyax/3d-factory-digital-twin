@@ -130,7 +130,7 @@ class SceneManager {
 
         camObj.localPosition = new Vector3(0, 0, 4);
 
-        this.cam.perspective(60, c.width / c.height, 0.1, 5000);\
+        this.cam.perspective(60, c.width / c.height, 0.1, 5000);
 
         this.scene.addChild(camObj);
 
