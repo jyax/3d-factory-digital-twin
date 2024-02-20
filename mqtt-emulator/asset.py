@@ -84,12 +84,12 @@ def animate(client):
         time.sleep(CYCLE_TIME)
         # print(TestItem.asDict())
         TestItem.animateSelf(TestItemFinal,0,10)
-        pub.publish(client,TestItem.toMsg())
+        pub.publish(client,TestItem.asDict())
         
         TestItem2.animateSelf(TestItemFinal2,0,10)
-        pub.publish(client,TestItem2.toMsg())
+        pub.publish(client,TestItem2.asDict())
 
         TestItem3.animateSelf(TestItemFinal3,0,10)
-        pub.publish(client,TestItem3.toMsg())
+        pub.publish(client,TestItem3.asDict())
 
 

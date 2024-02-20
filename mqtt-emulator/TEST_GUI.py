@@ -1,4 +1,5 @@
 import tkinter as tk
+import json
 import Publisher
 from asset import Asset
 
@@ -22,8 +23,8 @@ def main(client):
             unpacked[col] = entries[index].get()
             AssetID.UpdateSelf(*unpacked)
             print(index)
-
-            Publisher.publish(client, AssetID.toMsg())
+            json_obj = json.dumps(AssetID.asDict())
+            Publisher.publish(client, json_obj)
 
     # Create the main window
     root = tk.Tk()
