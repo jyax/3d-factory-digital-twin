@@ -144,7 +144,10 @@ class SceneManager {
 
         await Promise.all(promises);
 
-        this.createNewObject(new Vector3(), false);
+        this.createNewObject({
+            pos: new Vector3(),
+            select: false
+        });
 
         document.addEventListener("keydown", (event) => {
             switch (event.key) {
@@ -326,7 +329,7 @@ class SceneManager {
     }
 
 
-    // User Interface
+    // User Interfaces
 
     /**
      * Signal an alert to the event listener.
@@ -368,14 +371,20 @@ class SceneManager {
      * Create a new basic object and add it to the scene.
      * @param {Vector3} pos Initial position of object (optional)
      * @param {boolean} select Whether to select object after adding
+     * @param {string} model ID/name of mesh to use
      */
-    createNewObject(pos = null, select = true) {
+    createNewObject({
+        pos = null,
+        select = true,
+        model = ""
+    } = {}) {
         if (pos === null)
             pos = this.getCameraForward().mul(8).add(this.camera.transform.worldPosition);
 
         const object = new SceneObject({
             manager: this,
-            pos: pos
+            pos: pos,
+            model: model
         });
 
         this.addObject(object);
