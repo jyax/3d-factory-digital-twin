@@ -85,7 +85,7 @@ export default {
     update() {
       const s = this.mgr.getFirstSelected();
 
-      if (s === undefined) {
+      if (s === null) {
         this.current = "";
         return;
       }
