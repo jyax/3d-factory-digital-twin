@@ -48,11 +48,11 @@ import ObjectInfoRotation from "./info/ObjectInfoRotation.vue";
         <p class="hint">Objects will not receive live data unless they have an ID.</p>
 
         <object-info-dropdown label="Data type" :options="data_type_options" :default="data_type"
-                              :on-change="val => data_type = val"/>
+                              :on-change="onDataTypeChange"/>
         <object-info-input :mgr="mgr" v-show="data_type === 'single value'" label="Default value" placeholder="0"
                            :on-change="value => this.default = value"/>
 
-        <div class="single-input">
+        <div class="single-input" v-if="data_type === 'single value'">
           <div class="single-input-left">
             <div class="color-input">
               <p>Min</p>
@@ -308,8 +308,8 @@ export default {
       selected: [],
       tab: "general",
 
-      data_type_options: ["Single value", "Position", "Rotation"],
-      data_type: "single value",
+      data_type_options: ["None", "Single value", "Position"],
+      data_type: "none",
 
       min: 0,
       max: 100,
@@ -342,6 +342,39 @@ export default {
       obj.getObject3D().transform.localScale = new Vector3(scale, scale, scale);
     },
 
+    onDataTypeChange(val) {
+      this.data_type = val;
+
+      switch (val) {
+        case "none": {
+          this.mgr.getFirstSelected().liveData = {
+            type: "none"
+          };
+
+          break;
+        }
+
+        case "single value": {
+          this.mgr.getFirstSelected().liveData = {
+            type: "single value",
+            gradient: this.gradient,
+            min: this.min,
+            max: this.max
+          };
+
+          break;
+        }
+
+        case "position": {
+          this.mgr.getFirstSelected().liveData = {
+            type: "position"
+          };
+
+          break;
+        }
+      }
+    },
+
     makeGradient() {
       const c1 = new Color();
       c1.setHex(this.color_1);
@@ -353,32 +386,31 @@ export default {
       this.gradient.set(0, c1);
       this.gradient.set(1, c2);
 
-      const min = parseFloat(this.min);
-      const max = parseFloat(this.max);
-      let val = 0;
-      if (this.default !== "")
-        val = parseFloat(this.default);
-
-      const d = (val - min) / (max - min);
-
-      let color;
-      if (val <= min)
-        color = c1;
-      else if (val >= max)
-        color = c2;
-      else
-        color = this.gradient.get(d);
-
-      const object = this.mgr.getFirstSelected();
-      if (object !== null)
-        object.setSolidColor(color);
+      this.mgr.getFirstSelected().liveData = {
+        type: "single value",
+        gradient: this.gradient,
+        min: this.min,
+        max: this.max
+      };
 
       return "background-image: linear-gradient(to bottom, " + this.color_1 + ", " + this.color_2 + ");"
+    },
+
+    update(sel) {
+      this.selected = sel;
+
+      const obj = this.mgr.getFirstSelected();
+      if (obj === null)
+        return;
+
+      this.data_type = obj.liveData.type;
     }
   },
 
   created() {
-    this.listener = this.mgr.events.on("select", sel => this.selected = sel);
+    this.listener = this.mgr.events.on("select", sel => this.update(sel));
+
+    this.update(this.mgr.getSelected());
   },
 
   destroyed() {

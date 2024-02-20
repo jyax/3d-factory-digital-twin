@@ -17,7 +17,7 @@ import {
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
 import Util from "../util/Util.js";
-import MQTTHandler from "../event/mqtt_handler_new.js";
+import MQTTHandler from "../event/mqtt_handler.js";
 
 /**
  * @module SceneManager
@@ -30,15 +30,15 @@ import MQTTHandler from "../event/mqtt_handler_new.js";
  */
 class SceneManager {
     static MODELS = {
-        //"dragon": "https://cdn.orillusion.com/PBR/DragonAttenuation/DragonAttenuation.gltf",
-        //"table": "/glb_models/Assembly Warehouse Table.glb",
-        //"cart": "/glb_models/trolley cart for warehouse.glb",
-        //"rack": "/glb_models/JM_Rack_A.glb",
-        //"wall": "/glb_models/Slatwall_Bin_5.5in.glb",
-        //"floor": "/glb_models/factory_floor_sample_1.glb",
-        //"workstation1": "/glb_models/workstation.glb",
-        //"workstation1_whole": "/glb_models/workstation_whole.glb",
-        //"workstation2": "/glb_models/Station 10x Layout v31.glb",
+        "dragon": "https://cdn.orillusion.com/PBR/DragonAttenuation/DragonAttenuation.gltf",
+        "table": "/glb_models/Assembly Warehouse Table.glb",
+        "cart": "/glb_models/trolley cart for warehouse.glb",
+        "rack": "/glb_models/JM_Rack_A.glb",
+        "wall": "/glb_models/Slatwall_Bin_5.5in.glb",
+        "floor": "/glb_models/factory_floor_sample_1.glb",
+        "workstation1": "/glb_models/workstation.glb",
+        "workstation1_whole": "/glb_models/workstation_whole.glb",
+        "workstation2": "/glb_models/Station 10x Layout v31.glb",
 
         // Hidden models for editor use only
 
@@ -75,7 +75,8 @@ class SceneManager {
         this._ctrlPressed = false;
 
         this._mqttHandler = new MQTTHandler({
-            mgr: this
+            mgr: this,
+            server: true
         });
     }
 
@@ -489,6 +490,9 @@ class SceneManager {
      * @returns {SceneObject} First selected object
      */
     getFirstSelected() {
+        if (this.selectedCount === 0)
+            return null;
+
         return Array.from(this._selected.values())[0];
     }
 
@@ -625,77 +629,6 @@ class SceneManager {
             return new BoundingBox();
 
         return bb;
-    }
-
-
-    // Objects - Interaction (OLD, do not remove yet)
-
-    /**
-     * (OLD) Handles when the mouse hovers over an object.
-     * @param e Event
-     * @private
-     */
-    _onOver(e) {
-        console.log('onOver: Name-', e.target.name, e.data.pickInfo);
-        // console.log('onOver: Parent-', e.target.parent.object3D.name, e.data.pickInfo);
-        let node = e.target;
-        while(node.parent.parent != null)
-        {
-            // console.log('parent', node.name);
-            node = node.parent.object3D;
-            // console.log('parent', node.name);
-        }
-        this.targetObj = node;
-        // console.log("target object", this.targetObj.name);
-        if(this.targetObj.numChildren > 0){
-            this.targetObj.forChild((n) => {
-                if (n.hasComponent(MeshRenderer)) {
-                    let mr = n.getComponent(MeshRenderer);
-                    this.mat1 = mr.material;
-                    this.matList.push(mr.material);
-                    let colorMat = new LitMaterial();
-                    colorMat.baseColor = new Color(5, 5, 5, 0.5);
-                    mr.material = colorMat;
-                }
-            });
-        }
-        else{
-            let mr = this.targetObj.getComponent(MeshRenderer);
-            this.mat1 = mr.material;
-            let colorMat = new LitMaterial();
-            colorMat.baseColor = new Color(5, 5, 5, 0.5);
-            mr.material = colorMat;
-        }
-    }
-
-    /**
-     * (OLD) Handles when the mouse is no longer hovering over an object.
-     * @param e Event
-     * @private
-     */
-    _onOut(e) {
-        console.log('onOut', e.target.name, e.data.pickInfo);
-        if(this.targetObj.numChildren > 0){
-            let i  = this.matList.length - 1;
-            this.targetObj.forChild((n) => {
-                if (n.hasComponent(MeshRenderer)) {
-                    console.log("node", n.name);
-                    let mr = n.getComponent(MeshRenderer);
-                    let colorMat1 = new LitMaterial();
-                    colorMat1.baseColor = Color.COLOR_BLUE;
-                    // mr.material = this.mat1;
-                    mr.material = this.matList[i];
-                    i = i - 1;
-                }
-            });
-        }
-        else{
-            let obj = e.target;
-            let mr = obj.getComponent(MeshRenderer);
-            let colorMat1 = new LitMaterial();
-            colorMat1.baseColor = Color.COLOR_RED;
-            mr.material = this.mat1;
-        }
     }
 }
 
