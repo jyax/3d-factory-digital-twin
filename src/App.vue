@@ -3,7 +3,7 @@ import FloorDisplay from './components/FloorDisplay.vue'
 </script>
 
 <template>
-  <FloorDisplay></FloorDisplay>]
+  <FloorDisplay></FloorDisplay>
   
 </template>
 
