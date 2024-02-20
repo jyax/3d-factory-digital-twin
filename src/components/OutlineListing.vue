@@ -8,7 +8,9 @@
            v-if="!locked">
       <img class="listing-button" src="../assets/icon/lock.svg" alt="Lock" @click.stop="object.toggleLock()"
            v-if="locked">
+      <!--
       <img class="listing-button" src="../assets/icon/trash.svg" alt="Delete" @click.stop="doDelete()">
+      -->
     </div>
   </div>
 </template>

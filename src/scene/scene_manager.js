@@ -90,14 +90,14 @@ class SceneManager {
         this.targetObj = null;
         this.matList = [];
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
         await Engine3D.init();
 
         const c  = Engine3D.inputSystem.canvas;
         c.remove();
         document.querySelector("body").prepend(c);
+
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
 
         this.scene = new Scene3D();
 

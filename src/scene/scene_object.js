@@ -283,7 +283,7 @@ class SceneObject {
             return;
 
         const copy = this.mgr.models.get(id).clone();
-        this._object.transform.cloneTo(copy);
+        //this._object.transform.cloneTo(copy);
         this.mgr.revObjects.delete(this._object);
         this._object.destroy();
         this._object = copy;
