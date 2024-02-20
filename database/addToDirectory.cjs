@@ -10,6 +10,10 @@ const { MongoClient, GridFSBucket } = require('mongodb');
 const uri = 'mongodb://localhost:27017/';
 const dbName = 'test';
 const localDirectory = '../glb_models_2';
+const remoteHost = '35.9.22.105';
+const remotePort = 22;
+const remoteUsername = 'magna_user';
+const remoteDirectory = '../shared_files'; // Update with desired remote directory
 
 /**
  * connect to mongodb
@@ -29,11 +33,11 @@ async function ConnectToDatabase() {
 }
 
 /**
- * download files to local computer
+ * download files to local computer and transfer to remote server
  * @returns {Promise<void>}
  * @constructor
  */
-async function DownloadFiles() {
+async function DownloadAndTransferFiles() {
     const db = await ConnectToDatabase();
     try {
         console.log('MongoDB connection established');
@@ -44,28 +48,35 @@ async function DownloadFiles() {
         const fileList = await filesCursor.toArray();
         console.log('File list:', fileList);
 
-        const downloadAndConvertPromises = [];
+        const downloadAndTransferPromises = [];
         for (const file of fileList) {
             const fileName = file.filename;
             const outputFilePath = path.join(localDirectory, fileName);
 
-            const downloadPromise = new Promise((resolve, reject) => {
-                const downloadStream = bucket.openDownloadStream(file._id);
-                const fileStream = fs.createWriteStream(outputFilePath);
-                downloadStream.pipe(fileStream);
-                downloadStream.on('error', reject);
-                downloadStream.on('end', resolve);
+            // Wrap the entire file path in double quotes
+            const command = `scp -P ${remotePort} "${outputFilePath}" ${remoteUsername}@${remoteHost}:${remoteDirectory}/`;
+
+            const transferPromise = new Promise((resolve, reject) => {
+                exec(command)
+                    .then(() => {
+                        console.log(`File "${fileName}" transferred successfully`);
+                        resolve();
+                    })
+                    .catch((err) => {
+                        console.error(`Error transferring file "${fileName}"`, err);
+                        reject(err);
+                    });
             });
-            downloadAndConvertPromises.push(downloadPromise);
+            downloadAndTransferPromises.push(transferPromise);
         }
 
-        await Promise.all(downloadAndConvertPromises);
-        console.log('All files downloaded and converted successfully');
+        await Promise.all(downloadAndTransferPromises);
+        console.log('All files downloaded and transferred successfully');
     } catch (err) {
-        console.error('Error downloading and converting files', err);
+        console.error('Error downloading and transferring files', err);
     } finally {
         await db.client.close();
     }
 }
 
-DownloadFiles();
+DownloadAndTransferFiles();
