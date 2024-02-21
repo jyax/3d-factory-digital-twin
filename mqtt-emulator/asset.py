@@ -1,7 +1,7 @@
 
 import time
 import Publisher as pub
-
+import json
 #constants
 CYCLE_TIME = 0.05 # in seconds
 START_TIME = time.perf_counter()
@@ -72,24 +72,24 @@ class Asset:
 def animate(client):
 
 
-    TestItem = Asset("00001",0,0,0,25.0)
-    TestItemFinal = Asset("00001",0,3,0,25.0)
-    TestItem2 = Asset("00002",0,0,0,25.0)
-    TestItemFinal2 = Asset("00002",3,0,0,25.0)
-    TestItem3 = Asset("00003",0,0,0,25.0)
-    TestItemFinal3 = Asset("00003",0,0,3,25.0)
+    TestItem = Asset("1",0,0,0,25.0)
+    TestItemFinal = Asset("1",0,3,0,25.0)
+    TestItem2 = Asset("2",0,0,0,25.0)
+    TestItemFinal2 = Asset("2",3,0,0,25.0)
+    TestItem3 = Asset("3",0,0,0,25.0)
+    TestItemFinal3 = Asset("3",0,0,3,25.0)
     
 
     while (getTime()<10):
         time.sleep(CYCLE_TIME)
         # print(TestItem.asDict())
         TestItem.animateSelf(TestItemFinal,0,10)
-        pub.publish(client,TestItem.asDict())
+        pub.publish(client,json.dumps(TestItem.asDict()))
         
         TestItem2.animateSelf(TestItemFinal2,0,10)
-        pub.publish(client,TestItem2.asDict())
+        pub.publish(client,json.dumps(TestItem2.asDict()))
 
         TestItem3.animateSelf(TestItemFinal3,0,10)
-        pub.publish(client,TestItem3.asDict())
+        pub.publish(client,json.dumps(TestItem3.asDict()))
 
 
