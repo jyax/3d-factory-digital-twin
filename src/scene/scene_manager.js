@@ -12,7 +12,8 @@ import {
     SkyRenderer,
     SolidColorSky,
     Vector3,
-    View3D
+    View3D,
+    ComponentBase
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
@@ -122,6 +123,7 @@ class SceneManager {
         let camObj = new Object3D();
         let cam = camObj.addComponent(Camera3D);
         this.camera = camObj;
+        this.cam = cam
 
         this._cameraController = this.camera.addComponent(OrbitController);
         this._cameraController.smooth = 0;
@@ -137,7 +139,7 @@ class SceneManager {
 
         this.view = new View3D();
         this.view.scene = this.scene;
-        this.view.camera = cam;
+        this.view.camera = this.cam;
 
         const promises = [];
         const total = Object.keys(SceneManager.MODELS).length;
