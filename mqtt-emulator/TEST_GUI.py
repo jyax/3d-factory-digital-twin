@@ -3,28 +3,48 @@ import json
 import Publisher
 from asset import Asset
 
-# Initialize data
-# TODO change from global to item specific and create topic subscribers
 
 
-TestItem1 = Asset("0",0,12.0,0,25.0)
-TestItem2 = Asset("1",0,12.0,0,25.0)
-TestItem3 = Asset("2",0,12.0,0,25.0)
+assetList = []
 
-assetList = [TestItem1,TestItem2, TestItem3]
+
+def save(data, filepath):
+    parse = []
+    for item in data:
+        parse.append(item.asDict())
+
+    parsed = json.dumps(parse)
+    with open(filepath, "w") as outfile:
+        outfile.write(parsed)
+
+def readIn(filepath):
+    with open(filepath, "r") as read: 
+        dictList = json.load(read)
+    
+    for i in dictList:
+        assetList.append(Asset(i['id'],i['x'],i['y'],i['z'],i['temp']))
+        
+def updateAll(client,assetList):
+    for obj in assetList:
+        obj.liveUpdate(client)
+
+def addRow(assetList):
+    assetList.append(Asset())
+
+   
+
 entries = []
 
 def main(client):
+    filepath = './mqtt-emulator/sample.json'
+    readIn(filepath)
     
     def handle_entry_change(event,AssetID,row,col):
-            
             unpacked = AssetID.unpacked()
             index =(row-1)*len(unpacked)+col
             unpacked[col] = entries[index].get()
             AssetID.UpdateSelf(*unpacked)
-            print(index)
-            json_obj = json.dumps(AssetID.asDict())
-            Publisher.publish(client, json_obj)
+
 
     # Create the main window
     root = tk.Tk()
@@ -34,10 +54,10 @@ def main(client):
     # Create labels and entry fields for x, y, z positions, and temperature
     attributes = ["Asset ID", "X Position", "Y Position", "Z Position", "Temperature"]
     
-    for row, AssetID in enumerate(assetList):
+    for row, obj in enumerate(assetList):
         row+=1 #offset for column headers 
 
-        for col, attribute in enumerate(AssetID.unpacked()):
+        for col, attribute in enumerate(obj.asDict().values()):
             header_label = tk.Label(root, text=attributes[col])
             header_label.grid(row=0, column=col, padx=5, pady=5)
             
@@ -45,9 +65,24 @@ def main(client):
             entry.grid(row=row, column=col, padx=5, pady=5)
             entry.insert(0, str(attribute))
             entries.append(entry)
-            entry.bind("<FocusOut>", lambda event, col=col, AssetID=AssetID,row= row:
+            entry.bind("<FocusOut>", lambda event, col=col, AssetID=obj,row= row:
                         handle_entry_change(event,AssetID,row,col))
             
+        button = tk.Button(text='Update',command=lambda obj=obj, client=client:obj.liveUpdate(client))
+        button.grid(row=row, column=len(attributes)+1,padx=5,pady=5,)
+
+    button= tk.Button(text='Save', command=lambda filepath=filepath, assetList=assetList:save(assetList,filepath))
+    button.grid(row=len(assetList)+2,column=0)
+    
+    button= tk.Button(text='Update All', command=lambda client=client, assetList=assetList:updateAll(client,assetList))
+    button.grid(row=len(assetList)+2,column=1)
+
+    # button= tk.Button(text='Add Row', command=lambda assetList=assetList: addRow(assetList))
+    # button.grid(row=len(assetList)+2,column=2)
+
+       
             
+    
+             
 
     root.mainloop()
