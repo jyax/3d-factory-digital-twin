@@ -55,7 +55,8 @@ class Asset:
         vals = self.unpacked()
         return dict(zip(attributes,vals))
         
-
+    def liveUpdate(self,client):
+        pub.publish(client,json.dumps(self.asDict()))
 
     
     def animateSelf(self, goalstate, start_time, duration):
