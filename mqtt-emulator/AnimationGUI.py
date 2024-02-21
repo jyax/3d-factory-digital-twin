@@ -5,21 +5,38 @@ from asset import Asset
 
 
 
+assetList = []
 
-TestItem1 = Asset("0",0,12.0,0,25.0)
-TestItem2 = Asset("1",0,12.0,0,25.0)
-TestItem3 = Asset("2",0,12.0,0,25.0)
 
-assetList = [TestItem1,TestItem2, TestItem3]
+def save(data, filepath):
+    parse = []
+    for item in data:
+        parse.append(item.asDict())
+
+    parsed = json.dumps(parse)
+    with open(filepath, "w") as outfile:
+        outfile.write(parsed)
+
+def readIn(filepath):
+    with open(filepath, "r") as read: 
+        dictList = json.load(read)
+    
+    for i in dictList:
+        assetList.append(Asset(i['id'],i['x'],i['y'],i['z'],i['temp']))
+   
+
 entries = []
 
 def main(client):
+
+    readIn('./mqtt-emulator/sample.json')
     
     def handle_entry_change(event,AssetID,row,col):
             unpacked = AssetID.unpacked()
             index =(row-1)*len(unpacked)+col
             unpacked[col] = entries[index].get()
             AssetID.UpdateSelf(*unpacked)
+            save(assetList,'./mqtt-emulator/sample.json')
 
 
     # Create the main window
@@ -43,7 +60,7 @@ def main(client):
             entries.append(entry)
             entry.bind("<FocusOut>", lambda event, col=col, AssetID=obj,row= row:
                         handle_entry_change(event,AssetID,row,col))
-        button = tk.Button(text='Update',command=lambda obj=obj, client=client:obj.liveUpdate(client))
+        button = tk.Button(text='Update',command=lambda obj=obj, client=client, assetList=assetList:obj.liveUpdate(client))
         button.grid(row=row, column=len(attributes)+1,padx=5,pady=5,)
        
             
