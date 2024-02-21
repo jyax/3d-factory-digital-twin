@@ -1,5 +1,5 @@
 <template>
-  <p class="input-vector-label">Position</p>
+  <p class="input-label">Position</p>
   <div class="input-vector">
 
     <input class="input-vector-comp c-x" v-model="xVal" type="text" placeholder="x"
@@ -16,7 +16,7 @@
 
 <style scoped>
 
-.input-vector-label {
+.input-label {
   margin: 16px 0 4px;
 
   text-align: left;
@@ -115,11 +115,9 @@ export default {
 
     blurInput(e) {
       e.target.blur();
-    }
-  },
+    },
 
-  created() {
-    this.mgr.events.on("select", selected => {
+    update(selected) {
       if (selected.length !== 1)
         this.pos = new Vector3();
       else
@@ -128,7 +126,13 @@ export default {
       this.xVal = Math.floor(this.pos.x * 100) / 100;
       this.yVal = Math.floor(this.pos.y * 100) / 100;
       this.zVal = Math.floor(this.pos.z * 100) / 100;
-    });
+    }
+  },
+
+  created() {
+    this.mgr.events.on("select", selected => this.update(selected));
+
+    this.update(this.mgr.getSelected());
   }
 }
 </script>

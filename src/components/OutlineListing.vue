@@ -1,9 +1,16 @@
 <template>
-  <div class="listing" @click="this.object.select()" :class="dynamicStyle">
-    <p class="listing-name">{{object.name}}</p>
+  <div class="listing" @click="this.object.select(); this.object.mouseOff()" :class="dynamicStyle" @mouseover="this.object.mouseOver()"
+       @mouseout="this.object.mouseOff()">
+    <p class="listing-name anonymous" v-if="name === ''">Object</p>
+    <p class="listing-name" v-if="name !== ''">{{name}}</p>
     <div class="listing-buttons">
-      <img class="listing-button" src="../../icon/lock-slash.svg" alt="Lock">
-      <img class="listing-button" src="../../icon/trash.svg" alt="Delete" @click.stop="object.delete()">
+      <img class="listing-button" src="../assets/icon/lock-slash.svg" alt="Lock" @click.stop="object.toggleLock()"
+           v-if="!locked">
+      <img class="listing-button" src="../assets/icon/lock.svg" alt="Lock" @click.stop="object.toggleLock()"
+           v-if="locked">
+      <!--
+      <img class="listing-button" src="../assets/icon/trash.svg" alt="Delete" @click.stop="doDelete()">
+      -->
     </div>
   </div>
 </template>
@@ -34,6 +41,11 @@
 
   margin: 4px;
   text-align: left;
+}
+
+.anonymous {
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
 }
 
 .listing-buttons {
@@ -90,7 +102,12 @@
 
     data() {
       return {
-        selected: false
+        selectListener: null,
+        renameListener: null,
+        lockedListener: null,
+        selected: false,
+        name: "",
+        locked: false
       }
     },
 
@@ -102,10 +119,30 @@
       }
     },
 
-    created() {
-      this.object.mgr.events.on("select", () => {
+    methods: {
+      update() {
         this.selected = this.object.isSelected();
-      });
+        this.name = this.object.id;
+        this.locked = this.object.locked;
+      },
+
+      doDelete() {
+        this.object.delete();
+      }
+    },
+
+    created() {
+      this.selectListener = this.object.mgr.events.on("select", () => this.update());
+      this.renameListener = this.object.mgr.events.on("rename", () => this.update());
+      this.lockedListener = this.object.events.on("lock", () => this.update());
+
+      this.update();
+    },
+
+    destroyed() {
+      this.mgr.events.remove(this.selectListener);
+      this.mgr.events.remove(this.renameListener);
+      this.object.events.remove(this.lockedListener);
     }
   };
 </script>

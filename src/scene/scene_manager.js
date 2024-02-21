@@ -1,12 +1,23 @@
 import {
-    AtmosphericScatteringSky,
-    Camera3D, Color,
+    BoundingBox,
+    Camera3D,
+    Color,
     Engine3D,
-    Object3D, OrbitController, PointerEvent3D, PointLight,
-    Scene3D, SkyRenderer, SolidColorSky, Vector3, View3D
+    LitMaterial,
+    MeshRenderer,
+    Object3D,
+    OrbitController,
+    PointerEvent3D,
+    Scene3D,
+    SkyRenderer,
+    SolidColorSky,
+    Vector3,
+    View3D
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
+import Util from "../util/Util.js";
+import MQTTHandler from "../event/mqtt_handler.js";
 
 /**
  * @module SceneManager
@@ -18,115 +29,232 @@ import EventHandler from "../event/event_handler.js";
  * Main manager of entire scene. Responsible for managing all currently loaded objects and assets.
  */
 class SceneManager {
+    static MODELS = {
+        "dragon": "https://cdn.orillusion.com/PBR/DragonAttenuation/DragonAttenuation.gltf",
+        "table": "/glb_models/Assembly Warehouse Table.glb",
+        "cart": "/glb_models/trolley cart for warehouse.glb",
+        "rack": "/glb_models/JM_Rack_A.glb",
+        "wall": "/glb_models/Slatwall_Bin_5.5in.glb",
+        "floor": "/glb_models/factory_floor_sample_1.glb",
+        "workstation1": "/glb_models/workstation.glb",
+        "workstation1_whole": "/glb_models/workstation_whole.glb",
+        "workstation2": "/glb_models/Station 10x Layout v31.glb",
+
+        // Hidden models for editor use only
+
+        ".translation-handle": "/glb_models/translation_handle.glb"
+    };
+
     /**
      * Create a new scene manager.
      * @param {Color} skyColor Color of sky (optional)
      */
     constructor({
-        skyColor = Color.hexRGBColor(0x44495e)
+        skyColor = new Color(200, 200, 200)
     } = {}) {
         this._skyColor = skyColor;
 
         this.sky = null;
         this.scene = null;
+        this.view = null;
 
         this.camera = null;
 
-        this._nextID = 0;
-        this.objects = new Map();
-        this._revMap = new Map();
-
+        this.objects = new Set();
+        this.revObjects = new Map();
         this._selected = new Set();
+
+        this.models = new Map();
+
+        this.ids = new Map();
 
         this._cameraController = null;
 
         this._events = new EventHandler();
 
         this._ctrlPressed = false;
+
+        this._mqttHandler = new MQTTHandler({
+            mgr: this,
+            server: true
+        });
     }
 
     /**
      * Initialize the scene manager.
-     * @param canvas Reference to desired HTML canvas
      */
-    init({
-        canvas
-    } = {}) {
+    async init() {
         Engine3D.setting.pick.enable = true;
-        Engine3D.setting.pick.mode = "bound";
+        Engine3D.setting.pick.mode = "pixel";
 
-        Engine3D.init({
-            canvasConfig:  { canvas }
-        }).then(() => {
-            this.scene = new Scene3D();
+        this.targetObj = null;
+        this.matList = [];
 
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+        await Engine3D.init();
 
-            //let colorSky = new SolidColorSky(this._skyColor);
-            this.scene.envMap = new SolidColorSky(new Color(200, 200, 200));
-            //this.sky = this.scene.addComponent(SkyRenderer);
-            //this.sky.map = colorSky;
+        const c  = Engine3D.inputSystem.canvas;
+        c.remove();
+        document.querySelector("body").prepend(c);
 
-            //this.scene.envMap = colorSky;
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
 
-            let camObj = new Object3D();
-            let cam = camObj.addComponent(Camera3D);
-            this.camera = camObj;
+        this.scene = new Scene3D();
 
-            this._cameraController = this.camera.addComponent(OrbitController);
-            this._cameraController.smooth = false;
-            this._cameraController.panFactor = 0.025;
-            this._cameraController.wheelStep = 0.01;
+        this.scene.envMap = new SolidColorSky(this._skyColor);
 
-            camObj.localPosition = new Vector3(0, 0, 15);
+        let camObj = new Object3D();
+        let cam = camObj.addComponent(Camera3D);
+        this.camera = camObj;
 
-            cam.perspective(60, window.innerWidth / window.innerHeight, 0.1, 5000);
+        this._cameraController = this.camera.addComponent(OrbitController);
+        this._cameraController.smooth = 0;
+        this._cameraController.panFactor = 0.01;
+        this._cameraController.wheelStep = 0.01;
 
-            this.scene.addChild(camObj);
+        camObj.localPosition = new Vector3(0, 0, 4);
 
-            this.createNewObject(new Vector3());
+        cam.perspective(60, c.width / c.height, 0.1, 5000);
 
-            //const light = new Object3D();
-            //const lightComp = light.addComponent(PointLight);
-            //lightComp.intensity = 2;
-            //light.localPosition = new Vector3(0, 10, 0);
-            //this.scene.addChild(light);
+        this.scene.addChild(camObj);
 
-            let view = new View3D();
-            view.scene = this.scene;
-            view.camera = cam;
-            view.enablePick = true;
+        this.view = new View3D();
+        this.view.scene = this.scene;
+        this.view.camera = cam;
 
-            document.addEventListener("keydown", (event) => {
-                if (event.key === "r")
-                    this.createNewObject();
+        const promises = [];
+        const total = Object.keys(SceneManager.MODELS).length;
+        let i = 0;
 
-                else if (event.key === "Tab") {
+        for (const id of Object.keys(SceneManager.MODELS)) {
+            const model = Engine3D.res.loadGltf(SceneManager.MODELS[id]);
+            promises.push(model);
+
+            model.then(object => {
+                this.models.set(id, object)
+
+                i++;
+
+                let progress = 0;
+                if (total !== 0)
+                    progress = i / total;
+                this.events.do("load_models", progress);
+            });
+        }
+
+        await Promise.all(promises);
+
+        this.createNewObject({
+            pos: new Vector3(),
+            select: false
+        });
+
+        document.addEventListener("keydown", (event) => {
+            switch (event.key) {
+                case "a": {
+                    if (!event.ctrlKey)
+                        break;
+
+                    if (document.querySelector(":focus"))
+                        break;
+
+                    event.preventDefault();
+                    this.selectAll();
+
+                    break;
+                }
+
+                case "f": {
+                    this.focusOnSelected();
+                    break;
+                }
+
+                case "i": {
+                    if (!event.ctrlKey)
+                        break;
+
+                    event.preventDefault();
+                    this.invertSelection();
+
+                    break;
+                }
+
+                case "p": {
+                    this.alert("Temperature above critical threshold.");
+                    break;
+                }
+
+                case "r": {
+                    if (event.ctrlKey) {
+                        event.preventDefault();
+                        this.resetCamera();
+                    } else
+                        this.createNewObject();
+
+                    break;
+                }
+
+                case "Tab": {
+                    if (document.querySelector(":focus"))
+                        break;
+
                     this.clearSelection();
                     event.preventDefault();
+
+                    break;
                 }
 
-                else if (event.key === "Delete") {
+                case "Delete": {
                     this.deleteSelected();
                     event.preventDefault();
+
+                    break;
                 }
 
-                else if (event.key === "Control")
+                case "Control": {
                     this._ctrlPressed = true;
-            });
-
-            document.addEventListener("keyup", (event) => {
-                if (event.key === "Control")
-                    this._ctrlPressed = false;
-            });
-
-            Engine3D.startRenderView(view);
+                    break;
+                }
+            }
         });
+
+        document.addEventListener("keyup", (event) => {
+            if (event.key === "Control")
+                this._ctrlPressed = false;
+        });
+
+        Engine3D.startRenderView(this.view);
+
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_CLICK, e => {
+            const object = this.revObjects.get(e.target);
+            object.click();
+        }, this);
+
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, e => {
+            const object = this.revObjects.get(e.target);
+            object.mouseOver();
+        }, this);
+
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_OUT, e => {
+            const object = this.revObjects.get(e.target);
+            object.mouseOff();
+        }, this);
     }
 
 
     // Getters
+
+    /**
+     * Get an object in the manager by its global ID.
+     * @param {string} id Global ID
+     * @returns {SceneObject|null} Object with specified ID, or null if it doesn't exist.
+     */
+    getObjectById(id) {
+        if (!this.ids.has(id))
+            return null;
+
+        return this.ids.get(id);
+    }
 
     /**
      * Get the event handler.
@@ -186,10 +314,32 @@ class SceneManager {
         document.body.style.cursor = "default";
     }
 
+    /**
+     * Reset the camera position and target the center (0, 0, 0) of the scene.
+     */
+    resetCamera() {
+        const bounds = this._getAllBounds();
+        const pos = bounds.min.add(bounds.max).div(2);
+        this._cameraController.target = pos;
 
-    // User Interface
+        const mag = Util.getBoundingBoxScale(bounds);
+        const dir = this.camera.transform.localPosition.subtract(pos).normalize();
 
-    alert(title = "", description = "") {}
+        this.camera.localPosition = pos.add(dir.mul(mag));
+    }
+
+
+    // User Interfaces
+
+    /**
+     * Signal an alert to the event listener.
+     * Used for displaying UI alert messages.
+     * @param {string} description Description of alert
+     * @param {string} id Object Identifier
+     */
+    alert(description = "", id = "") {
+        this.events.do("alert", description, id);
+    }
 
 
     // Objects - Access
@@ -219,18 +369,30 @@ class SceneManager {
 
     /**
      * Create a new basic object and add it to the scene.
-     * @param {Vector3} pos Initial position of object
+     * @param {Vector3} pos Initial position of object (optional)
+     * @param {boolean} select Whether to select object after adding
+     * @param {string} model ID/name of mesh to use
      */
-    createNewObject(pos = null) {
+    createNewObject({
+        pos = null,
+        select = true,
+        model = ""
+    } = {}) {
         if (pos === null)
-            pos = this.getCameraForward().mul(16).add(this.camera.localPosition);
+            pos = this.getCameraForward().mul(8).add(this.camera.transform.worldPosition);
 
         const object = new SceneObject({
             manager: this,
-            pos: pos
+            pos: pos,
+            model: model
         });
 
         this.addObject(object);
+
+        if (select) {
+            object.select();
+            this.focusOnSelected();
+        }
     }
 
     /**
@@ -238,27 +400,12 @@ class SceneManager {
      * @param {SceneObject} object Object to add
      */
     addObject(object) {
-        const id = this._nextID;
-
-        this.objects.set(id, object);
-        this._revMap.set(object.getObject3D(), object);
-
-        object.id = id;
+        this.objects.add(object);
 
         this.scene.addChild(object.getObject3D());
-
-        this._findNextID();
+        this.revObjects.set(object.getObject3D(), object);
 
         this.events.do("add", object);
-    }
-
-    /**
-     * Increment the next available object ID until it is available.
-     * @private
-     */
-    _findNextID() {
-        while (this.objects.has(this._nextID))
-            this._nextID++;
     }
 
 
@@ -269,15 +416,13 @@ class SceneManager {
      * @param {SceneObject} object Object to remove
      */
     removeObject(object) {
-        this.objects.delete(object.id);
+        this.objects.delete(object);
+        this.revObjects.delete(object.getObject3D());
 
         if (this._selected.has(object))
             this.deselect(object);
 
         this.events.do("delete", object);
-
-        if (object.id !== -1 && object.id < this._nextID)
-            this._nextID = object.id;
     }
 
     /**
@@ -296,12 +441,57 @@ class SceneManager {
      * @param {SceneObject} object Object to select
      */
     select(object) {
-        if (!this._ctrlPressed)
+        if (!this._ctrlPressed) {
             this.clearSelection();
-
-        this._selected.add(object);
+            this._selected.add(object);
+        } else {
+            if (this._selected.has(object))
+                this._selected.delete(object);
+            else {
+                this._selected.add(object);
+            }
+        }
 
         this.events.do("select", Array.from(this._selected.values()));
+
+        this.updateSelectBox();
+    }
+
+    /**
+     * Select all objects.
+     */
+    selectAll() {
+        this._selected.clear();
+        this.objects.forEach(object => this._selected.add(object));
+
+        this.updateSelectBox();
+        this.events.do("select", this.getSelected());
+    }
+
+    /**
+     * Deselect the objects currently selected and select those that are not.
+     */
+    invertSelection() {
+        const notSelected = new Set(this.objects);
+        notSelected.forEach(object => {
+            if (this._selected.has(object))
+                notSelected.delete(object);
+        });
+
+        this._selected.clear();
+
+        this._selected = notSelected;
+
+        this.updateSelectBox();
+        this.events.do("select", this.getSelected())
+    }
+
+    /**
+     * Get an array of all currently selected objects.
+     * @returns {SceneObject[]} Array of selected objects
+     */
+    getSelected() {
+        return Array.from(this._selected.values());
     }
 
     /**
@@ -309,6 +499,9 @@ class SceneManager {
      * @returns {SceneObject} First selected object
      */
     getFirstSelected() {
+        if (this.selectedCount === 0)
+            return null;
+
         return Array.from(this._selected.values())[0];
     }
 
@@ -320,6 +513,8 @@ class SceneManager {
         this._selected.delete(object);
 
         this.events.do("select", Array.from(this._selected.values()));
+
+        this.updateSelectBox();
     }
 
     /**
@@ -329,6 +524,8 @@ class SceneManager {
         this._selected.clear();
 
         this.events.do("select", Array.from(this._selected.values()));
+
+        this.updateSelectBox();
     }
 
     /**
@@ -340,12 +537,107 @@ class SceneManager {
     }
 
     /**
+     * Duplicate all selected objects.
+     * @param {boolean} select Whether to select duplicated objects (true by default)
+     */
+    duplicateSelected(select = true) {
+        if (this.selectedCount === 0)
+            return;
+
+        const toDuplicate = Array.from(this._selected.values());
+        this.clearSelection();
+
+        for (const obj of toDuplicate) {
+            const newObj = obj.duplicate();
+            if (select)
+                this._selected.add(newObj);
+        }
+
+        if (select) {
+            this.updateSelectBox();
+            this.events.do("select", Array.from(this._selected.values()));
+        }
+    }
+
+    /**
+     * Focus/target camera on currently selected objects.
+     */
+    focusOnSelected() {
+        if (this.selectedCount === 0)
+            return;
+
+        const bounds = this._getSelectedBounds();
+        const pos = bounds.min.add(bounds.max).div(2);
+        this._cameraController.target = pos;
+
+        const mag = Util.getBoundingBoxScale(bounds) * 2;
+        const dir = this.camera.transform.localPosition.subtract(pos).normalize();
+
+        this.camera.localPosition = pos.add(dir.mul(mag));
+    }
+
+    /**
      * Check if an object is currently selected.
      * @param {SceneObject} object Object to check for
      * @returns {boolean} Whether object is currently selected
      */
     isSelected(object) {
         return this._selected.has(object);
+    }
+
+    /**
+     * Update the visual selection indicator.
+     */
+    updateSelectBox() {
+        this.view.graphic3D.Clear("selection");
+        if (this.selectedCount === 0)
+            return;
+
+        const bb = this._getSelectedBounds();
+
+        this.view.graphic3D.drawBox("selection", bb.min, bb.max);
+    }
+
+    /**
+     * Get the bounding box containing all the bounding boxes of selected objects.
+     * @returns {BoundingBox}
+     * @private
+     */
+    _getSelectedBounds() {
+        let bb = null;
+
+        for (const object of this._selected.values()) {
+            if (bb === null)
+                bb = object.getBoundingBox();
+            else
+                bb.merge(object.getBoundingBox());
+        }
+
+        if (bb === null)
+            return new BoundingBox();
+
+        return bb;
+    }
+
+    /**
+     * Get the bounding box containing all the bounding boxes of all objects in the scene.
+     * @returns {BoundingBox} Total bounding box
+     * @private
+     */
+    _getAllBounds() {
+        let bb = null;
+
+        for (const object of this.objects.values()) {
+            if (bb === null)
+                bb = object.getBoundingBox();
+            else
+                bb.merge(object.getBoundingBox());
+        }
+
+        if (bb === null)
+            return new BoundingBox();
+
+        return bb;
     }
 }
 
