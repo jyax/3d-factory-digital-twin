@@ -13,7 +13,7 @@ const localDirectory = '../glb_models_2';
 const remoteHost = '35.9.22.105';
 const remotePort = 22;
 const remoteUsername = 'magna_user';
-const remoteDirectory = '../shared_files'; // Update with desired remote directory
+const remoteDirectory = './shared_files'; // Update with desired remote directory
 
 /**
  * connect to mongodb
@@ -50,10 +50,13 @@ async function DownloadAndTransferFiles() {
 
         const downloadAndTransferPromises = [];
         for (const file of fileList) {
-            const fileName = file.filename;
+            let fileName = file.filename;
+            // Check if the file name already contains the .glb extension
+            if (!fileName.endsWith('.glb')) {
+                fileName += '.glb'; // Append the .glb extension if it's missing
+            }
             const outputFilePath = path.join(localDirectory, fileName);
 
-            // Wrap the entire file path in double quotes
             const command = `scp -P ${remotePort} "${outputFilePath}" ${remoteUsername}@${remoteHost}:${remoteDirectory}/`;
 
             const transferPromise = new Promise((resolve, reject) => {
