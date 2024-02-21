@@ -23,20 +23,23 @@ def readIn(filepath):
     
     for i in dictList:
         assetList.append(Asset(i['id'],i['x'],i['y'],i['z'],i['temp']))
+        
+def updateAll(client,assetList):
+    for obj in assetList:
+        obj.liveUpdate(client)
    
 
 entries = []
 
 def main(client):
-
-    readIn('./mqtt-emulator/sample.json')
+    filepath = './mqtt-emulator/sample.json'
+    readIn(filepath)
     
     def handle_entry_change(event,AssetID,row,col):
             unpacked = AssetID.unpacked()
             index =(row-1)*len(unpacked)+col
             unpacked[col] = entries[index].get()
             AssetID.UpdateSelf(*unpacked)
-            save(assetList,'./mqtt-emulator/sample.json')
 
 
     # Create the main window
@@ -60,8 +63,16 @@ def main(client):
             entries.append(entry)
             entry.bind("<FocusOut>", lambda event, col=col, AssetID=obj,row= row:
                         handle_entry_change(event,AssetID,row,col))
-        button = tk.Button(text='Update',command=lambda obj=obj, client=client, assetList=assetList:obj.liveUpdate(client))
+        button = tk.Button(text='Update',command=lambda obj=obj, client=client:obj.liveUpdate(client))
         button.grid(row=row, column=len(attributes)+1,padx=5,pady=5,)
+
+    button= tk.Button(text='Save', command=lambda filepath=filepath, assetList=assetList:save(assetList,filepath))
+    button.grid(row=len(assetList)+2,column=0)
+    # button= tk.Button(text='Add Row', command=lambda assetList=assetList: assetList.append(Asset()))
+    # button.grid(row=len(assetList)+2,column=1)
+    button= tk.Button(text='Update All', command=lambda client=client, assetList=assetList:updateAll(client,assetList))
+    button.grid(row=len(assetList)+2,column=1)
+
        
             
     
