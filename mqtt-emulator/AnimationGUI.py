@@ -27,6 +27,10 @@ def readIn(filepath):
 def updateAll(client,assetList):
     for obj in assetList:
         obj.liveUpdate(client)
+
+def addRow(assetList):
+    assetList.append(Asset())
+
    
 
 entries = []
@@ -63,15 +67,18 @@ def main(client):
             entries.append(entry)
             entry.bind("<FocusOut>", lambda event, col=col, AssetID=obj,row= row:
                         handle_entry_change(event,AssetID,row,col))
+            
         button = tk.Button(text='Update',command=lambda obj=obj, client=client:obj.liveUpdate(client))
         button.grid(row=row, column=len(attributes)+1,padx=5,pady=5,)
 
     button= tk.Button(text='Save', command=lambda filepath=filepath, assetList=assetList:save(assetList,filepath))
     button.grid(row=len(assetList)+2,column=0)
-    # button= tk.Button(text='Add Row', command=lambda assetList=assetList: assetList.append(Asset()))
-    # button.grid(row=len(assetList)+2,column=1)
+    
     button= tk.Button(text='Update All', command=lambda client=client, assetList=assetList:updateAll(client,assetList))
     button.grid(row=len(assetList)+2,column=1)
+
+    # button= tk.Button(text='Add Row', command=lambda assetList=assetList: addRow(assetList))
+    # button.grid(row=len(assetList)+2,column=2)
 
        
             
