@@ -7,7 +7,7 @@ from paho.mqtt import client as mqtt_client
 ###TOGGLE TEST MODES###
 #######################
 SERVERLESS  =   False###
-ANIMATE     =  False###
+ANIMATE     =  True###
 #######################
 
 if not SERVERLESS:

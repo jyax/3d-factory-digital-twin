@@ -91,7 +91,7 @@ class SceneObject {
         this._events = new EventHandler();
 
         this.liveData = {
-            type: "none"
+            type: "position"
         };
     }
 
@@ -283,7 +283,7 @@ class SceneObject {
             return;
 
         const copy = this.mgr.models.get(id).clone();
-        //this._object.transform.cloneTo(copy);
+        this._object.transform.cloneTo(copy);
         this.mgr.revObjects.delete(this._object);
         this._object.destroy();
         this._object = copy;
@@ -455,9 +455,9 @@ class SceneObject {
 
             case "position": {
                 this.setPos(new Vector3(
-                    data["x"],
-                    data["y"],
-                    data["z"]
+                    parseFloat(data["x"]),
+                    parseFloat(data["y"]),
+                    parseFloat(data["z"])
                 ));
             }
         }
