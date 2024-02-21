@@ -415,6 +415,15 @@ class SceneObject {
     }
 
     /**
+     * Handle when the mouse is no longer hovering over the object.
+     * @param e Event
+     */
+    mouseDown(e) {
+        // console.log("Down");
+        this.mgr.ObjectToMove = this;
+    }
+
+    /**
      * Handle when the mouse clicks on the object.
      * @param e Event
      */
