@@ -70,9 +70,7 @@ class SceneObject {
         this._hoverPreview = "";
 
         if (modelID === "") {
-            //let data = Engine3D.res.loadGltf('./src/assets/glb_models/downloadsGLB/desk_lathe.glb');
-            //this._object.addChild(data);
-            //mesh = this._object.addComponent(MeshRenderer);
+            // mesh = this._object.addComponent(MeshRenderer);
             // mesh.geometry = new BoxGeometry();
             // mesh.material = new LitMaterial();
             // mesh.material.baseColor = new Color(0.2, 0.5, 1);
@@ -337,6 +335,7 @@ class SceneObject {
      * @returns {SceneObject} Duplicate object
      */
     duplicate() {
+        cloned
         const copy = this.copy();
 
         this.mgr.addObject(copy);
