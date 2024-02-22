@@ -127,12 +127,7 @@ class SceneManager {
         //
         
         // Creating a Plane/floor
-        // const plane = new Object3D();
-        // let meshRenderer1 = plane.addComponent(MeshRenderer);
-        // meshRenderer1.geometry = new PlaneGeometry(100, 100, 100, 100);
-        // meshRenderer1.material = new LitMaterial();
-        // plane.transform.localPosition = new Vector3(0, -1, 0);
-        // this.scene.addChild(plane);
+
         let floor = await Engine3D.res.loadGltf('./src/assets/glb_models/factory_floor_sample_1.glb');
         floor.scaleX = 0.02;
         floor.scaleY = 0.02;
