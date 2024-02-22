@@ -75,6 +75,14 @@ export default {
       required: true
     },
 
+    default: {
+      default: ""
+    },
+
+    onChange: {
+      default: value => {}
+    },
+
     label: {
       default: "Field"
     },
@@ -95,7 +103,13 @@ export default {
       e.target.blur();
     },
 
-    doChange() {}
+    doChange() {
+      this.onChange(this.val);
+    }
+  },
+
+  created() {
+    this.val = this.default;
   }
 }
 

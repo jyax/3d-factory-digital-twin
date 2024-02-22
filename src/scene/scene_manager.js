@@ -1,15 +1,23 @@
 import {
     BoundingBox,
-    BoxColliderShape,
-    Camera3D, ColliderComponent, Color,
-    ComponentBase,
-    Engine3D, FlyCameraController, KeyEvent, LitMaterial, MeshRenderer,
-    Object3D, OrbitController,
+    Camera3D,
+    Color,
+    Engine3D,
+    LitMaterial,
+    MeshRenderer,
+    Object3D,
+    OrbitController,
     PointerEvent3D,
-    Scene3D, SkyRenderer, SolidColorSky, Vector3, View3D, PlaneGeometry
+    Scene3D,
+    SkyRenderer,
+    SolidColorSky,
+    Vector3,
+    View3D
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
+import Util from "../util/Util.js";
+import MQTTHandler from "../event/mqtt_handler.js";
 
 /**
  * @module SceneManager
@@ -49,6 +57,7 @@ class SceneManager {
         this.sky = null;
         this.scene = null;
         this.view = null;
+
         this.camera = null;
 
         this.objects = new Set();
@@ -77,7 +86,14 @@ class SceneManager {
 
         this.canMove = false;
 
-        this._dragMult = 100;
+        this._dragMult = 200;
+
+        this.count = 0;
+
+        this._mqttHandler = new MQTTHandler({
+            mgr: this,
+            server: false
+        });
     }
 
     /**
@@ -90,37 +106,65 @@ class SceneManager {
         this.targetObj = null;
         this.matList = [];
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
         await Engine3D.init();
 
         const c  = Engine3D.inputSystem.canvas;
         c.remove();
         document.querySelector("body").prepend(c);
 
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
+
         this.scene = new Scene3D();
 
         this.scene.envMap = new SolidColorSky(this._skyColor);
 
         let camObj = new Object3D();
-        this.cam = camObj.addComponent(Camera3D);
+        let cam = camObj.addComponent(Camera3D);
         this.camera = camObj;
 
-        this._cameraController = this.camera.addComponent(FlyCameraController);
-        this._cameraController.smooth = false;
-        this._cameraController.setCamera(new Vector3(0, 2, 10), new Vector3(0, 0, 0));
-        this._cameraController.panFactor = 0.025;
+        this._cameraController = this.camera.addComponent(OrbitController);
+        this._cameraController.smooth = 0;
+        this._cameraController.panFactor = 0.01;
         this._cameraController.wheelStep = 0.01;
-        this._cameraController.moveSpeed = 20;
+
         camObj.localPosition = new Vector3(0, 0, 4);
 
         this.cam.perspective(60, c.width / c.height, 0.1, 5000);
 
         this.scene.addChild(camObj);
 
+
         this.view = new View3D();
         this.view.scene = this.scene;
+        this.view.camera = cam;
+
+        const promises = [];
+        const total = Object.keys(SceneManager.MODELS).length;
+        let i = 0;
+
+        for (const id of Object.keys(SceneManager.MODELS)) {
+            const model = Engine3D.res.loadGltf(SceneManager.MODELS[id]);
+            promises.push(model);
+
+            model.then(object => {
+                this.models.set(id, object)
+
+                i++;
+
+                let progress = 0;
+                if (total !== 0)
+                    progress = i / total;
+                this.events.do("load_models", progress);
+            });
+        }
+
+        await Promise.all(promises);
+
+        this.createNewObject({
+            pos: new Vector3(),
+            select: false
+        });
         this.view.camera = this.cam;
         //
         // HARDCODING THE SCENE
@@ -517,8 +561,9 @@ class SceneManager {
                     if (event.ctrlKey) {
                         event.preventDefault();
                         this.resetCamera();
-                    } else
+                    } else{
                         this.createNewObject();
+                    }
 
                     break;
                 }
@@ -574,10 +619,7 @@ class SceneManager {
             object.mouseDown();
         }, this);
 
-        this.view.pickFire.addEventListener(PointerEvent3D.PICK_UP, e => {
-            const object = this.revObjects.get(e.target);
-            object.mouseUp();
-        }, this);
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, this._onOver, this);
 
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_DOWN, this._onMouseDown, this, null, 999);
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_MOVE, this._onMouseMove, this);
@@ -639,6 +681,7 @@ class SceneManager {
         this.sky.map = colorSky;
     }
 
+
     // Input
 
     /**
@@ -660,11 +703,18 @@ class SceneManager {
      * Reset the camera position and target the center (0, 0, 0) of the scene.
      */
     resetCamera() {
-        this._cameraController.target = new Vector3(0, 0, 0);
+        const bounds = this._getAllBounds();
+        const pos = bounds.min.add(bounds.max).div(2);
+        this._cameraController.target = pos;
+
+        const mag = Util.getBoundingBoxScale(bounds);
+        const dir = this.camera.transform.localPosition.subtract(pos).normalize();
+
+        this.camera.localPosition = pos.add(dir.mul(mag));
     }
 
 
-    // User Interface
+    // User Interfaces
 
     /**
      * Signal an alert to the event listener.
@@ -706,20 +756,33 @@ class SceneManager {
      * Create a new basic object and add it to the scene.
      * @param {Vector3} pos Initial position of object (optional)
      * @param {boolean} select Whether to select object after adding
+     * @param {string} model ID/name of mesh to use
      */
-    createNewObject(pos = null, select = true) {
+    createNewObject({
+        pos = null,
+        select = true,
+        model = ""
+    } = {}) {
         if (pos === null)
-            pos = this.getCameraForward().mul(8).add(this.camera.localPosition);
+            pos = this.getCameraForward().mul(8).add(this.camera.transform.worldPosition);
 
         const object = new SceneObject({
             manager: this,
-            pos: pos
+            pos: pos,
+            id: this.count.toString(),
+            model: model
         });
+
+        object.getObject3D().name = this.count.toString();
+        this.count += 1;
+        console.log("Object "+object.getObject3D().name, object)
 
         this.addObject(object);
 
-        if (select)
+        if (select) {
             object.select();
+            this.focusOnSelected();
+        }
     }
 
     /**
@@ -733,10 +796,6 @@ class SceneManager {
         this.revObjects.set(object.getObject3D(), object);
 
         this.events.do("add", object);
-
-        // let collider = object.addComponent(ColliderComponent);
-        // collider.shape = new BoxColliderShape().setFromCenterAndSize(new Vector3(0, 0, 0), new Vector3(15, 15, 15));
-        //this.view.pickFire.addEventListener(PointerEvent3D.PICK_CLICK, onPick, this);
     }
 
 
@@ -830,6 +889,9 @@ class SceneManager {
      * @returns {SceneObject} First selected object
      */
     getFirstSelected() {
+        if (this.selectedCount === 0)
+            return null;
+
         return Array.from(this._selected.values())[0];
     }
 
@@ -894,7 +956,14 @@ class SceneManager {
         if (this.selectedCount === 0)
             return;
 
-        this._cameraController.target = this._getSelectedBounds().center.clone();
+        const bounds = this._getSelectedBounds();
+        const pos = bounds.min.add(bounds.max).div(2);
+        this._cameraController.target = pos;
+
+        const mag = Util.getBoundingBoxScale(bounds) * 2;
+        const dir = this.camera.transform.localPosition.subtract(pos).normalize();
+
+        this.camera.localPosition = pos.add(dir.mul(mag));
     }
 
     /**
@@ -940,45 +1009,57 @@ class SceneManager {
         return bb;
     }
 
-
-    // Objects - Interaction (OLD, do not remove yet)
-
     /**
-     * (OLD) Handles when the mouse hovers over an object.
-     * @param e Event
+     * Get the bounding box containing all the bounding boxes of all objects in the scene.
+     * @returns {BoundingBox} Total bounding box
      * @private
      */
+    _getAllBounds() {
+        let bb = null;
+
+        for (const object of this.objects.values()) {
+            if (bb === null)
+                bb = object.getBoundingBox();
+            else
+                bb.merge(object.getBoundingBox());
+        }
+
+        if (bb === null)
+            return new BoundingBox();
+
+        return bb;
+    }    
     _onOver(e) {
-        console.log('onOver: Name-', e.target.name, e.data.pickInfo);
+        console.log('onOver: Name-', this.revObjects);
         // console.log('onOver: Parent-', e.target.parent.object3D.name, e.data.pickInfo);
-        let node = e.target;
-        while(node.parent.parent != null)
-        {
-            // console.log('parent', node.name);
-            node = node.parent.object3D;
-            // console.log('parent', node.name);
-        }
-        this.targetObj = node;
-        // console.log("target object", this.targetObj.name);
-        if(this.targetObj.numChildren > 0){
-            this.targetObj.forChild((n) => {
-                if (n.hasComponent(MeshRenderer)) {
-                    let mr = n.getComponent(MeshRenderer);
-                    this.mat1 = mr.material;
-                    this.matList.push(mr.material);
-                    let colorMat = new LitMaterial();
-                    colorMat.baseColor = new Color(5, 5, 5, 0.5);
-                    mr.material = colorMat;
-                }
-            });
-        }
-        else{
-            let mr = this.targetObj.getComponent(MeshRenderer);
-            this.mat1 = mr.material;
-            let colorMat = new LitMaterial();
-            colorMat.baseColor = new Color(5, 5, 5, 0.5);
-            mr.material = colorMat;
-        }
+        // let node = e.target;
+        // while(node.parent.parent != null)
+        // {
+        //     // console.log('parent', node.name);
+        //     node = node.parent.object3D;
+        //     // console.log('parent', node.name);
+        // }
+        // this.targetObj = node;
+        // // console.log("target object", this.targetObj.name);
+        // if(this.targetObj.numChildren > 0){
+        //     this.targetObj.forChild((n) => {
+        //         if (n.hasComponent(MeshRenderer)) {
+        //             let mr = n.getComponent(MeshRenderer);
+        //             this.mat1 = mr.material;
+        //             this.matList.push(mr.material);
+        //             let colorMat = new LitMaterial();
+        //             colorMat.baseColor = new Color(5, 5, 5, 0.5);
+        //             mr.material = colorMat;
+        //         }
+        //     });
+        // }
+        // else{
+        //     let mr = this.targetObj.getComponent(MeshRenderer);
+        //     this.mat1 = mr.material;
+        //     let colorMat = new LitMaterial();
+        //     colorMat.baseColor = new Color(5, 5, 5, 0.5);
+        //     mr.material = colorMat;
+        // }
     }
 
     /**
@@ -1010,6 +1091,48 @@ class SceneManager {
             mr.material = this.mat1;
         }
     }
+
+    _onMouseDown(e) {
+        if (e.mouseCode === 2) {
+            // console.log("Scene click down");
+            this.lastTime = Date.now();
+            this.canMove = true; 
+            const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, 0);
+            this.lastX = pos.x;
+            this.lastY = pos.y;
+            this.lastZ = pos.z;
+
+        }
+    }
+
+    _onMouseMove(e){
+        // If right mouse is being clicked on a moveable object then continue else return
+        if (this.canMove && this.ObjectToMove != undefined){
+            // Stop camera movement with mouse
+            e.stopImmediatePropagation();
+
+            // Update the position of the selected object to the mouse position
+            const now = Date.now();
+            if (now - this.lastTime > this.moveInterval) {
+                this.lastTime = now;                
+                const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, 0);
+                this.ObjectToMove.setX(this.ObjectToMove.getObject3D().x + (pos.x - this.lastX) * this._dragMult);
+                this.ObjectToMove.setY(this.ObjectToMove.getObject3D().y + (pos.y - this.lastY) * this._dragMult);
+                this.ObjectToMove.setZ(this.ObjectToMove.getObject3D().z + (pos.z - this.lastZ) * this._dragMult);
+                this.lastX = pos.x;
+                this.lastY = pos.y;
+                this.lastZ = pos.z;
+
+            }
+        }
+    }
+
+    _onMouseUp(e){
+        // console.log("Up");
+        this.ObjectToMove = undefined;
+        this.canMove = false;
+    }
+
 }
 
 class keyboardScript extends ComponentBase
@@ -1053,6 +1176,5 @@ class keyboardScript extends ComponentBase
         if(this.right) trans.rotationY += 5;
     }
 }
-
 
 export default SceneManager;
