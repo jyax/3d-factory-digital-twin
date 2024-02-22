@@ -1,4 +1,5 @@
 import {
+    ComponentBase,
     BoundingBox,
     Camera3D,
     Color,
@@ -122,6 +123,7 @@ class SceneManager {
         let camObj = new Object3D();
         let cam = camObj.addComponent(Camera3D);
         this.camera = camObj;
+        this.cam = cam;
 
         this._cameraController = this.camera.addComponent(OrbitController);
         this._cameraController.smooth = 0;
@@ -1135,46 +1137,46 @@ class SceneManager {
 
 }
 
-class keyboardScript extends ComponentBase
-{
-    #right = false;
-    #left = false;
+// class keyboardScript extends ComponentBase
+// {
+//     #right = false;
+//     #left = false;
 
-    start() {
-        Engine3D.inputSystem.addEventListener(KeyEvent.KEY_UP, this.keyup, this);
-        Engine3D.inputSystem.addEventListener(KeyEvent.KEY_DOWN, this.keyDown, this);
-    }
-    keyDown(e) {
-        if (e.keyCode == KeyCode.Key_Right){
-            this.right = true;
-        }
-        else if(e.keyCode = KeyCode.Key_Left){
-            this.left = true;
-        }
-    }
-    keyUp(e) {
-        let trans = this.object3D.transform;
-        console.log(this.transform.rotationY);
+//     start() {
+//         Engine3D.inputSystem.addEventListener(KeyEvent.KEY_UP, this.keyup, this);
+//         Engine3D.inputSystem.addEventListener(KeyEvent.KEY_DOWN, this.keyDown, this);
+//     }
+//     keyDown(e) {
+//         if (e.keyCode == KeyCode.Key_Right){
+//             this.right = true;
+//         }
+//         else if(e.keyCode = KeyCode.Key_Left){
+//             this.left = true;
+//         }
+//     }
+//     keyUp(e) {
+//         let trans = this.object3D.transform;
+//         console.log(this.transform.rotationY);
 
-        if(e.keyCode == KeyCode.Key_Right){
-            this.right = false;
-        }
-        else if(e.keyCode = KeyCode.Key_Left){
-            this.left = false;
-        }
-        else {
-            trans.rotationY = 0;
-            console.log(trans.rotationY);
-        }
-    }
+//         if(e.keyCode == KeyCode.Key_Right){
+//             this.right = false;
+//         }
+//         else if(e.keyCode = KeyCode.Key_Left){
+//             this.left = false;
+//         }
+//         else {
+//             trans.rotationY = 0;
+//             console.log(trans.rotationY);
+//         }
+//     }
 
-    onUpdate() {
-        if(!this.enable) return;
+//     onUpdate() {
+//         if(!this.enable) return;
 
-        let trans = this.object3D.transform;
-        if(this.left) trans.rotationY -= 5;
-        if(this.right) trans.rotationY += 5;
-    }
-}
+//         let trans = this.object3D.transform;
+//         if(this.left) trans.rotationY -= 5;
+//         if(this.right) trans.rotationY += 5;
+//     }
+// }
 
 export default SceneManager;
