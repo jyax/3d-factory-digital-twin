@@ -1,11 +1,10 @@
 <template>
 
   <div class="model-parent">
-    <p class="label">Model</p>
+    <p class="label">{{label}}</p>
 
     <select class="dropdown" v-model="current" @change="doChange()">
-      <option value="">Default</option>
-      <option v-for="id of options" :value="id">{{id}}</option>
+      <option v-for="id of optionList" :value="id.toLowerCase()">{{id}}</option>
     </select>
   </div>
 
@@ -16,6 +15,8 @@
 .model-parent {
   display: flex;
   flex-direction: row;
+
+  margin-bottom: 8px;
 }
 
 .label {
@@ -58,51 +59,42 @@ option {
 
 <script>
 
-import SceneManager from "../../scene/scene_manager.js";
-
 export default {
   props: {
-    mgr: {
-      type: SceneManager,
-      required: true
+    label: {
+      default: "Dropdown"
+    },
+
+    options: {
+      type: Array,
+      default: []
+    },
+
+    default: {
+      default: ""
+    },
+
+    onChange: {
+      default: val => {}
     }
   },
 
   data() {
     return {
-      options: Array.from(this.mgr.models.keys()).filter(id => id[0] !== '.'),
-      current: this.mgr.getFirstSelected().modelID,
-
-      listener: null
+      optionList: [],
+      current: ""
     }
   },
 
   methods: {
     doChange() {
-      this.mgr.getFirstSelected().setModel(this.current);
-    },
-
-    update() {
-      const s = this.mgr.getFirstSelected();
-
-      if (s === null) {
-        this.current = "";
-        return;
-      }
-
-      this.current = s.modelID;
+      this.onChange(this.current);
     }
   },
 
   created() {
-    this.listener = this.mgr.events.on("select", sel => this.update());
-
-    this.update();
-  },
-
-  destroyed() {
-    if (this.listener !== null)
-      this.mgr.events.remove(this.listener);
+    this.current = this.default;
+    this.optionList = [...this.options];
   }
 }
 

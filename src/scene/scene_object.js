@@ -4,15 +4,13 @@ import {
     BoxGeometry,
     ColliderComponent,
     Color,
-    Engine3D,
     LitMaterial,
     MeshRenderer,
     Object3D,
-    PointerEvent3D,
-    Scene3D,
     Vector3
 } from "@orillusion/core";
 import EventHandler from "../event/event_handler.js";
+import ColorGradient from "../color/color_gradient.js";
 
 /**
  * @module SceneObject
@@ -45,13 +43,15 @@ class SceneObject {
      * @param {string} id Global ID (optional)
      * @param {string} name Name of object (optional)
      * @param {string} modelID ID of model/mesh to use (optional)
+     * @param {boolean} locked Whether user edits of the objects should be prevented
      */
     constructor({
         manager,
         pos = new Vector3(),
         id = "",
         name = "",
-        model: modelID = ""
+        model: modelID = "",
+        locked = false
     } = {}) {
         this._manager = manager;
 
@@ -60,6 +60,8 @@ class SceneObject {
             this.mgr.ids.set(this._id, this);
 
         this.name = name;
+
+        this._locked = locked;
 
         this.modelID = modelID;
 
@@ -87,13 +89,11 @@ class SceneObject {
         col.shape = new BoxColliderShape()
             .setFromCenterAndSize(new Vector3(0, 0, 0), new Vector3(1, 1, 1));
 
-        this.forAll(obj => {
-            //obj.addEventListener(PointerEvent3D.PICK_MOVE, this._mouseOver, this);
-            //obj.addEventListener(PointerEvent3D.PICK_OUT, this._mouseOff, this);
-            //obj.addEventListener(PointerEvent3D.PICK_CLICK, this._click, this);
-        });
-
         this._events = new EventHandler();
+
+        this.liveData = {
+            type: "position"
+        };
     }
 
 
@@ -136,6 +136,23 @@ class SceneObject {
     }
 
     /**
+     * Check if the object is blocking user edits.
+     * @returns {boolean} Whether object is blocking user edits
+     */
+    get locked() {
+        return this._locked;
+    }
+
+    /**
+     * Toggle the locked status of the object.
+     */
+    toggleLock() {
+        this._locked = !this._locked;
+
+        this.events.do("lock", this._locked);
+    }
+
+    /**
      * Get the Orillusion Object3D.
      * @returns {Object3D} Orillusion Object3D
      */
@@ -160,6 +177,7 @@ class SceneObject {
         this.forAll(obj => {
             if (obj.hasComponent(MeshRenderer)) {
                 const bounds = obj.getComponent(MeshRenderer).geometry.bounds.clone();
+
                 if (bb === null)
                     bb = bounds;
                 else
@@ -192,6 +210,16 @@ class SceneObject {
 
         if (val !== "")
             this.mgr.ids.set(this._id, this);
+    }
+
+    /**
+     * Set the locked status of the object.
+     * @param val Whether object should block user edits
+     */
+    set locked(val) {
+        this._locked = val;
+
+        this.events.do("lock", val);
     }
 
     /**
@@ -270,6 +298,17 @@ class SceneObject {
         this.modelID = id;
     }
 
+    /**
+     * Set the color for every part of the object.
+     * @param {Color} color New solid color
+     */
+    setSolidColor(color) {
+        this.forAll(obj => {
+            if (obj.hasComponent(MeshRenderer))
+                obj.getComponent(MeshRenderer).material.baseColor = color;
+        });
+    }
+
 
     // Iteration
 
@@ -308,7 +347,6 @@ class SceneObject {
      * Select this actor.
      */
     select() {
-        console.log('onClick');
         this.mgr.select(this);
     }
 
@@ -351,7 +389,6 @@ class SceneObject {
      * @param e Event
      */
     mouseOver(e) {
-        console.log("Object over");
         document.body.style.cursor = "pointer";
 
         if (this.isSelected())
@@ -364,7 +401,7 @@ class SceneObject {
         const bb = this.getBoundingBox();
 
         this._hoverPreview = String(Math.floor(Math.random() * 4096));
-        this.mgr.view.graphic3D.drawBox(this._hoverPreview, bb.min, bb.max, new Color(0.7, 0.7, 0.7));
+        this.mgr.view.graphic3D.drawBoundingBox(this._hoverPreview, bb, new Color(0.7, 0.7, 0.7));
     }
 
     /**
@@ -383,18 +420,8 @@ class SceneObject {
      * Handle when the mouse is no longer hovering over the object.
      * @param e Event
      */
-    mouseUp(e) {
-        // console.log("Up");
-        // this.mgr.ObjectToMove = undefined;
-        // this.mgr.canMove = false;
-    }
-
-    /**
-     * Handle when the mouse is no longer hovering over the object.
-     * @param e Event
-     */
     mouseDown(e) {
-        console.log("Down");
+        // console.log("Down");
         this.mgr.ObjectToMove = this;
     }
 
@@ -404,10 +431,47 @@ class SceneObject {
      */
     click(e) {
         this.select();
-        console.log("undrag");
+
         if (this._hoverPreview !== "")
             this.mgr.view.graphic3D.Clear(this._hoverPreview);
         this._hoverPreview = "";
+    }
+
+
+    // Live Data
+
+    /**
+     * Handle live data from MQTT.
+     * @param {Object} data Live data from MQTT
+     */
+    handleLiveData(data) {
+        switch (this.liveData.type) {
+            case "single value": {
+                const min = this.liveData.min;
+                const max = this.liveData.max;
+                let val = data["temp"];
+
+                const d = (val - min) / (max - min);
+
+                const color = this.liveData.gradient.get(d);
+
+                this.setSolidColor(color);
+
+                if (val >= this.liveData.max) {
+                    this.mgr.alert("Temperature exceeded maximum threshold.", this.id);
+                }
+
+                break;
+            }
+
+            case "position": {
+                this.setPos(new Vector3(
+                    parseFloat(data["x"]),
+                    parseFloat(data["y"]),
+                    parseFloat(data["z"])
+                ));
+            }
+        }
     }
 }
 
