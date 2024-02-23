@@ -1,7 +1,7 @@
 import tkinter as tk
 import json
 import Publisher
-from asset import Asset, tempSpikeDemo
+from asset import Asset, tempSpikeDemo, animate
 
 
 
@@ -90,6 +90,10 @@ def main(client):
     # button.grid(row=len(assetList)+2,column=2)
 
     button= tk.Button(text='Factory Demo', command=lambda client=client: factoryDemo(client))
-    button.grid(row=len(assetList)+2,column=3)         
+    button.grid(row=len(assetList)+2,column=3)
+
+    button= tk.Button(text='012 Animate', command=lambda client=client: animate(client))
+    button.grid(row=len(assetList)+2,column=4)       
+
 
     root.mainloop()
