@@ -80,8 +80,8 @@ def animate(client):
     TestItemFinal = Asset("1",0,3,0,25.0)
     TestItem2 = Asset("2",0,0,0,25.0)
     TestItemFinal2 = Asset("2",3,0,0,25.0)
-    TestItem3 = Asset("3",0,0,0,25.0)
-    TestItemFinal3 = Asset("3",0,0,3,25.0)
+    TestItem3 = Asset("0",0,0,0,25.0)
+    TestItemFinal3 = Asset("0",0,0,3,25.0)
 
     while (getTime()<10):
         time.sleep(CYCLE_TIME)
@@ -100,8 +100,8 @@ def tempSpikeDemo(client):
     TestItem = Asset("0",0,0,0,0)
     TestItemFinal = Asset("0",0,3,0,105.0)
 
-    while (getTime()<5):
+    while (getTime()<6):
         time.sleep(CYCLE_TIME)
        
-        TestItem.animateSelf(TestItemFinal,0,3)
+        TestItem.animateSelf(TestItemFinal,0,2)
         TestItem.liveUpdate(client)
