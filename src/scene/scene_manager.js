@@ -691,6 +691,8 @@ class SceneManager {
             object.mouseDown();
         }, this);
 
+        this.createNewObject({model: 'dragon',pos:new Vector3(0,0,0)})
+
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, this._onOver, this);
 
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_DOWN, this._onMouseDown, this, null, 999);
