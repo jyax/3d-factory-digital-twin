@@ -1,7 +1,7 @@
 import tkinter as tk
 import json
 import Publisher
-from asset import Asset
+from asset import Asset, tempSpikeDemo, animate
 
 
 
@@ -30,6 +30,12 @@ def updateAll(client,assetList):
 
 def addRow(assetList):
     assetList.append(Asset())
+
+def factoryDemo(client):
+    readIn('./mqtt-emulator/alphaDemo.json')
+    updateAll(client,assetList)
+    readIn('./mqtt-emulator/sample.json')
+
 
    
 
@@ -76,13 +82,18 @@ def main(client):
     
     button= tk.Button(text='Update All', command=lambda client=client, assetList=assetList:updateAll(client,assetList))
     button.grid(row=len(assetList)+2,column=1)
+    
+    button= tk.Button(text='Temp Demo', command=lambda client=client: tempSpikeDemo(client))
+    button.grid(row=len(assetList)+2,column=2)
 
     # button= tk.Button(text='Add Row', command=lambda assetList=assetList: addRow(assetList))
     # button.grid(row=len(assetList)+2,column=2)
 
-       
-            
-    
-             
+    button= tk.Button(text='Factory Demo', command=lambda client=client: factoryDemo(client))
+    button.grid(row=len(assetList)+2,column=3)
+
+    button= tk.Button(text='012 Animate', command=lambda client=client: animate(client))
+    button.grid(row=len(assetList)+2,column=4)       
+
 
     root.mainloop()

@@ -7,7 +7,6 @@ from asset import Asset
 
 assetList = []
 
-
 def save(data, filepath):
     parse = []
     for item in data:
@@ -53,6 +52,7 @@ def main(client):
 
     # Create labels and entry fields for x, y, z positions, and temperature
     attributes = ["Asset ID", "X Position", "Y Position", "Z Position", "Temperature"]
+    nextAttr = ["Asset ID", "X Position", "Y Position", "Z Position", "Temperature"]
     
     for row, obj in enumerate(assetList):
         row+=1 #offset for column headers 

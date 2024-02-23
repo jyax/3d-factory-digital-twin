@@ -60,15 +60,18 @@ class Asset:
 
     
     def animateSelf(self, goalstate, start_time, duration):
+        
         curr = self.asDict()
         vals = list(curr.values())
         keys =list(curr.keys())
         end = goalstate.asDict()
 
         for i in range(1,len(keys)):
-            curr.update({keys[i]:calc_val(vals[i],end[keys[i]],start_time,duration)})
+            curr.update({keys[i]:calc_val(vals[i],end[keys[i]],start_time,duration/CYCLE_TIME)})
             # print(calc_val(vals[i],end[keys[i]],start_time,duration))
         self.UpdateSelf(curr['id'], curr['x'],curr['y'],curr['z'],curr['temp'])
+
+        
         
 def animate(client):
 
@@ -77,9 +80,8 @@ def animate(client):
     TestItemFinal = Asset("1",0,3,0,25.0)
     TestItem2 = Asset("2",0,0,0,25.0)
     TestItemFinal2 = Asset("2",3,0,0,25.0)
-    TestItem3 = Asset("3",0,0,0,25.0)
-    TestItemFinal3 = Asset("3",0,0,3,25.0)
-    
+    TestItem3 = Asset("0",0,0,0,25.0)
+    TestItemFinal3 = Asset("0",0,0,3,25.0)
 
     while (getTime()<10):
         time.sleep(CYCLE_TIME)
@@ -94,3 +96,12 @@ def animate(client):
         pub.publish(client,json.dumps(TestItem3.asDict()))
 
 
+def tempSpikeDemo(client):
+    TestItem = Asset("0",0,0,0,0)
+    TestItemFinal = Asset("0",0,3,0,105.0)
+
+    while (getTime()<6):
+        time.sleep(CYCLE_TIME)
+       
+        TestItem.animateSelf(TestItemFinal,0,2)
+        TestItem.liveUpdate(client)
