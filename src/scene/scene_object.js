@@ -72,12 +72,13 @@ class SceneObject {
         this._hoverPreview = "";
 
         if (modelID === "") {
-            mesh = this._object.addComponent(MeshRenderer);
-            mesh.geometry = new BoxGeometry();
-            mesh.material = new LitMaterial();
-            mesh.material.baseColor = new Color(0.2, 0.5, 1);
-            mesh.material.roughness = 1;
-            mesh.material.metallic = 0;
+            // mesh = this._object.addComponent(MeshRenderer);
+            // mesh.geometry = new BoxGeometry();
+            // mesh.material = new LitMaterial();
+            // mesh.material.baseColor = new Color(0.2, 0.5, 1);
+            // mesh.material.roughness = 1;
+            // mesh.material.metallic = 0;
+            
         } else {
             this._object.addChild(this.mgr.models.get(modelID).clone());
         }
@@ -372,6 +373,7 @@ class SceneObject {
      * @returns {SceneObject} Duplicate object
      */
     duplicate() {
+        cloned
         const copy = this.copy();
 
         this.mgr.addObject(copy);
