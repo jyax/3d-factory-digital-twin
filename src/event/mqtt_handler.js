@@ -1,83 +1,84 @@
-import SceneManager from "../scene/scene_manager";
-import SceneObject from "../scene/scene_object";
+/**
+ * @module MQTTHandler
+ * @fileoverview Contains MQTTHandler class.
+ */
 
-// MQTT Broker Configurations
-var broker = 'ws://broker.emqx.io:8083/mqtt'; // Update with your EMQ X broker WebSocket URL
-var topic = 'python/mqtt'; // Update with your MQTT topic
+/**
+ * @class
+ * Handler for MQTT live data.
+ */
+class MQTTHandler {
+    static BROKER_SERVER = 'ws://35.9.22.105:8083/mqtt';
+    static BROKER_LOCAL = 'ws://localhost:8083/mqtt';
 
-// Create a client instance
-const options = {
-    // Clean session
-    clean: true,
-    connectTimeout: 4000,
-    // Authentication
-    clientId: 'emqx_test',
-    username: 'emqx_test',
-    password: 'emqx_test',
-  }
+    static TOPIC = 'python/mqtt';
 
-const client = mqtt.connect(broker, options);
-
-
-// set callback handlers
-// client.onConnectionLost = onConnectionLost;
-// client.onMessageArrived = onMessageArrived;
-
-// connect the client
-client.on('connect', () => onConnect());
-// client.on('message', (topic, message)  => onMessageArrived(message));
-client.on('message', (topic, message) => {
-    console.log('receive message：', topic, message.toString())
-  })
-  client.on('error', (error) => {
-    console.log('Connection failed:', error)
-})
-// called when the client connects
-function onConnect() {
-    console.log("Connected");
-    // subscribe to a topic
-    //client.subscribe(topic);
-    client.subscribe(topic, { qos: 0 }, function (error, granted) {
-        if (error) {
-          console.log(error)
-        } else {
-          console.log(granted)
-          console.log(client)
+    /**
+     * Create a new MQTT Handler.
+     * @param {SceneManager} mgr Central scene manager
+     * @param {boolean} server Whether to use server instead of localhost (false by default)
+     * @param {Object} options Options for MQTT connection
+     */
+    constructor({
+        mgr,
+        server = false,
+        options = {
+            // Clean session
+            clean: true,
+            connectTimeout: 4000,
+            // Authentication
+            clientId: 'emqx_test',
+            username: 'root',
+            password: 'M0nG0$$w0rd'
         }
-      })
-}
+    }) {
+        this.mgr = mgr;
 
-// called when a message arrives
-function onMessageArrived(message) {
-    console.log("Message Arrived: " + message);
-    parse = message.split(',');
-    id = parse[0];
-    parse.remove(0);
-    floats = parse.split(',').map(item => parseFloat(item.trim()));
-    SceneManager.forEach(SceneObject => {
-        if(SceneObject.id == id){
-            SceneObject.setPos(floats[0],floats[1],floats[2])
-            //SET TEMP
-            //SceneObject.setTemp(floats[3]);
+        this.broker = MQTTHandler.BROKER_LOCAL;
+        if (server)
+            this.broker = MQTTHandler.BROKER_SERVER;
+
+        this.client = mqtt.connect(this.broker, options);
+
+        this.client.on("connect", () => this._onConnect());
+        this.client.on("message", (topic, message) => this._onMessage(message));
+        this.client.on("error", error => console.log("Connection failed: " + error));
+    }
+
+
+    // Handling
+
+    /**
+     * Handle MQTT connection.
+     * @private
+     */
+    _onConnect() {
+        this.client.subscribe(MQTTHandler.TOPIC, { qos: 0 }, (error, granted) => {
+            if (error)
+                console.log(error);
+            else
+                console.log('Connected to:' + this.broker);
+        });
+    }
+
+    /**
+     * Handle the receiving of live MQTT data.
+     * @param {string} message String containing live data
+     * @private
+     */
+    _onMessage(message){
+        console.log("Parsing: " + message.toString());
+        const data = JSON.parse(message);
+        console.log(this.mgr.ids)
+
+        let obj = this.mgr.getObjectById(data.id);
+        if (obj === null) {
+            console.log(data.id +' is NOT a valid object');
+            return;
         }
-    });
-}
 
-// called when the client loses its connection
-function onConnectionLost(responseObject) {
-    if (responseObject.errorCode !== 0) {
-        console.log("Connection Lost: " + responseObject.errorMessage);
+        obj.handleLiveData(data);
     }
 }
 
-export default{
-    onConnect:onConnect,
-    onMessageArrived:onMessageArrived,
-    onConnectionLost:onConnectionLost,
-    client:client,
-    broker:broker,
-    options:options
-
-
-
-};
+export default MQTTHandler;

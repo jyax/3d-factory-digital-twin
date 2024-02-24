@@ -1,10 +1,16 @@
 <template>
-  <div class="listing" @click="this.object.select()" :class="dynamicStyle">
+  <div class="listing" @click="this.object.select(); this.object.mouseOff()" :class="dynamicStyle" @mouseover="this.object.mouseOver()"
+       @mouseout="this.object.mouseOff()">
     <p class="listing-name anonymous" v-if="name === ''">Object</p>
     <p class="listing-name" v-if="name !== ''">{{name}}</p>
     <div class="listing-buttons">
-      <img class="listing-button" src="../assets/icon/lock-slash.svg" alt="Lock">
+      <img class="listing-button" src="../assets/icon/lock-slash.svg" alt="Lock" @click.stop="object.toggleLock()"
+           v-if="!locked">
+      <img class="listing-button" src="../assets/icon/lock.svg" alt="Lock" @click.stop="object.toggleLock()"
+           v-if="locked">
+      <!--
       <img class="listing-button" src="../assets/icon/trash.svg" alt="Delete" @click.stop="doDelete()">
+      -->
     </div>
   </div>
 </template>
@@ -98,8 +104,10 @@
       return {
         selectListener: null,
         renameListener: null,
+        lockedListener: null,
         selected: false,
-        name: ""
+        name: "",
+        locked: false
       }
     },
 
@@ -115,6 +123,7 @@
       update() {
         this.selected = this.object.isSelected();
         this.name = this.object.id;
+        this.locked = this.object.locked;
       },
 
       doDelete() {
@@ -125,8 +134,7 @@
     created() {
       this.selectListener = this.object.mgr.events.on("select", () => this.update());
       this.renameListener = this.object.mgr.events.on("rename", () => this.update());
-
-      this.name = this.object.id;
+      this.lockedListener = this.object.events.on("lock", () => this.update());
 
       this.update();
     },
@@ -134,6 +142,7 @@
     destroyed() {
       this.mgr.events.remove(this.selectListener);
       this.mgr.events.remove(this.renameListener);
+      this.object.events.remove(this.lockedListener);
     }
   };
 </script>

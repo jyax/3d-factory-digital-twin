@@ -7,10 +7,10 @@ import {
     LitMaterial,
     MeshRenderer,
     Object3D,
-    PointerEvent3D,
     Vector3
 } from "@orillusion/core";
 import EventHandler from "../event/event_handler.js";
+import ColorGradient from "../color/color_gradient.js";
 
 /**
  * @module SceneObject
@@ -24,19 +24,34 @@ import EventHandler from "../event/event_handler.js";
  */
 class SceneObject {
     /**
+     * Get the root Object3D of an object.
+     * @param {Object3D} object Object to find root of
+     * @returns {Object3D} Root object
+     */
+    static GetRoot(object) {
+        if (object.parentObject != null)
+            if (object.parentObject instanceof Object3D)
+                return this.GetRoot(object.parentObject)
+
+        return object;
+    }
+
+    /**
      * Create a new scene object.
      * @param {SceneManager} manager Parent scene manager
      * @param {Vector3} pos Initial position (optional)
      * @param {string} id Global ID (optional)
      * @param {string} name Name of object (optional)
      * @param {string} modelID ID of model/mesh to use (optional)
+     * @param {boolean} locked Whether user edits of the objects should be prevented
      */
     constructor({
         manager,
         pos = new Vector3(),
         id = "",
         name = "",
-        model: modelID = ""
+        model: modelID = "",
+        locked = false
     } = {}) {
         this._manager = manager;
 
@@ -46,19 +61,24 @@ class SceneObject {
 
         this.name = name;
 
+        this._locked = locked;
+
         this.modelID = modelID;
 
         let mesh;
 
         this._object = new Object3D();
 
+        this._hoverPreview = "";
+
         if (modelID === "") {
-            mesh = this._object.addComponent(MeshRenderer);
-            mesh.geometry = new BoxGeometry();
-            mesh.material = new LitMaterial();
-            mesh.material.baseColor = new Color(0.2, 0.5, 1);
-            mesh.material.roughness = 1;
-            mesh.material.metallic = 0;
+            // mesh = this._object.addComponent(MeshRenderer);
+            // mesh.geometry = new BoxGeometry();
+            // mesh.material = new LitMaterial();
+            // mesh.material.baseColor = new Color(0.2, 0.5, 1);
+            // mesh.material.roughness = 1;
+            // mesh.material.metallic = 0;
+            
         } else {
             this._object.addChild(this.mgr.models.get(modelID).clone());
         }
@@ -69,13 +89,11 @@ class SceneObject {
         col.shape = new BoxColliderShape()
             .setFromCenterAndSize(new Vector3(0, 0, 0), new Vector3(1, 1, 1));
 
-        this.forAll(obj => {
-            obj.addEventListener(PointerEvent3D.PICK_MOVE, this._mouseOver, this);
-            obj.addEventListener(PointerEvent3D.PICK_OUT, this._mouseOff, this);
-            obj.addEventListener(PointerEvent3D.PICK_CLICK, this._click, this);
-        });
-
         this._events = new EventHandler();
+
+        this.liveData = {
+            type: "position"
+        };
     }
 
 
@@ -85,9 +103,9 @@ class SceneObject {
      * Delete the object and remove it from the scene manager.
      */
     delete() {
-        this._object.destroy();
-
         this.mgr.removeObject(this);
+
+        this._object.destroy();
     }
 
 
@@ -118,6 +136,23 @@ class SceneObject {
     }
 
     /**
+     * Check if the object is blocking user edits.
+     * @returns {boolean} Whether object is blocking user edits
+     */
+    get locked() {
+        return this._locked;
+    }
+
+    /**
+     * Toggle the locked status of the object.
+     */
+    toggleLock() {
+        this._locked = !this._locked;
+
+        this.events.do("lock", this._locked);
+    }
+
+    /**
      * Get the Orillusion Object3D.
      * @returns {Object3D} Orillusion Object3D
      */
@@ -142,6 +177,7 @@ class SceneObject {
         this.forAll(obj => {
             if (obj.hasComponent(MeshRenderer)) {
                 const bounds = obj.getComponent(MeshRenderer).geometry.bounds.clone();
+
                 if (bb === null)
                     bb = bounds;
                 else
@@ -174,6 +210,16 @@ class SceneObject {
 
         if (val !== "")
             this.mgr.ids.set(this._id, this);
+    }
+
+    /**
+     * Set the locked status of the object.
+     * @param val Whether object should block user edits
+     */
+    set locked(val) {
+        this._locked = val;
+
+        this.events.do("lock", val);
     }
 
     /**
@@ -239,20 +285,28 @@ class SceneObject {
 
         const copy = this.mgr.models.get(id).clone();
         this._object.transform.cloneTo(copy);
+        this.mgr.revObjects.delete(this._object);
         this._object.destroy();
         this._object = copy;
         this.mgr.scene.addChild(this._object);
 
-        this.forAll(obj => {
-            obj.addEventListener(PointerEvent3D.PICK_MOVE, this._mouseOver, this);
-            obj.addEventListener(PointerEvent3D.PICK_OUT, this._mouseOff, this);
-            obj.addEventListener(PointerEvent3D.PICK_CLICK, this._click, this);
-        });
+        this.mgr.revObjects.set(this._object, this);
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
 
         this.modelID = id;
+    }
+
+    /**
+     * Set the color for every part of the object.
+     * @param {Color} color New solid color
+     */
+    setSolidColor(color) {
+        this.forAll(obj => {
+            if (obj.hasComponent(MeshRenderer))
+                obj.getComponent(MeshRenderer).material.baseColor = color;
+        });
     }
 
 
@@ -319,6 +373,7 @@ class SceneObject {
      * @returns {SceneObject} Duplicate object
      */
     duplicate() {
+        cloned
         const copy = this.copy();
 
         this.mgr.addObject(copy);
@@ -332,28 +387,91 @@ class SceneObject {
     /**
      * Handle when the mouse hovers over the object.
      * @param e Event
-     * @private
      */
-    _mouseOver(e) {
+    mouseOver(e) {
         document.body.style.cursor = "pointer";
+
+        if (this.isSelected())
+            return;
+
+        if (this._hoverPreview !== "")
+            this.mgr.view.graphic3D.Clear(this._hoverPreview);
+        this._hoverPreview = "";
+
+        const bb = this.getBoundingBox();
+
+        this._hoverPreview = String(Math.floor(Math.random() * 4096));
+        this.mgr.view.graphic3D.drawBoundingBox(this._hoverPreview, bb, new Color(0.7, 0.7, 0.7));
     }
 
     /**
      * Handle when the mouse is no longer hovering over the object.
      * @param e Event
-     * @private
      */
-    _mouseOff(e) {
+    mouseOff(e) {
         document.body.style.cursor = "default";
+
+        if (this._hoverPreview !== "")
+            this.mgr.view.graphic3D.Clear(this._hoverPreview);
+        this._hoverPreview = "";
+    }
+
+    /**
+     * Handle when the mouse is no longer hovering over the object.
+     * @param e Event
+     */
+    mouseDown(e) {
+        // console.log("Down");
+        this.mgr.ObjectToMove = this;
     }
 
     /**
      * Handle when the mouse clicks on the object.
      * @param e Event
-     * @private
      */
-    _click(e) {
+    click(e) {
         this.select();
+
+        if (this._hoverPreview !== "")
+            this.mgr.view.graphic3D.Clear(this._hoverPreview);
+        this._hoverPreview = "";
+    }
+
+
+    // Live Data
+
+    /**
+     * Handle live data from MQTT.
+     * @param {Object} data Live data from MQTT
+     */
+    handleLiveData(data) {
+        switch (this.liveData.type) {
+            case "single value": {
+                const min = this.liveData.min;
+                const max = this.liveData.max;
+                let val = data["temp"];
+
+                const d = (val - min) / (max - min);
+
+                const color = this.liveData.gradient.get(d);
+
+                this.setSolidColor(color);
+
+                if (val >= this.liveData.max) {
+                    this.mgr.alert("Temperature exceeded maximum threshold.", this.id);
+                }
+
+                break;
+            }
+
+            case "position": {
+                this.setPos(new Vector3(
+                    parseFloat(data["x"]),
+                    parseFloat(data["y"]),
+                    parseFloat(data["z"])
+                ));
+            }
+        }
     }
 }
 
