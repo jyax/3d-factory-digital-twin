@@ -5,8 +5,8 @@ const { MongoClient, GridFSBucket } = require('mongodb');
 const fs = require('fs');
 const path = require('path');
 
-const uri = 'mongodb://localhost:27017/';
-const dbName = 'test';
+const uri = 'mongodb+srv://alanfeng6:magnaspring24@magna-cluster.xht2nlr.mongodb.net/';
+const dbName = 'Magna-db';
 const modelPath = '../glb_models';
 
 /**

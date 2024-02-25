@@ -1181,8 +1181,8 @@ class SceneManager {
     }
 
     _onMouseMove(e){
-        // If right mouse is being clicked on a moveable object then continue else return
-        if (this.canMove && this.ObjectToMove != undefined){
+        // If right mouse is being clicked on a movable object then continue else return
+        if (this.canMove && this.ObjectToMove !== undefined){
             // Stop camera movement with mouse
             e.stopImmediatePropagation();
 
@@ -1251,5 +1251,102 @@ class SceneManager {
 //         if(this.right) trans.rotationY += 5;
 //     }
 // }
+
+// create a connection to mongodb
+
+// import { MongoClient } from 'mongodb';
+//
+// // Connection URI
+// const uri = 'mongodb://localhost:27017';
+//
+// // Database Name
+// const dbName = 'test';
+//
+// // Create a new MongoClient
+// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+//
+// Connect to the MongoDB server
+// async function ConnectToMongoDB() {
+//     try {
+//         // Connect to MongoDB
+//         await client.connect();
+//         console.log('Connected to MongoDB');
+//
+//         // Select the database
+//         const db = client.db(dbName);
+//
+//         return db;
+//     } catch (error) {
+//         console.error('Error connecting to MongoDB:', error);
+//         throw error;
+//     }
+// }
+//
+// module.exports = ConnectToMongoDB;
+//
+// // use connection in routes
+//
+// // routes/modelRoutes.js
+// const express = require('express');
+// const router = express.Router();
+// const connectToMongoDB = require('../db');
+//
+// // Define routes
+// router.get('/model/:id', async (req, res) => {
+//     try {
+//         // Connect to MongoDB
+//         const db = await connectToMongoDB();
+//
+//         // Access collection and perform operations
+//         const collection = db.collection('fs.files');
+//         const modelFile = await collection.findOne({ _id: req.params.id });
+//
+//         // Send model file as response
+//         res.send(modelFile);
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).send('Server Error');
+//     }
+// });
+//
+// module.exports = router;
+//
+// // Close the MongoDB connection when the application terminates
+// process.on('SIGINT', async () => {
+//     try {
+//         await client.close();
+//         console.log('MongoDB connection closed');
+//         process.exit(0);
+//     } catch (error) {
+//         console.error('Error closing MongoDB connection:', error);
+//         process.exit(1);
+//     }
+// });
+
+import { MongoClient, ServerApiVersion } from 'mongodb';
+
+const uri = "mongodb+srv://alanfeng6:magnaspring24@magna-cluster.xht2nlr.mongodb.net/?retryWrites=true&w=majority&appName=Magna-cluster";
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri, {
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    }
+});
+
+async function run() {
+    try {
+        // Connect the client to the server	(optional starting in v4.7)
+        await client.connect();
+        // Send a ping to confirm a successful connection
+        await client.db("admin").command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    } finally {
+        // Ensures that the client will close when you finish/error
+        await client.close();
+    }
+}
+run().catch(console.dir);
 
 export default SceneManager;
