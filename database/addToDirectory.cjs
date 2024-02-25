@@ -7,13 +7,9 @@ const fs = require('fs');
 const path = require('path');
 const { MongoClient, GridFSBucket } = require('mongodb');
 
-const uri = 'mongodb://localhost:27017/';
-const dbName = 'test';
+const uri = 'mongodb+srv://alanfeng6:magnaspring24@magna-cluster.xht2nlr.mongodb.net/';
+const dbName = 'Magna-db';
 const localDirectory = '../glb_models_2';
-const remoteHost = '35.9.22.105';
-const remotePort = 22;
-const remoteUsername = 'magna_user';
-const remoteDirectory = './shared_files'; // Update with desired remote directory
 
 /**
  * connect to mongodb
@@ -33,11 +29,11 @@ async function ConnectToDatabase() {
 }
 
 /**
- * download files to local computer and transfer to remote server
+ * download files to local computer
  * @returns {Promise<void>}
  * @constructor
  */
-async function DownloadAndTransferFiles() {
+async function DownloadFiles() {
     const db = await ConnectToDatabase();
     try {
         console.log('MongoDB connection established');
@@ -57,24 +53,24 @@ async function DownloadAndTransferFiles() {
             }
             const outputFilePath = path.join(localDirectory, fileName);
 
-            const command = `scp -P ${remotePort} "${outputFilePath}" ${remoteUsername}@${remoteHost}:${remoteDirectory}/`;
-
-            const transferPromise = new Promise((resolve, reject) => {
-                exec(command)
-                    .then(() => {
-                        console.log(`File "${fileName}" transferred successfully`);
-                        resolve();
-                    })
-                    .catch((err) => {
-                        console.error(`Error transferring file "${fileName}"`, err);
-                        reject(err);
-                    });
-            });
-            downloadAndTransferPromises.push(transferPromise);
+            // Download the file from GridFS and write it to the local directory
+            downloadAndTransferPromises.push(new Promise((resolve, reject) => {
+                const downloadStream = bucket.openDownloadStream(file._id);
+                const fileStream = fs.createWriteStream(outputFilePath);
+                downloadStream.pipe(fileStream);
+                fileStream.on('finish', () => {
+                    console.log(`File "${fileName}" downloaded and saved to "${outputFilePath}"`);
+                    resolve();
+                });
+                fileStream.on('error', (err) => {
+                    console.error(`Error saving file "${fileName}" to "${outputFilePath}":`, err);
+                    reject(err);
+                });
+            }));
         }
 
         await Promise.all(downloadAndTransferPromises);
-        console.log('All files downloaded and transferred successfully');
+        console.log('All files downloaded and saved to local directory successfully');
     } catch (err) {
         console.error('Error downloading and transferring files', err);
     } finally {
@@ -82,4 +78,4 @@ async function DownloadAndTransferFiles() {
     }
 }
 
-DownloadAndTransferFiles();
+DownloadFiles();
