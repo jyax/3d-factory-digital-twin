@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const { pipeline } = require('stream');
 
-const uri = 'mongodb://localhost:27017/';
+const url = 'mongodb://root:password@localhost:27017';
 const dbName = 'local';
 const modelPath = '../glb_models';
 
@@ -15,7 +15,7 @@ const modelPath = '../glb_models';
  * @returns {Promise<MongoClient>}
  */
 async function ConnectToDatabase() {
-    const client = new MongoClient(uri);
+    const client = new MongoClient(url);
     try {
         await client.connect();
         console.log('Connected to MongoDB');
@@ -32,54 +32,36 @@ async function ConnectToDatabase() {
  * @param filePath file path to add to
  * @param fileName file name to add
  * @returns {Promise<unknown>}
- * @constructor
  */
 async function UploadFile(db, filePath, fileName) {
     const bucket = new GridFSBucket(db);
 
     const metadata = {
-        contentType: 'model/gltf-binary',
-        filename: `${fileName}.glb`
+        contentType: 'model/gltf-binary', // GLB file content type
+        filename: `${fileName}.glb` // Append the .glb extension to the file name
     };
+
+    const fileStream = fs.createReadStream(filePath);
 
     // Check file size to ensure it contains data
     const stats = fs.statSync(filePath);
     if (stats.size === 0) {
         console.error(`File "${fileName}" is empty. Skipping upload.`);
-        return Promise.resolve(); // Return a resolved promise if the file is empty
+        return;
     }
 
-    console.log(`Starting upload for file: ${fileName}.glb`);
-
-    // Create the upload stream outside of the Promise constructor
-    const uploadStream = bucket.openUploadStream(metadata);
-
-    // Wrap the file reading in a promise-based function
-    const readFile = () => {
-        return new Promise((resolve, reject) => {
-            const fileStream = fs.createReadStream(filePath);
-            fileStream.on('error', reject);
-            fileStream.pipe(uploadStream)
-                .on('finish', resolve) // Resolve the promise when the file stream has been fully piped
-                .on('error', reject);  // Reject the promise if there's an error during piping
-        });
-    };
+    const uploadStream = bucket.openUploadStream(`${fileName}.glb`, { metadata }); // Use the updated file name
 
     return new Promise((resolve, reject) => {
-        // Handle errors during upload
+        fileStream.pipe(uploadStream);
         uploadStream.on('error', err => {
             console.error(`Error uploading file "${fileName}":`, err);
             reject(err);
         });
-
-        // Handle completion of upload
-        uploadStream.once('finish', () => {
+        uploadStream.on('finish', () => {
             console.log(`File "${fileName}" uploaded successfully`);
             resolve();
         });
-
-        // Call the readFile function to start reading the file
-        readFile().catch(reject);
     });
 }
 
