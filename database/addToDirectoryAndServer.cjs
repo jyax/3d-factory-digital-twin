@@ -7,8 +7,8 @@ const fs = require('fs');
 const path = require('path');
 const { MongoClient, GridFSBucket } = require('mongodb');
 
-const uri = 'mongodb+srv://alanfeng6:magnaspring24@magna-cluster.xht2nlr.mongodb.net/';
-const dbName = 'Magna-db';
+const url = 'mongodb://root:password@localhost:27017';
+const dbName = 'local';
 const localDirectory = '../glb_models_2';
 const remoteHost = '35.9.22.105';
 const remotePort = 22;
@@ -21,7 +21,7 @@ const remoteDirectory = './shared_files'; // Update with desired remote director
  * @constructor
  */
 async function ConnectToDatabase() {
-    const client = new MongoClient(uri);
+    const client = new MongoClient(url);
     try {
         await client.connect();
         console.log('Connected to MongoDB');
