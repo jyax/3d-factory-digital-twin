@@ -11,6 +11,7 @@
   "dependencies": {
     "@orillusion/core": "^0.7.2",
     "gltf-pipeline": "^4.1.0",
+    "gridfs-stream": "^1.1.1",
     "mongodb": "^6.3.0",
     "util": "^0.12.5",
     "util.promisify": "^1.1.2",
