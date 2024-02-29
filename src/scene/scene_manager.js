@@ -639,6 +639,13 @@ class SceneManager {
 
                     break;
                 }
+                case "s": {
+                    if (event.ctrlKey) {
+                        event.preventDefault()
+                        this.saveScene()
+                    }
+                    break
+                }
 
                 case "Tab": {
                     if (document.querySelector(":focus"))
@@ -823,6 +830,29 @@ class SceneManager {
         return Array.from(this.objects.values());
     }
 
+    /**
+     * Save scene information to JSON.
+     * @returns JSON Downloadable JSON file
+     */
+    saveScene() {
+        let currentScene = this.getAllObjects().map(obj => obj.serializeObject())
+        let jsonString = JSON.stringify(currentScene, null, 3)
+
+        let sceneBlob = new Blob([jsonString], {type: "application/json"})
+        const blobUrl = URL.createObjectURL(sceneBlob);
+
+        // Create element to do a click event for blobUrl
+        const downloadLink = document.createElement("a")
+        downloadLink.href = blobUrl
+
+        // Need to add for it to ask for file name if none set
+        let saveName = "scene"
+        downloadLink.download = `${saveName}.json`
+        downloadLink.click()
+
+        // Remove the URL from usage
+        URL.revokeObjectURL(blobUrl)
+    }
 
     // Objects - Creation
 
