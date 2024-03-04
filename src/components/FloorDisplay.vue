@@ -8,8 +8,6 @@
 
   let mgr = new SceneManager();
   window.manager = mgr;
-  
-  const canvas = ref("canvas");
 
   onMounted(() => {
     mgr.init();
@@ -17,8 +15,6 @@
 </script>
 
 <template>
-
-  <canvas id="canvas" ref="canvas" @mousedown="mgr.startDrag" @mouseleave="mgr.stopDrag" @mouseup="mgr.stopDrag"></canvas>
 
   <object-info :mgr="mgr"/>
   <toolbar :mgr="mgr"/>
@@ -28,10 +24,6 @@
   <load-bar :mgr="mgr"/>
 
 </template>
-
-<style scoped>
-
-</style>
 
 <script>
   import Outline from "./Outline.vue";

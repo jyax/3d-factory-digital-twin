@@ -77,15 +77,15 @@
 </style>
 
 <script>
-import SceneManager from "../../scene/scene_manager.js";
 import {Vector3} from "@orillusion/core";
+import SceneObject from "../../scene/scene_object.js";
 
 export default {
   name: "ObjectInfoPosition",
 
   props: {
-    mgr: {
-      type: SceneManager,
+    object: {
+      type: SceneObject,
       required: true
     }
   },
@@ -102,37 +102,29 @@ export default {
 
   methods: {
     doX() {
-      this.mgr.getFirstSelected().setX(parseFloat(this.xVal));
+      this.object.setX(parseFloat(this.xVal));
     },
 
     doY() {
-      this.mgr.getFirstSelected().setY(parseFloat(this.yVal));
+      this.object.setY(parseFloat(this.yVal));
     },
 
     doZ() {
-      this.mgr.getFirstSelected().setZ(parseFloat(this.zVal));
+      this.object.setZ(parseFloat(this.zVal));
     },
 
     blurInput(e) {
       e.target.blur();
-    },
-
-    update(selected) {
-      if (selected.length !== 1)
-        this.pos = new Vector3();
-      else
-        this.pos = selected[0].getObject3D().localPosition;
-
-      this.xVal = Math.floor(this.pos.x * 100) / 100;
-      this.yVal = Math.floor(this.pos.y * 100) / 100;
-      this.zVal = Math.floor(this.pos.z * 100) / 100;
     }
   },
 
   created() {
-    this.mgr.events.on("select", selected => this.update(selected));
+    this.pos = this.object.getObject3D().localPosition;
 
-    this.update(this.mgr.getSelected());
+    this.xVal = Math.floor(this.pos.x * 100) / 100;
+    this.yVal = Math.floor(this.pos.y * 100) / 100;
+    this.zVal = Math.floor(this.pos.z * 100) / 100;
   }
 }
+
 </script>

@@ -44,15 +44,13 @@
   top: 50%;
   transform: translate(-50%, -50%);
 
-  width: 12vw;
-
   display: flex;
   flex-direction: column;
 
-  padding: 8px;
-  border-radius: 8px;
+  padding: 12px;
+  border-radius: 6px;
 
-  background-color: rgba(0, 0, 0, 0.45);
+  background-color: rgba(0, 0, 0, 0.4);
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
 }
 
@@ -65,13 +63,13 @@
 
   background-color: rgba(255, 255, 255, 0.2);
 
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 .bar-fill {
   height: 100%;
 
-  border-radius: 4px;
+  border-radius: 2px;
 
   background-color: #75bb6e;
 
@@ -119,7 +117,7 @@ export default {
   created() {
     this.listener = this.mgr.events.on("load_models", progress => this.progress = progress);
 
-    this.gradient.set(0, new Color(0.99, 1, 0.39));
+    this.gradient.set(0.33, new Color(0.5, 0.5, 0.5));
     this.gradient.set(1, new Color(0.45, 0.93, 0.34));
   },
 

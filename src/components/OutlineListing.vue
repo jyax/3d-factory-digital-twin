@@ -6,7 +6,7 @@
     <div class="listing-buttons">
       <img class="listing-button" src="../assets/icon/lock-slash.svg" alt="Lock" @click.stop="object.toggleLock()"
            v-if="!locked">
-      <img class="listing-button" src="../assets/icon/lock.svg" alt="Lock" @click.stop="object.toggleLock()"
+      <img class="listing-button locked-button" src="../assets/icon/lock.svg" alt="Lock" @click.stop="object.toggleLock()"
            v-if="locked">
       <!--
       <img class="listing-button" src="../assets/icon/trash.svg" alt="Delete" @click.stop="doDelete()">
@@ -133,7 +133,7 @@
 
     created() {
       this.selectListener = this.object.mgr.events.on("select", () => this.update());
-      this.renameListener = this.object.mgr.events.on("rename", () => this.update());
+      this.renameListener = this.object.events.on("rename", () => this.update());
       this.lockedListener = this.object.events.on("lock", () => this.update());
 
       this.update();
@@ -141,7 +141,7 @@
 
     destroyed() {
       this.mgr.events.remove(this.selectListener);
-      this.mgr.events.remove(this.renameListener);
+      this.object.events.remove(this.renameListener);
       this.object.events.remove(this.lockedListener);
     }
   };
