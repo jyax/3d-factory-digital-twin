@@ -20,8 +20,8 @@ import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
 import Util from "../util/Util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
-//import AddToMongoDBWebBrowser from '../../database/AddToMongoDBWebBrowser.js';
-import ModelLoader from '../../database/ModelLoader.js';
+import AddToMongoDBWebBrowser from '../../database/AddToMongoDBWebBrowser.js';
+//import ModelLoader from '../../database/ModelLoader.js';
 
 /**
  * @module SceneManager
@@ -114,9 +114,9 @@ class SceneManager {
         const appId = 'application-0-irddf';
 
         // Create an instance of AddToMongoDBWebBrowser
-        //this.addToMongoDBWebBrowser = new AddToMongoDBWebBrowser(appId);
+        this.addToMongoDBWebBrowser = new AddToMongoDBWebBrowser(appId);
 
-        this.modelLoader = new ModelLoader(appId, SceneManager.MODELS);
+        //this.modelLoader = new ModelLoader(appId, SceneManager.MODELS);
     }
 
     /**
@@ -709,6 +709,9 @@ class SceneManager {
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_DOWN, this._onMouseDown, this, null, 999);
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_MOVE, this._onMouseMove, this);
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_UP, this._onMouseUp, this);
+
+        // mongodb init
+        await this.modelLoader.loadModelsFromMongoDB();
     }
 
 
@@ -1381,7 +1384,7 @@ class SceneManager {
 const sceneManager = new SceneManager();
 
 // Run the AddToMongoDBWebBrowser instance
-//sceneManager.runAddToMongoDB();
-sceneManager.runModelLoader();
+sceneManager.runAddToMongoDB();
+//sceneManager.runModelLoader();
 
 export default SceneManager;
