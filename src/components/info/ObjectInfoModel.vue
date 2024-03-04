@@ -58,20 +58,20 @@ option {
 
 <script>
 
-import SceneManager from "../../scene/scene_manager.js";
+import SceneObject from "../../scene/scene_object.js";
 
 export default {
   props: {
-    mgr: {
-      type: SceneManager,
+    object: {
+      type: SceneObject,
       required: true
     }
   },
 
   data() {
     return {
-      options: Array.from(this.mgr.models.keys()).filter(id => id[0] !== '.'),
-      current: this.mgr.getFirstSelected().modelID,
+      options: Array.from(this.object.mgr.models.keys()).filter(id => id[0] !== '.'),
+      current: this.object.modelID,
 
       listener: null
     }
@@ -79,30 +79,12 @@ export default {
 
   methods: {
     doChange() {
-      this.mgr.getFirstSelected().setModel(this.current);
-    },
-
-    update() {
-      const s = this.mgr.getFirstSelected();
-
-      if (s === null) {
-        this.current = "";
-        return;
-      }
-
-      this.current = s.modelID;
+      this.object.setModel(this.current);
     }
   },
 
   created() {
-    this.listener = this.mgr.events.on("select", sel => this.update());
-
-    this.update();
-  },
-
-  destroyed() {
-    if (this.listener !== null)
-      this.mgr.events.remove(this.listener);
+    this.current = this.object.modelID;
   }
 }
 

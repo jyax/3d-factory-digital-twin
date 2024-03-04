@@ -1,12 +1,8 @@
 <script setup>
 
-import ObjectInfoText from "./info/ObjectInfoText.vue";
-import ObjectInfoPosition from "./info/ObjectInfoPosition.vue";
-import ObjectInfoID from "./info/ObjectInfoID.vue";
-import ObjectInfoModel from "./info/ObjectInfoModel.vue";
-import ObjectInfoInput from "./info/ObjectInfoInput.vue";
-import ObjectInfoDropdown from "./info/ObjectInfoDropdown.vue";
-import ObjectInfoRotation from "./info/ObjectInfoRotation.vue";
+import ObjectInfoGeneral from "./info/general/ObjectInfoGeneral.vue";
+import ObjectInfoSync from "./info/sync/ObjectInfoSync.vue";
+
 </script>
 
 <template>
@@ -21,57 +17,14 @@ import ObjectInfoRotation from "./info/ObjectInfoRotation.vue";
           </div>
           <div class="info-tab" @click="tab = 'live_data'" :class="tabStyle('live_data')">
             <img class="section-header-icon" src="../assets/icon/wifi.svg" alt="General">
-            <p>Sync</p>
+            <p>Live Data</p>
           </div>
         </div>
       </div>
 
-      <div class="section-inner" v-show="tab === 'general'">
+      <object-info-general :object="object" :key="object" v-if="tab === 'general'"/>
 
-        <object-info-text name="Type" value="Object"/>
-
-        <object-info-i-d :mgr="mgr" label="ID" placeholder="Optional"/>
-
-        <object-info-model :mgr="mgr"/>
-
-        <object-info-position :mgr="mgr"/>
-        <object-info-rotation :mgr="mgr"/>
-
-        <object-info-input :mgr="mgr" label="Scale" placeholder="1" :on-change="val => setScale(val)"
-                           style="margin-top: 16px;"/>
-
-      </div>
-
-      <div class="section-inner" v-show="tab === 'live_data'">
-
-        <object-info-i-d :mgr="mgr" label="ID" placeholder="Optional"/>
-        <p class="hint">Objects will not receive live data unless they have an ID.</p>
-
-        <object-info-dropdown label="Data type" :options="data_type_options" :default="data_type"
-                              :on-change="onDataTypeChange"/>
-        <object-info-input :mgr="mgr" v-show="data_type === 'single value'" label="Default value" placeholder="0"
-                           :on-change="value => this.default = value"/>
-
-        <div class="single-input" v-if="data_type === 'single value'">
-          <div class="single-input-left">
-            <div class="color-input">
-              <p>Min</p>
-              <input class="input single-input-input" type="text" placeholder="0" v-model="min">
-              <input type="color" v-model="color_1">
-            </div>
-            <div class="gradient-dots">
-              <img class="section-header-icon" src="../assets/icon/more-vert.svg" alt="Gradient">
-            </div>
-            <div class="color-input">
-              <p>Max</p>
-              <input class="input single-input-input" type="text" placeholder="100" v-model="max">
-              <input type="color" v-model="color_2">
-            </div>
-          </div>
-          <div class="single-input-right" id="color-gradient" :style="makeGradient()"></div>
-        </div>
-
-      </div>
+      <object-info-sync :object="object" :key="object" v-if="tab === 'live_data'"/>
 
     </div>
   </div>
@@ -89,27 +42,14 @@ import ObjectInfoRotation from "./info/ObjectInfoRotation.vue";
   top: 0;
   left: 0;
 
-  max-width: 35%;
+  min-width: 20%;
+  max-width: 25%;
   max-height: 75%;
 }
 
 #info {
   margin-left: 12px;
   margin-top: 12px;
-}
-
-.section-inner {
-  display: flex;
-  flex-direction: column;
-
-  overflow-y: scroll;
-
-  padding: 12px;
-  border-radius: 8px;
-
-  background-color: rgba(37, 37, 37, 0.67);
-  backdrop-filter: blur(4px);
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
 }
 
 .section-header {
@@ -140,7 +80,7 @@ import ObjectInfoRotation from "./info/ObjectInfoRotation.vue";
   display: flex;
   flex-direction: row;
 
-  margin-left: 2px;
+  margin-left: 4px;
 }
 
 .info-tab {
@@ -153,13 +93,14 @@ import ObjectInfoRotation from "./info/ObjectInfoRotation.vue";
 
   border-radius: 4px;
 
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(140, 140, 140, 0.15);
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
 
   cursor: pointer;
 }
 
 .info-tab:hover {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(100, 100, 100, 0.15);
 }
 
 .info-tab-current {
@@ -169,10 +110,18 @@ import ObjectInfoRotation from "./info/ObjectInfoRotation.vue";
 
 .info-tab img {
   width: 20px;
+
+  opacity: 75%;
 }
 
 .info-tab p {
   margin: 0 0 0 6px;
+
+  opacity: 75%;
+}
+
+.info-tab-current img, .info-tab-current p {
+  opacity: 100%;
 }
 
 .section-title {
@@ -289,7 +238,6 @@ input[type="color"]::-webkit-color-swatch:hover {
 <script>
 import SceneManager from "../scene/scene_manager.js";
 import ColorGradient from "../color/color_gradient.js";
-import {Color, Vector3} from "@orillusion/core";
 
 export default {
   name: "ObjectInfo",
@@ -306,19 +254,8 @@ export default {
       listener: null,
 
       selected: [],
-      tab: "general",
-
-      data_type_options: ["None", "Single value", "Position"],
-      data_type: "none",
-
-      min: 0,
-      max: 100,
-      default: 0,
-
-      color_1: "#5dc938",
-      color_2: "#f24f44",
-
-      gradient: new ColorGradient()
+      object: null,
+      tab: "general"
     }
   },
 
@@ -330,80 +267,9 @@ export default {
         return "";
     },
 
-    setScale(val) {
-      const obj = this.mgr.getFirstSelected();
-      if (obj === null)
-        return;
-
-      let scale = 1;
-      if (val !== "")
-        scale = parseFloat(val);
-
-      obj.getObject3D().transform.localScale = new Vector3(scale, scale, scale);
-    },
-
-    onDataTypeChange(val) {
-      this.data_type = val;
-
-      switch (val) {
-        case "none": {
-          this.mgr.getFirstSelected().liveData = {
-            type: "none"
-          };
-
-          break;
-        }
-
-        case "single value": {
-          this.mgr.getFirstSelected().liveData = {
-            type: "single value",
-            gradient: this.gradient,
-            min: this.min,
-            max: this.max
-          };
-
-          break;
-        }
-
-        case "position": {
-          this.mgr.getFirstSelected().liveData = {
-            type: "position"
-          };
-
-          break;
-        }
-      }
-    },
-
-    makeGradient() {
-      const c1 = new Color();
-      c1.setHex(this.color_1);
-
-      const c2 = new Color();
-      c2.setHex(this.color_2);
-
-      this.gradient.clear();
-      this.gradient.set(0, c1);
-      this.gradient.set(1, c2);
-
-      this.mgr.getFirstSelected().liveData = {
-        type: "single value",
-        gradient: this.gradient,
-        min: this.min,
-        max: this.max
-      };
-
-      return "background-image: linear-gradient(to bottom, " + this.color_1 + ", " + this.color_2 + ");"
-    },
-
     update(sel) {
       this.selected = sel;
-
-      const obj = this.mgr.getFirstSelected();
-      if (obj === null)
-        return;
-
-      this.data_type = obj.liveData.type;
+      this.object = this.mgr.getFirstSelected();
     }
   },
 

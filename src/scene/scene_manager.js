@@ -3,8 +3,6 @@ import {
     Camera3D,
     Color,
     Engine3D,
-    LitMaterial,
-    MeshRenderer,
     Object3D,
     OrbitController,
     PointerEvent3D,
@@ -31,18 +29,26 @@ import MQTTHandler from "../event/mqtt_handler.js";
 class SceneManager {
     static MODELS = {
         "dragon": "https://cdn.orillusion.com/PBR/DragonAttenuation/DragonAttenuation.gltf",
-        "table": "/glb_models/Assembly Warehouse Table.glb",
-        "cart": "/glb_models/trolley cart for warehouse.glb",
-        "rack": "/glb_models/JM_Rack_A.glb",
-        "wall": "/glb_models/Slatwall_Bin_5.5in.glb",
+        //"table": "/glb_models/Assembly Warehouse Table.glb",
+        //"cart": "/glb_models/trolley cart for warehouse.glb",
+        //"rack": "/glb_models/JM_Rack_A.glb",
+        "bin": "/glb_models/Slatwall_Bin_5.5in.glb",
         "floor": "/glb_models/factory_floor_sample_1.glb",
-        "workstation1": "/glb_models/workstation.glb",
-        "workstation1_whole": "/glb_models/workstation_whole.glb",
-        "workstation2": "/glb_models/Station 10x Layout v31.glb",
+        //"workstation1": "/glb_models/workstation.glb",
+        //"workstation1_whole": "/glb_models/workstation_whole.glb",
+        //"workstation2": "/glb_models/Station 10x Layout v31.glb",
+
+        "chair": "/glb_models/metal_folding_chair.glb",
+        "desk": "/glb_models/metal_desk.glb",
+        "lamp": "/glb_models/vintage_desk_lamp.glb",
 
         // Hidden models for editor use only
 
         ".translation-handle": "/glb_models/translation_handle.glb"
+    };
+
+    static ROTATIONS = {
+        "table": new Vector3(-90, 0, 0)
     };
 
     /**
@@ -74,9 +80,11 @@ class SceneManager {
 
         this._ctrlPressed = false;
 
+        this._pressedKeys = new Set();
+
         this._mqttHandler = new MQTTHandler({
             mgr: this,
-            server: true
+            server: false
         });
     }
 
@@ -86,9 +94,6 @@ class SceneManager {
     async init() {
         Engine3D.setting.pick.enable = true;
         Engine3D.setting.pick.mode = "pixel";
-
-        this.targetObj = null;
-        this.matList = [];
 
         await Engine3D.init();
 
@@ -131,7 +136,10 @@ class SceneManager {
             promises.push(model);
 
             model.then(object => {
-                this.models.set(id, object)
+                if (id in SceneManager.ROTATIONS)
+                    object.localRotation = SceneManager.ROTATIONS[id].clone();
+
+                this.models.set(id, object);
 
                 i++;
 
@@ -146,16 +154,23 @@ class SceneManager {
 
         this.createNewObject({
             pos: new Vector3(),
-            select: false
+            select: true,
+            model: "bin"
         });
 
+        setTimeout(() => {
+            this.resetCamera();
+        }, 1);
+
         document.addEventListener("keydown", (event) => {
+            if (document.querySelector(":focus"))
+                return;
+
+            this._pressedKeys.add(event.key.toLowerCase());
+
             switch (event.key) {
                 case "a": {
                     if (!event.ctrlKey)
-                        break;
-
-                    if (document.querySelector(":focus"))
                         break;
 
                     event.preventDefault();
@@ -219,6 +234,8 @@ class SceneManager {
         });
 
         document.addEventListener("keyup", (event) => {
+            this._pressedKeys.delete(event.key.toLowerCase());
+
             if (event.key === "Control")
                 this._ctrlPressed = false;
         });
@@ -239,6 +256,10 @@ class SceneManager {
             const object = this.revObjects.get(e.target);
             object.mouseOff();
         }, this);
+
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_DOWN, e => this._onMouseDown(e), this);
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_UP, e => this._onMouseUp(e), this);
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_MOVE, e => this._onMouseMove(e), this);
     }
 
 
@@ -281,6 +302,15 @@ class SceneManager {
             return new Vector3();
 
         return this.camera.transform.forward;
+    }
+
+    /**
+     * Check if a key is currently pressed.
+     * @param {string} key Key to check
+     * @returns {boolean} Whether key is down
+     */
+    isKeyDown(key) {
+        return this._pressedKeys.has(key.toLowerCase());
     }
 
 
@@ -372,6 +402,7 @@ class SceneManager {
      * @param {Vector3} pos Initial position of object (optional)
      * @param {boolean} select Whether to select object after adding
      * @param {string} model ID/name of mesh to use
+     * @returns {SceneObject} Created object
      */
     createNewObject({
         pos = null,
@@ -393,6 +424,8 @@ class SceneManager {
             object.select();
             this.focusOnSelected();
         }
+
+        return object;
     }
 
     /**
@@ -404,6 +437,8 @@ class SceneManager {
 
         this.scene.addChild(object.getObject3D());
         this.revObjects.set(object.getObject3D(), object);
+
+        this.scene.notifyChange();
 
         this.events.do("add", object);
     }
@@ -638,6 +673,45 @@ class SceneManager {
             return new BoundingBox();
 
         return bb;
+    }
+
+    _onMouseDown(e) {
+        if (e.mouseCode === 0 && this._pressedKeys.has("e")) {
+            this.lastTime = Date.now();
+            this.canMove = true;
+            const pos = this.camera.screenPointToWorld(e.mouseX, e.mouseY, 0);
+            this.lastX = pos.x;
+            this.lastY = pos.y;
+            this.lastZ = pos.z;
+        }
+    }
+
+    _onMouseUp(e){
+        this.objectToMove = null;
+        this.canMove = false;
+    }
+
+
+    _onMouseMove(e){
+
+        // If right mouse is being clicked on a movable object then continue else return
+        if (this.canMove && this.objectToMove != null) {
+            // Stop camera movement with mouse
+            e.stopImmediatePropagation();
+
+            // Update the position of the selected object to the mouse position
+            const now = Date.now();
+            if (now - this.lastTime > this.moveInterval) {
+                this.lastTime = now;
+                const pos = this.camera.screenPointToWorld(e.mouseX, e.mouseY, 0);
+                this.objectToMove.setX(this.objectToMove.getObject3D().x + (pos.x - this.lastX) * this._dragMult);
+                this.objectToMove.setY(this.objectToMove.getObject3D().y + (pos.y - this.lastY) * this._dragMult);
+                this.objectToMove.setZ(this.objectToMove.getObject3D().z + (pos.z - this.lastZ) * this._dragMult);
+                this.lastX = pos.x;
+                this.lastY = pos.y;
+                this.lastZ = pos.z;
+            }
+        }
     }
 }
 
