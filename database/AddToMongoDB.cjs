@@ -1,10 +1,10 @@
-// const { MongoClient, GridFSBucket } = require('mongodb');
-// const fs = require('fs');
-// const path = require('path');
+const { MongoClient, GridFSBucket } = require('mongodb');
+const fs = require('fs');
+const path = require('path');
 
-import { MongoClient, GridFSBucket } from 'mongodb';
-import fs from 'fs';
-import path from 'path';
+// import { MongoClient, GridFSBucket } from 'mongodb';
+// import fs from 'fs';
+// import path from 'path';
 
 /**
  * @class
@@ -131,4 +131,4 @@ const modelPath = '../glb_models';
 const addToMongoDB = new AddToMongoDB(url, dbName, modelPath);
 addToMongoDB.run();
 
-export default AddToMongoDB;
+//export default AddToMongoDB;

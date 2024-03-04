@@ -20,7 +20,8 @@ import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
 import Util from "../util/Util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
-import AddToMongoDBWebBrowser from '../../database/AddToMongoDBWebBrowser.js';
+//import AddToMongoDBWebBrowser from '../../database/AddToMongoDBWebBrowser.js';
+import ModelLoader from '../../database/ModelLoader.js';
 
 /**
  * @module SceneManager
@@ -61,11 +62,6 @@ class SceneManager {
     /**
      * Create a new scene manager.
      * @param {Color} skyColor Color of sky (optional)
-     * @param fileUploaderUrl
-     * @param fileInputElementId
-     * @param fileUploadServerPort
-     * @param mongoDBUrl
-     * @param mongoDBName
      */
     constructor({
         skyColor = new Color(200, 200, 200)
@@ -115,11 +111,12 @@ class SceneManager {
 
         // mongodb stuff
         // Provide your MongoDB Realm App ID and model input ID here
-        const appId = 'your-realm-app-id';
-        const modelInputId = 'modelInput';
+        const appId = 'application-0-irddf';
 
         // Create an instance of AddToMongoDBWebBrowser
-        this.addToMongoDBWebBrowser = new AddToMongoDBWebBrowser(appId, modelInputId);
+        //this.addToMongoDBWebBrowser = new AddToMongoDBWebBrowser(appId);
+
+        this.modelLoader = new ModelLoader(appId, SceneManager.MODELS);
     }
 
     /**
@@ -1227,6 +1224,16 @@ class SceneManager {
     runAddToMongoDB() {
         this.addToMongoDBWebBrowser.run();
     }
+
+    async runModelLoader() {
+        // Call the loadModelsFromMongoDB method to load models from MongoDB
+        await this.modelLoader.loadModelsFromMongoDB();
+
+        // After the models are loaded, you can access them using this.modelLoader.models
+        // For example:
+        // const model = this.modelLoader.models.get('modelId');
+        // Use the loaded model as needed
+    }
 }
 
 // class keyboardScript extends ComponentBase
@@ -1370,10 +1377,11 @@ class SceneManager {
 //     sceneManager.uploadFiles();
 // });
 
-// Create an instance of AnotherClass
+// Create an instance
 const sceneManager = new SceneManager();
 
 // Run the AddToMongoDBWebBrowser instance
-sceneManager.runAddToMongoDB();
+//sceneManager.runAddToMongoDB();
+sceneManager.runModelLoader();
 
 export default SceneManager;
