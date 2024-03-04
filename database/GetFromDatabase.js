@@ -1,6 +1,6 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
-const url = "mongodb+srv://alanfeng6:magnaspring24@magna-cluster.xht2nlr.mongodb.net";
+const url = "mongodb://root:password@localhost:27017";
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(url, {
     serverApi: {

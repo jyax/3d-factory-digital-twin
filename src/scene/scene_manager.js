@@ -20,6 +20,7 @@ import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
 import Util from "../util/Util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
+import AddToMongoDBWebBrowser from '../../database/AddToMongoDBWebBrowser.js';
 
 /**
  * @module SceneManager
@@ -60,6 +61,11 @@ class SceneManager {
     /**
      * Create a new scene manager.
      * @param {Color} skyColor Color of sky (optional)
+     * @param fileUploaderUrl
+     * @param fileInputElementId
+     * @param fileUploadServerPort
+     * @param mongoDBUrl
+     * @param mongoDBName
      */
     constructor({
         skyColor = new Color(200, 200, 200)
@@ -106,6 +112,14 @@ class SceneManager {
             mgr: this,
             server: false
         });
+
+        // mongodb stuff
+        // Provide your MongoDB Realm App ID and model input ID here
+        const appId = 'your-realm-app-id';
+        const modelInputId = 'modelInput';
+
+        // Create an instance of AddToMongoDBWebBrowser
+        this.addToMongoDBWebBrowser = new AddToMongoDBWebBrowser(appId, modelInputId);
     }
 
     /**
@@ -1208,6 +1222,11 @@ class SceneManager {
         this.canMove = false;
     }
 
+    // mongodb stuff
+    // Method to run the AddToMongoDBWebBrowser instance
+    runAddToMongoDB() {
+        this.addToMongoDBWebBrowser.run();
+    }
 }
 
 // class keyboardScript extends ComponentBase
@@ -1251,6 +1270,9 @@ class SceneManager {
 //         if(this.right) trans.rotationY += 5;
 //     }
 // }
+
+// ######################################################################################################################################################################
+// mongodb stuff
 
 // create a connection to mongodb
 
@@ -1323,6 +1345,35 @@ class SceneManager {
 //     }
 // });
 
+// import AddToMongoDB from '../../database/AddToMongoDB.cjs';
+// //import AddToDirectory from '../../database/AddToDirectory.cjs';
+//
+// const url = 'mongodb://root:password@localhost:27017';
+// const dbName = 'local';
+// const modelPath = '../../glb_models';
+//
+// const addToMongoDB = new AddToMongoDB(url, dbName, modelPath);
+// addToMongoDB.run();
+//
+// const localDirectory = '../../glb_models_2';
+// const addToDirectory = new AddToDirectory(url, dbName, localDirectory);
+// addToDirectory.run();
 
+// document.addEventListener('DOMContentLoaded', () => {
+//     const fileUploaderUrl = 'http://localhost:5173/';
+//     const fileInputElementId = 'fileInput';
+//     const fileUploadServerPort = 5173;
+//     const mongoDBUrl = 'mongodb://root:password@localhost:27017';
+//     const mongoDBName = 'local';
+//
+//     const sceneManager = new SceneManager(fileUploaderUrl, fileInputElementId, fileUploadServerPort, mongoDBUrl, mongoDBName);
+//     sceneManager.uploadFiles();
+// });
+
+// Create an instance of AnotherClass
+const sceneManager = new SceneManager();
+
+// Run the AddToMongoDBWebBrowser instance
+sceneManager.runAddToMongoDB();
 
 export default SceneManager;

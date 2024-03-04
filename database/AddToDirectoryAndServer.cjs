@@ -5,6 +5,7 @@ const path = require('path');
 const { MongoClient, GridFSBucket } = require('mongodb');
 
 /**
+ * @class
  * Move from MongoDB to local computer and remote server
  */
 class AddToDirectoryAndServer {
@@ -100,5 +101,7 @@ const remotePort = 22;
 const remoteUsername = 'magna_user';
 const remoteDirectory = './shared_files'; // Update with desired remote directory
 
-const fileManager = new AddToDirectoryAndServer(url, dbName, localDirectory, remoteHost, remotePort, remoteUsername, remoteDirectory);
-fileManager.DownloadAndTransferFiles();
+const addToDirectoryAndServer = new AddToDirectoryAndServer(url, dbName, localDirectory, remoteHost, remotePort, remoteUsername, remoteDirectory);
+addToDirectoryAndServer.DownloadAndTransferFiles();
+
+//export default AddToDirectoryAndServer;

@@ -1,10 +1,17 @@
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
-const fs = require('fs');
-const path = require('path');
-const { MongoClient, GridFSBucket } = require('mongodb');
+// const util = require('util');
+// const exec = util.promisify(require('child_process').exec);
+// const fs = require('fs');
+// const path = require('path');
+// const { MongoClient, GridFSBucket } = require('mongodb');
+
+import { promisify } from 'util';
+import { exec as execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { MongoClient, GridFSBucket } from 'mongodb';
 
 /**
+ * @class
  * Move from MongoDB to local computer
  */
 class AddToDirectory {
@@ -87,5 +94,7 @@ const url = 'mongodb://root:password@localhost:27017';
 const dbName = 'local';
 const localDirectory = '../glb_models_2';
 
-const fileManager = new AddToDirectory(url, dbName, localDirectory);
-fileManager.DownloadFiles();
+const addToDirectory = new AddToDirectory(url, dbName, localDirectory);
+addToDirectory.DownloadFiles();
+
+export default AddToDirectory;

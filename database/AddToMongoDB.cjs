@@ -1,8 +1,13 @@
-const { MongoClient, GridFSBucket } = require('mongodb');
-const fs = require('fs');
-const path = require('path');
+// const { MongoClient, GridFSBucket } = require('mongodb');
+// const fs = require('fs');
+// const path = require('path');
+
+import { MongoClient, GridFSBucket } from 'mongodb';
+import fs from 'fs';
+import path from 'path';
 
 /**
+ * @class
  * Upload files to MongoDB from local computer
  */
 class AddToMongoDB {
@@ -116,12 +121,14 @@ class AddToMongoDB {
     }
 }
 
-// use username and password from docker container and MongoDB port
+// use username and password from docker compose and MongoDB port
 const url = 'mongodb://root:password@localhost:27017';
 // use name of database
 const dbName = 'local';
 // path of models
 const modelPath = '../glb_models';
 
-const uploader = new AddToMongoDB(url, dbName, modelPath);
-uploader.run();
+const addToMongoDB = new AddToMongoDB(url, dbName, modelPath);
+addToMongoDB.run();
+
+export default AddToMongoDB;
