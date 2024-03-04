@@ -2,9 +2,8 @@ import { App } from 'realm-web';
 import path from 'path';
 
 class AddToMongoDBWebBrowser {
-    constructor(appId, modelInputId) {
+    constructor(appId) {
         this.appId = appId;
-        this.modelInputId = modelInputId;
     }
 
     async uploadFile(fileName, fileBuffer) {
@@ -55,24 +54,43 @@ class AddToMongoDBWebBrowser {
     }
 
     async run() {
-        const modelInput = document.getElementById(this.modelInputId);
-        if (modelInput) {
-            modelInput.addEventListener('change', async (event) => {
-                const fileList = event.target.files;
-                await this.handleFileChange(fileList);
-            });
-        } else {
-            console.error(`Element with ID "${this.modelInputId}" not found.`);
+        try {
+            const fileInput = await this.promptForFiles();
+            if (fileInput.files.length > 0) {
+                await this.handleFileChange(Array.from(fileInput.files));
+            } else {
+                console.warn('No files selected.');
+            }
+        } catch (error) {
+            console.error('Error while prompting for files:', error);
         }
+    }
+
+    promptForFiles() {
+        return new Promise((resolve, reject) => {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.multiple = true;
+            fileInput.addEventListener('change', () => {
+                resolve(fileInput);
+            });
+
+            // Create a button to trigger the file input dialog
+            const button = document.createElement('button');
+            button.textContent = 'Select Files';
+            button.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // Append the button to the document body
+            document.body.appendChild(button);
+        });
     }
 }
 
-// Provide your MongoDB Realm App ID
-const appId = 'your-realm-app-id';
-// Provide the ID of the input element for selecting model files
-const modelInputId = 'modelInput';
-
-const addToMongoDB = new AddToMongoDBWebBrowser(appId, modelInputId);
-addToMongoDB.run();
+// const appId = 'application-0-irddfd';
+//
+// const addToMongoDBWebBrowser = new AddToMongoDBWebBrowser(appId);
+// addToMongoDBWebBrowser.run();
 
 export default AddToMongoDBWebBrowser;
