@@ -20,8 +20,9 @@ import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
 import Util from "../util/Util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
-import AddToMongoDBWebBrowser from '../../database/AddToMongoDBWebBrowser.js';
+//import AddToMongoDBWebBrowser from '../../database/AddToMongoDBWebBrowser.js';
 //import ModelLoader from '../../database/ModelLoader.js';
+//import SendHTTPRequests from "../../database/SendHTTPRequests.js";
 
 /**
  * @module SceneManager
@@ -48,7 +49,6 @@ class SceneManager {
         "forklift": "./src/assets/glb_models/downloadsGLB/forklift_gameready.glb",
         "picaMachine": "./src/assets/glb_models/downloadsGLB/pica_pica_-_machines.glb",
         "robot": "./src/assets/glb_models/FANUC-430 Robot.glb",
-        "rack": "./src/assets/glb_models/JM_Rack_A.glb",
         "bin": "./src/assets/glb_models/Slatwall_Bin_5.5in.glb",
         "tank": "./src/assets/glb_models/UN-COMPLIANT IBC TANK.glb",
         "boiler": "./src/assets/glb_models/downloadsGLB/boiler_from_the_puffer_vic_32 (1).glb",
@@ -111,12 +111,26 @@ class SceneManager {
 
         // mongodb stuff
         // Provide your MongoDB Realm App ID and model input ID here
-        const appId = 'application-0-irddf';
+        //const appId = 'application-0-irddf';
 
         // Create an instance of AddToMongoDBWebBrowser
-        this.addToMongoDBWebBrowser = new AddToMongoDBWebBrowser(appId);
+        //this.addToMongoDBWebBrowser = new AddToMongoDBWebBrowser(appId);
 
         //this.modelLoader = new ModelLoader(appId, SceneManager.MODELS);
+
+        //this.sendHTTPRequests = new SendHTTPRequests();
+
+        fetch('http://localhost:3000/api/loadModels', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                thing: "yes"
+            })
+        }).then(val => {
+            console.log(val);
+        });
     }
 
     /**
@@ -711,7 +725,7 @@ class SceneManager {
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_UP, this._onMouseUp, this);
 
         // mongodb init
-        await this.modelLoader.loadModelsFromMongoDB();
+        //await this.modelLoader.loadModelsFromMongoDB();
     }
 
 
@@ -1224,18 +1238,23 @@ class SceneManager {
 
     // mongodb stuff
     // Method to run the AddToMongoDBWebBrowser instance
-    runAddToMongoDB() {
-        this.addToMongoDBWebBrowser.run();
-    }
+    // runAddToMongoDB() {
+    //     this.addToMongoDBWebBrowser.run();
+    // }
 
-    async runModelLoader() {
-        // Call the loadModelsFromMongoDB method to load models from MongoDB
-        await this.modelLoader.loadModelsFromMongoDB();
+    // async runModelLoader() {
+    //     // Call the loadModelsFromMongoDB method to load models from MongoDB
+    //     await this.modelLoader.loadModelsFromMongoDB();
+    //
+    //     // After the models are loaded, you can access them using this.modelLoader.models
+    //     // For example:
+    //     // const model = this.modelLoader.models.get('modelId');
+    //     // Use the loaded model as needed
+    // }
 
-        // After the models are loaded, you can access them using this.modelLoader.models
-        // For example:
-        // const model = this.modelLoader.models.get('modelId');
-        // Use the loaded model as needed
+    runSendHTTPRequests()
+    {
+        this.sendHTTPRequests.run();
     }
 }
 
@@ -1356,14 +1375,14 @@ class SceneManager {
 // });
 
 // import AddToMongoDB from '../../database/AddToMongoDB.cjs';
-// //import AddToDirectory from '../../database/AddToDirectory.cjs';
+// import AddToDirectory from '../../database/AddToDirectory.js';
 //
 // const url = 'mongodb://root:password@localhost:27017';
 // const dbName = 'local';
 // const modelPath = '../../glb_models';
 //
-// const addToMongoDB = new AddToMongoDB(url, dbName, modelPath);
-// addToMongoDB.run();
+// // const addToMongoDB = new AddToMongoDB(url, dbName, modelPath);
+// // addToMongoDB.run();
 //
 // const localDirectory = '../../glb_models_2';
 // const addToDirectory = new AddToDirectory(url, dbName, localDirectory);
@@ -1381,10 +1400,10 @@ class SceneManager {
 // });
 
 // Create an instance
-const sceneManager = new SceneManager();
+//const sceneManager = new SceneManager();
 
 // Run the AddToMongoDBWebBrowser instance
-sceneManager.runAddToMongoDB();
+//sceneManager.runSendHTTPRequests();
 //sceneManager.runModelLoader();
 
 export default SceneManager;
