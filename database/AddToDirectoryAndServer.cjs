@@ -10,7 +10,7 @@ const { MongoClient, GridFSBucket } = require('mongodb');
  */
 class AddToDirectoryAndServer {
     /**
-     * Constructor for MongoDBFileManager
+     * Constructor
      * @param {string} url - MongoDB connection URL
      * @param {string} dbName - Database name
      * @param {string} localDirectory - Local directory path for file storage

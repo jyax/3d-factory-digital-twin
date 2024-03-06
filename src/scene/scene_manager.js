@@ -128,9 +128,25 @@ class SceneManager {
             body: JSON.stringify({
                 thing: "yes"
             })
-        }).then(val => {
-            console.log(val);
+        }).then(response => {
+            return response.json(); // Parse JSON data from response
+        }).then(data => {
+            console.log(data); // Log parsed JSON data
+        }).catch(error => {
+            console.error('Error:', error);
         });
+
+        // fetch('http://localhost:3000/api/loadModels', {
+        //     method: "POST",
+        //     headers: {
+        //         "Content-Type": "application/json"
+        //     },
+        //     body: JSON.stringify({
+        //         thing: "yes"
+        //     })
+        // }).then(val => {
+        //     console.log(val);
+        // });
     }
 
     /**
@@ -1375,7 +1391,7 @@ class SceneManager {
 // });
 
 // import AddToMongoDB from '../../database/AddToMongoDB.cjs';
-// import AddToDirectory from '../../database/AddToDirectory.js';
+// import AddToDirectory from '../../database/AddToDirectory.cjs';
 //
 // const url = 'mongodb://root:password@localhost:27017';
 // const dbName = 'local';

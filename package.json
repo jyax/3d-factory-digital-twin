@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "start": "node vite.config.js",
-    "dev": "node database/server.js & vite",
+    "dev": "node database/server.cjs & vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "@orillusion/core": "^0.7.2",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "express": "^4.18.3",
     "gltf-pipeline": "^4.1.0",

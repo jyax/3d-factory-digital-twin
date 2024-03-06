@@ -55,7 +55,7 @@ class AddToDirectory {
             const bucket = new GridFSBucket(db);
             const filesCursor = bucket.find();
             const fileList = await filesCursor.toArray();
-            console.log('File list:', fileList);
+            //console.log('File list:', fileList);
 
             const downloadAndTransferPromises = [];
             for (const file of fileList) {
@@ -86,13 +86,14 @@ class AddToDirectory {
             console.error('Error downloading and transferring files', err);
         } finally {
             await db.client.close();
+            process.exit();
         }
     }
 }
 
 const url = 'mongodb://root:password@localhost:27017';
 const dbName = 'local';
-const localDirectory = '../glb_models_2';
+const localDirectory = './src/assets/glb_models';
 
 const addToDirectory = new AddToDirectory(url, dbName, localDirectory);
 addToDirectory.DownloadFiles();
