@@ -126,9 +126,10 @@ const url = 'mongodb://root:password@localhost:27017';
 // use name of database
 const dbName = 'local';
 // path of models
-const modelPath = '../glb_models';
+const modelPath = './glb_models';
 
 const addToMongoDB = new AddToMongoDB(url, dbName, modelPath);
 addToMongoDB.run();
 
 //export default AddToMongoDB;
+module.exports = {AddToMongoDB:AddToMongoDB};

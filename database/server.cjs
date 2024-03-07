@@ -20,15 +20,25 @@ const startServer = async () => {
         app.post('/api/loadModels', async (req, res) => {
             console.log('Received request at /api/loadModels');
             console.log(req.body);
-            // try {
-            //     //const modelLoader = new ModelLoader(databaseUrl);
-            //     await modelLoader.loadModelsFromMongoDB();
-            //     res.json({ message: 'Models loaded successfully.' });
-            // } catch (error) {
-            //     console.error('Error loading models:', error);
-            //     res.status(500).json({ error: 'Failed to load models.' });
-            // }
+            try {
+                //const modelLoader = new ModelLoader(databaseUrl);
+                //await modelLoader.loadModelsFromMongoDB();
+                res.json({ message: 'Models loaded successfully.' });
+            } catch (error) {
+                console.error('Error loading models:', error);
+                res.status(500).json({ error: 'Failed to load models.' });
+            }
         });
+
+        // Define a route that handles the client's request
+        // app.get('/api/sendData', (req, res) => {
+        //     // Create some data to send to the client
+        //     const responseData = { message: 'Data sent from server to client' };
+        //
+        //     // Send the data to the client as JSON
+        //     res.json(responseData);
+        //     console.log("test");
+        // });
 
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
