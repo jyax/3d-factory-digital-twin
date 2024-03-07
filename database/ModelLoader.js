@@ -1,5 +1,13 @@
 import { MongoClient } from 'mongodb';
+import { Engine3D } from "@orillusion/core";
 
+// const { MongoClient } = require('mongodb');
+// const { Engine3D } = require('@orillusion/core');
+
+/**
+ * @class
+ * Load in models
+ */
 class ModelLoader {
     constructor(databaseUrl) {
         this.databaseUrl = databaseUrl;
@@ -49,4 +57,5 @@ const databaseUrl = 'mongodb://root:password@localhost:27017';
 const modelLoader = new ModelLoader(databaseUrl);
 modelLoader.loadModelsFromMongoDB();
 
-export default ModelLoader;
+//export default ModelLoader;
+module.exports = {ModelLoader:ModelLoader};
