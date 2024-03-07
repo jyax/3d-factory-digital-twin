@@ -120,6 +120,7 @@ class SceneManager {
 
         //this.sendHTTPRequests = new SendHTTPRequests();
 
+        console.log("test1")
         fetch('http://localhost:3000/api/loadModels', {
             method: "POST",
             headers: {
@@ -135,6 +136,7 @@ class SceneManager {
         }).catch(error => {
             console.error('Error:', error);
         });
+        console.log("test2");
 
         // fetch('http://localhost:3000/api/loadModels', {
         //     method: "POST",
