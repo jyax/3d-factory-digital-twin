@@ -120,7 +120,6 @@ class SceneManager {
 
         //this.sendHTTPRequests = new SendHTTPRequests();
 
-        console.log("test1")
         fetch('http://localhost:3000/api/loadModels', {
             method: "POST",
             headers: {
@@ -129,26 +128,32 @@ class SceneManager {
             body: JSON.stringify({
                 thing: "yes"
             })
-        }).then(response => {
-            return response.json(); // Parse JSON data from response
-        }).then(data => {
-            console.log(data); // Log parsed JSON data
-        }).catch(error => {
-            console.error('Error:', error);
-        });
-        console.log("test2");
+        })
+            .then(response => {
+                // Log the raw response for inspection
+                console.log(response);
+                console.log("test");
 
-        // fetch('http://localhost:3000/api/loadModels', {
-        //     method: "POST",
-        //     headers: {
-        //         "Content-Type": "application/json"
-        //     },
-        //     body: JSON.stringify({
-        //         thing: "yes"
-        //     })
-        // }).then(val => {
-        //     console.log(val);
-        // });
+                // Check the response status
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                // Parse JSON data from response
+                return response.json();
+            })
+            .then(data => {
+                // Log parsed JSON data
+                console.log(data);
+            })
+            .catch(error => {
+                // Handle errors
+                console.error('Error:', error);
+            });
+
+        // fetch('http://localhost:3000/api/sendData')
+        //     .then(response => response.json())
+        //     .then(data => console.log(data))
+        //     .catch(error => console.error('Error:', error));
     }
 
     /**
