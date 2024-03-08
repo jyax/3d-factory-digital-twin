@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 //import ModelLoader from './ModelLoader';
+const { AddToMongoDB } = require('./AddToMongoDB.cjs');
 //const { AddToDirectory } = require('./AddToDirectory.cjs');
 
 const app = express();

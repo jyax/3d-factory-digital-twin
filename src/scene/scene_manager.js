@@ -152,7 +152,7 @@ class SceneManager {
         });
 
         // mongodb stuff
-        let receivedModels = []; // Variable to store the received models
+        let modelsMap = new Map;
         fetch('http://localhost:3000/api/loadModels', {
             method: "POST",
             headers: {
@@ -176,7 +176,8 @@ class SceneManager {
             .then(data => {
                 // Log parsed JSON data
                 console.log(data);
-                receivedModels = data.models;
+                const modelsArray = data.models;
+                modelsMap = new Map(modelsArray);
             })
             .catch(error => {
                 // Handle errors
@@ -184,7 +185,7 @@ class SceneManager {
             })
             .finally(() => {
                 console.log("Models:")
-                console.log(receivedModels);
+                console.log(modelsMap);
             });
     }
 
