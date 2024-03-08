@@ -14,12 +14,57 @@ import {
     SolidColorSky,
     Vector3,
     View3D,
-    FlyCameraController
+    FlyCameraController,
+    AtmosphericComponent,
+    KeyEvent,
+    KeyCode
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
 import Util from "../util/Util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
+
+class keyboardScript extends ComponentBase
+{
+    right = false;
+    left = false;
+
+    start() {
+        Engine3D.inputSystem.addEventListener(KeyEvent.KEY_UP, this.keyUp, this);
+        Engine3D.inputSystem.addEventListener(KeyEvent.KEY_DOWN, this.keyDown, this);
+    }
+    keyDown(e) {
+        if (e.keyCode == KeyCode.Key_Right){
+            this.right = true;
+        }
+        else if(e.keyCode = KeyCode.Key_Left){
+            this.left = true;
+        }
+    }
+    keyUp(e) {
+        let trans = this.object3D.transform;
+        console.log(this.transform.rotationY);
+
+        if(e.keyCode == KeyCode.Key_Right){
+            this.right = false;
+        }
+        else if(e.keyCode = KeyCode.Key_Left){
+            this.left = false;
+        }
+        else {
+            trans.rotationY = 0;
+            console.log(trans.rotationY);
+        }
+    }
+
+    onUpdate() {
+        if(!this.enable) return;
+
+        let trans = this.object3D.transform;
+        if(this.left) trans.rotationY -= 5;
+        if(this.right) trans.rotationY += 5;
+    }
+}
 
 /**
  * @module SceneManager
@@ -674,6 +719,13 @@ class SceneManager {
 
                     break;
                 }
+                case "s": {
+                    if (event.ctrlKey) {
+                        event.preventDefault()
+                        this.saveScene()
+                    }
+                    break
+                }
 
                 case "Tab": {
                     if (document.querySelector(":focus"))
@@ -861,6 +913,29 @@ class SceneManager {
         return Array.from(this.objects.values());
     }
 
+    /**
+     * Save scene information to JSON.
+     * @returns JSON Downloadable JSON file
+     */
+    saveScene() {
+        let currentScene = this.getAllObjects().map(obj => obj.serializeObject())
+        let jsonString = JSON.stringify(currentScene, null, 3)
+
+        let sceneBlob = new Blob([jsonString], {type: "application/json"})
+        const blobUrl = URL.createObjectURL(sceneBlob);
+
+        // Create element to do a click event for blobUrl
+        const downloadLink = document.createElement("a")
+        downloadLink.href = blobUrl
+
+        // Need to add for it to ask for file name if none set
+        let saveName = "scene"
+        downloadLink.download = `${saveName}.json`
+        downloadLink.click()
+
+        // Remove the URL from usage
+        URL.revokeObjectURL(blobUrl)
+    }
 
     // Objects - Creation
 
@@ -956,6 +1031,8 @@ class SceneManager {
         }
 
         this.events.do("select", Array.from(this._selected.values()));
+        console.log(object);
+        object.getObject3D().addComponent(keyboardScript);
 
         this.updateSelectBox();
     }
@@ -1247,46 +1324,6 @@ class SceneManager {
     }
 }
 
-// class keyboardScript extends ComponentBase
-// {
-//     #right = false;
-//     #left = false;
 
-//     start() {
-//         Engine3D.inputSystem.addEventListener(KeyEvent.KEY_UP, this.keyup, this);
-//         Engine3D.inputSystem.addEventListener(KeyEvent.KEY_DOWN, this.keyDown, this);
-//     }
-//     keyDown(e) {
-//         if (e.keyCode == KeyCode.Key_Right){
-//             this.right = true;
-//         }
-//         else if(e.keyCode = KeyCode.Key_Left){
-//             this.left = true;
-//         }
-//     }
-//     keyUp(e) {
-//         let trans = this.object3D.transform;
-//         console.log(this.transform.rotationY);
-
-//         if(e.keyCode == KeyCode.Key_Right){
-//             this.right = false;
-//         }
-//         else if(e.keyCode = KeyCode.Key_Left){
-//             this.left = false;
-//         }
-//         else {
-//             trans.rotationY = 0;
-//             console.log(trans.rotationY);
-//         }
-//     }
-
-//     onUpdate() {
-//         if(!this.enable) return;
-
-//         let trans = this.object3D.transform;
-//         if(this.left) trans.rotationY -= 5;
-//         if(this.right) trans.rotationY += 5;
-//     }
-// }
 
 export default SceneManager;
