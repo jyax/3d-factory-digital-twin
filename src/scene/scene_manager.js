@@ -20,9 +20,6 @@ import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
 import Util from "../util/Util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
-//import AddToMongoDBWebBrowser from '../../database/AddToMongoDBWebBrowser.js';
-//import ModelLoader from '../../database/ModelLoader.js';
-//import SendHTTPRequests from "../../database/SendHTTPRequests.js";
 
 /**
  * @module SceneManager
@@ -110,16 +107,7 @@ class SceneManager {
         });
 
         // mongodb stuff
-        // Provide your MongoDB Realm App ID and model input ID here
-        //const appId = 'application-0-irddf';
-
-        // Create an instance of AddToMongoDBWebBrowser
-        //this.addToMongoDBWebBrowser = new AddToMongoDBWebBrowser(appId);
-
-        //this.modelLoader = new ModelLoader(appId, SceneManager.MODELS);
-
-        //this.sendHTTPRequests = new SendHTTPRequests();
-
+        let receivedModels = []; // Variable to store the received models
         fetch('http://localhost:3000/api/loadModels', {
             method: "POST",
             headers: {
@@ -132,7 +120,6 @@ class SceneManager {
             .then(response => {
                 // Log the raw response for inspection
                 console.log(response);
-                console.log("test");
 
                 // Check the response status
                 if (!response.ok) {
@@ -144,16 +131,16 @@ class SceneManager {
             .then(data => {
                 // Log parsed JSON data
                 console.log(data);
+                receivedModels = data.models;
             })
             .catch(error => {
                 // Handle errors
                 console.error('Error:', error);
+            })
+            .finally(() => {
+                console.log("Models:")
+                console.log(receivedModels);
             });
-
-        // fetch('http://localhost:3000/api/sendData')
-        //     .then(response => response.json())
-        //     .then(data => console.log(data))
-        //     .catch(error => console.error('Error:', error));
     }
 
     /**
@@ -1258,27 +1245,6 @@ class SceneManager {
         this.ObjectToMove = undefined;
         this.canMove = false;
     }
-
-    // mongodb stuff
-    // Method to run the AddToMongoDBWebBrowser instance
-    // runAddToMongoDB() {
-    //     this.addToMongoDBWebBrowser.run();
-    // }
-
-    // async runModelLoader() {
-    //     // Call the loadModelsFromMongoDB method to load models from MongoDB
-    //     await this.modelLoader.loadModelsFromMongoDB();
-    //
-    //     // After the models are loaded, you can access them using this.modelLoader.models
-    //     // For example:
-    //     // const model = this.modelLoader.models.get('modelId');
-    //     // Use the loaded model as needed
-    // }
-
-    runSendHTTPRequests()
-    {
-        this.sendHTTPRequests.run();
-    }
 }
 
 // class keyboardScript extends ComponentBase
@@ -1322,111 +1288,5 @@ class SceneManager {
 //         if(this.right) trans.rotationY += 5;
 //     }
 // }
-
-// ######################################################################################################################################################################
-// mongodb stuff
-
-// create a connection to mongodb
-
-// import { MongoClient } from 'mongodb';
-//
-// // Connection URI
-// const uri = 'mongodb://localhost:27017';
-//
-// // Database Name
-// const dbName = 'test';
-//
-// // Create a new MongoClient
-// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-//
-// Connect to the MongoDB server
-// async function ConnectToMongoDB() {
-//     try {
-//         // Connect to MongoDB
-//         await client.connect();
-//         console.log('Connected to MongoDB');
-//
-//         // Select the database
-//         const db = client.db(dbName);
-//
-//         return db;
-//     } catch (error) {
-//         console.error('Error connecting to MongoDB:', error);
-//         throw error;
-//     }
-// }
-//
-// module.exports = ConnectToMongoDB;
-//
-// // use connection in routes
-//
-// // routes/modelRoutes.js
-// const express = require('express');
-// const router = express.Router();
-// const connectToMongoDB = require('../db');
-//
-// // Define routes
-// router.get('/model/:id', async (req, res) => {
-//     try {
-//         // Connect to MongoDB
-//         const db = await connectToMongoDB();
-//
-//         // Access collection and perform operations
-//         const collection = db.collection('fs.files');
-//         const modelFile = await collection.findOne({ _id: req.params.id });
-//
-//         // Send model file as response
-//         res.send(modelFile);
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).send('Server Error');
-//     }
-// });
-//
-// module.exports = router;
-//
-// // Close the MongoDB connection when the application terminates
-// process.on('SIGINT', async () => {
-//     try {
-//         await client.close();
-//         console.log('MongoDB connection closed');
-//         process.exit(0);
-//     } catch (error) {
-//         console.error('Error closing MongoDB connection:', error);
-//         process.exit(1);
-//     }
-// });
-
-// import AddToMongoDB from '../../database/AddToMongoDB.cjs';
-// import AddToDirectory from '../../database/AddToDirectory.cjs';
-//
-// const url = 'mongodb://root:password@localhost:27017';
-// const dbName = 'local';
-// const modelPath = '../../glb_models';
-//
-// // const addToMongoDB = new AddToMongoDB(url, dbName, modelPath);
-// // addToMongoDB.run();
-//
-// const localDirectory = '../../glb_models_2';
-// const addToDirectory = new AddToDirectory(url, dbName, localDirectory);
-// addToDirectory.run();
-
-// document.addEventListener('DOMContentLoaded', () => {
-//     const fileUploaderUrl = 'http://localhost:5173/';
-//     const fileInputElementId = 'fileInput';
-//     const fileUploadServerPort = 5173;
-//     const mongoDBUrl = 'mongodb://root:password@localhost:27017';
-//     const mongoDBName = 'local';
-//
-//     const sceneManager = new SceneManager(fileUploaderUrl, fileInputElementId, fileUploadServerPort, mongoDBUrl, mongoDBName);
-//     sceneManager.uploadFiles();
-// });
-
-// Create an instance
-//const sceneManager = new SceneManager();
-
-// Run the AddToMongoDBWebBrowser instance
-//sceneManager.runSendHTTPRequests();
-//sceneManager.runModelLoader();
 
 export default SceneManager;
