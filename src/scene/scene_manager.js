@@ -151,6 +151,8 @@ class SceneManager {
             server: false
         });
 
+        this.editMode = false;
+
         // mongodb stuff
         let receivedModels = []; // Variable to store the received models
         fetch('http://localhost:3000/api/loadModels', {
@@ -709,11 +711,12 @@ class SceneManager {
                     break;
                 }
 
+                // Create an object with 'r'
                 case "r": {
                     if (event.ctrlKey) {
                         event.preventDefault();
                         this.resetCamera();
-                    } else{
+                    } else if(this.editMode){
                         this.createNewObject();
                     }
 
@@ -738,9 +741,10 @@ class SceneManager {
                 }
 
                 case "Delete": {
-                    this.deleteSelected();
-                    event.preventDefault();
-
+                    if(this.editMode){
+                        this.deleteSelected();
+                        event.preventDefault();
+                    }
                     break;
                 }
 
