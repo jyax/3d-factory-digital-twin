@@ -43,10 +43,12 @@ class AddToMongoDB {
     async UploadFile(filePath, fileName) {
         const db = this.client.db(this.dbName);
         const bucket = new GridFSBucket(db);
+        console.log(filePath);
 
         const metadata = {
             contentType: 'model/gltf-binary',
-            filename: `${fileName}.glb`
+            filename: `${fileName}.glb`,
+            filePath: filePath // Add the file path to metadata
         };
 
         const fileStream = fs.createReadStream(filePath);
@@ -75,7 +77,6 @@ class AddToMongoDB {
     /**
      * Upload all GLB files to MongoDB from local computer
      * @returns {Promise<void>}
-     * @constructor
      */
     async UploadGLBFiles() {
         try {
