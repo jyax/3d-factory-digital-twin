@@ -8,9 +8,9 @@ const path = require('path');
 
 /**
  * @class
- * Upload files to MongoDB from local computer
+ * Upload files to MongoDB on capstone server from local computer
  */
-class AddToMongoDB {
+class AddToMongoDBServer {
     constructor(url, dbName, modelPath) {
         this.url = url;
         this.dbName = dbName;
@@ -34,7 +34,7 @@ class AddToMongoDB {
     }
 
     /**
-     * Upload a file to MongoDB from local computer
+     * Upload a file to MongoDB on capstone server from local computer
      * @param filePath Path of file to upload
      * @param fileName Name of file to upload
      * @returns {Promise<unknown>}
@@ -43,7 +43,6 @@ class AddToMongoDB {
     async UploadFile(filePath, fileName) {
         const db = this.client.db(this.dbName);
         const bucket = new GridFSBucket(db);
-        console.log(filePath);
 
         const metadata = {
             contentType: 'model/gltf-binary',
@@ -75,7 +74,7 @@ class AddToMongoDB {
     }
 
     /**
-     * Upload all GLB files to MongoDB from local computer
+     * Upload all GLB files to MongoDB on capstone server from local computer
      * @returns {Promise<void>}
      */
     async UploadGLBFiles() {
@@ -123,14 +122,14 @@ class AddToMongoDB {
 }
 
 // use username and password from docker compose and MongoDB port
-const url = 'mongodb://root:password@localhost:27017';
+const url = 'mongodb://root:password@35.9.22.105:27017';
 // use name of database
 const dbName = 'local';
 // path of models
 const modelPath = './glb_models';
 
-const addToMongoDB = new AddToMongoDB(url, dbName, modelPath);
-addToMongoDB.run();
+const addToMongoDBServer = new AddToMongoDBServer(url, dbName, modelPath);
+addToMongoDBServer.run();
 
 //export default AddToMongoDB;
-module.exports = {AddToMongoDB:AddToMongoDB};
+module.exports = {AddToMongoDBServer:AddToMongoDBServer};

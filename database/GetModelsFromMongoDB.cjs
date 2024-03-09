@@ -1,14 +1,23 @@
 const { MongoClient, GridFSBucket } = require('mongodb');
 const path = require('path');
 
-class ModelLoader {
+/**
+ * @class
+ * Get models from MongoDB and store them in an object
+ */
+class GetModelsFromMongoDB {
     constructor(databaseUrl, databaseName) {
         this.databaseUrl = databaseUrl;
         this.databaseName = databaseName;
-        this.models = {}; // Initialize as an object
+        this.models = {};
     }
 
-    async loadModelsFromMongoDB() {
+    /**
+     * Get models from MongoDB and store them in this.models
+     * @returns {Promise<void>}
+     * @constructor
+     */
+    async GetModels() {
         const client = new MongoClient(this.databaseUrl);
 
         try {
@@ -45,4 +54,4 @@ class ModelLoader {
     }
 }
 
-module.exports = { ModelLoader: ModelLoader };
+module.exports = { ModelLoader: GetModelsFromMongoDB };
