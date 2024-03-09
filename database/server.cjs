@@ -28,7 +28,7 @@ const startServer = async () => {
                 await modelLoader.loadModelsFromMongoDB();
 
                 // Send the loaded models as JSON in the response
-                res.json({ message: 'Models loaded successfully.', models: Array.from(modelLoader.models) });
+                res.json({ message: 'Models loaded successfully.', models: modelLoader.models });
             } catch (error) {
                 console.error('Error loading models:', error);
                 res.status(500).json({ error: 'Failed to load models.' });

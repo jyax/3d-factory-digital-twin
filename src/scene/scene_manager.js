@@ -152,7 +152,11 @@ class SceneManager {
         });
 
         // mongodb stuff
-        let modelsMap = new Map;
+        this.modelsMap = {};
+        this.loadData();
+    }
+
+    loadData() {
         fetch('http://localhost:3000/api/loadModels', {
             method: "POST",
             headers: {
@@ -176,16 +180,11 @@ class SceneManager {
             .then(data => {
                 // Log parsed JSON data
                 console.log(data);
-                const modelsArray = data.models;
-                modelsMap = new Map(modelsArray);
+                this.modelsMap = data.models;
             })
             .catch(error => {
                 // Handle errors
                 console.error('Error:', error);
-            })
-            .finally(() => {
-                console.log("Models:")
-                console.log(modelsMap);
             });
     }
 
@@ -237,12 +236,48 @@ class SceneManager {
         this.view.scene = this.scene;
         this.view.camera = this.cam;
 
+        console.log("database models:");
+        console.log(this.modelsMap);
+        console.log("scene manager models:");
+        console.log(SceneManager.MODELS);
+
+        // logan's version
+
+        // const promises = [];
+        // const total = Object.keys(SceneManager.MODELS).length;
+        // let i = 0;
+        //
+        // for (const id of Object.keys(SceneManager.MODELS)) {
+        //     const model = Engine3D.res.loadGltf(SceneManager.MODELS[id]);
+        //     promises.push(model);
+        //
+        //     model.then(object => {
+        //         this.models.set(id, object)
+        //
+        //         i++;
+        //
+        //         let progress = 0;
+        //         if (total !== 0)
+        //             progress = i / total;
+        //         this.events.do("load_models", progress);
+        //     });
+        // }
+        //
+        // await Promise.all(promises);
+        //
+        // this.createNewObject({
+        //     pos: new Vector3(),
+        //     select: false
+        // });
+        // this.view.camera = this.cam;
+
+        // mongodb version
         const promises = [];
-        const total = Object.keys(SceneManager.MODELS).length;
+        const total = Object.keys(this.modelsMap).length;
         let i = 0;
 
-        for (const id of Object.keys(SceneManager.MODELS)) {
-            const model = Engine3D.res.loadGltf(SceneManager.MODELS[id]);
+        for (const id of Object.keys(this.modelsMap)) {
+            const model = Engine3D.res.loadGltf(this.modelsMap[id]);
             promises.push(model);
 
             model.then(object => {
@@ -264,66 +299,67 @@ class SceneManager {
             select: false
         });
         this.view.camera = this.cam;
+
         //
         // HARDCODING THE SCENE
         //
         
         // Creating a Plane/floor
-        let floor = this.createNewObject({model:"floor", pos: new Vector3(0, 1, 0), select: false});
-        floor.scaleX = 0.01;
-        floor.scaleY = 0.01;
-        floor.scaleZ = 0.01;
-        floor.rotationY = 90;
-        floor.transform.localPosition = new Vector3(0, -2, 0);
-        for (i=0; i<3;i++){
-            let lathe = this.createNewObject({model:"lathe", select: false});
-            lathe.scaleX = 3;
-            lathe.scaleY = 3;
-            lathe.scaleZ = 3;
-        }
-        let ladder = this.createNewObject({model:"ladder", select: false});
-        for (i=0; i<3;i++){
-            let forklift = this.createNewObject({model:"forklift", select: false});
-            forklift.scaleX = 1.3;
-            forklift.scaleY = 1.3;
-            forklift.scaleZ = 1.3;
-    }
-
-        for (i=0; i<2;i++){
-            let picaMachine = this.createNewObject({model:"picaMachine", select: false});
-            picaMachine.scaleX = 0.2;
-            picaMachine.scaleY = 0.2;
-            picaMachine.scaleZ = 0.2;
-        }
-        for (i=0; i<3;i++){
-            let robot = this.createNewObject({model:"robot", select: false});
-            robot.scaleX = 0.04;
-            robot.scaleY = 0.04;
-            robot.scaleZ = 0.04;
-        }
-        let bin = this.createNewObject({model:"bin", select: false});
-        bin.scaleX = 0.06;
-        bin.scaleY = 0.06;
-        bin.scaleZ = 0.06;
-        bin.rotationX = 90;
-
-        for (i=0; i<3;i++){
-            let tank = this.createNewObject({model:"tank", select: false});
-            tank.scaleX = 0.025;
-            tank.scaleY = 0.025;
-            tank.scaleZ = 0.025;
-        }
-
-        for (i=0; i<3;i++){
-            let boiler = this.createNewObject({model:"boiler", select: false});
-            boiler.rotationX = -90;
-        }
-        for (i=0; i<1;i++){
-            let roboticArm = this.createNewObject({model:"roboticArm", select: false});
-            roboticArm.scaleX = 2.5;
-            roboticArm.scaleY = 2.5;
-            roboticArm.scaleZ = 2.5;
-        }
+    //     let floor = this.createNewObject({model:"floor", pos: new Vector3(0, 1, 0), select: false});
+    //     floor.scaleX = 0.01;
+    //     floor.scaleY = 0.01;
+    //     floor.scaleZ = 0.01;
+    //     floor.rotationY = 90;
+    //     floor.transform.localPosition = new Vector3(0, -2, 0);
+    //     for (i=0; i<3;i++){
+    //         let lathe = this.createNewObject({model:"lathe", select: false});
+    //         lathe.scaleX = 3;
+    //         lathe.scaleY = 3;
+    //         lathe.scaleZ = 3;
+    //     }
+    //     let ladder = this.createNewObject({model:"ladder", select: false});
+    //     for (i=0; i<3;i++){
+    //         let forklift = this.createNewObject({model:"forklift", select: false});
+    //         forklift.scaleX = 1.3;
+    //         forklift.scaleY = 1.3;
+    //         forklift.scaleZ = 1.3;
+    // }
+    //
+    //     for (i=0; i<2;i++){
+    //         let picaMachine = this.createNewObject({model:"picaMachine", select: false});
+    //         picaMachine.scaleX = 0.2;
+    //         picaMachine.scaleY = 0.2;
+    //         picaMachine.scaleZ = 0.2;
+    //     }
+    //     for (i=0; i<3;i++){
+    //         let robot = this.createNewObject({model:"robot", select: false});
+    //         robot.scaleX = 0.04;
+    //         robot.scaleY = 0.04;
+    //         robot.scaleZ = 0.04;
+    //     }
+    //     let bin = this.createNewObject({model:"bin", select: false});
+    //     bin.scaleX = 0.06;
+    //     bin.scaleY = 0.06;
+    //     bin.scaleZ = 0.06;
+    //     bin.rotationX = 90;
+    //
+    //     for (i=0; i<3;i++){
+    //         let tank = this.createNewObject({model:"tank", select: false});
+    //         tank.scaleX = 0.025;
+    //         tank.scaleY = 0.025;
+    //         tank.scaleZ = 0.025;
+    //     }
+    //
+    //     for (i=0; i<3;i++){
+    //         let boiler = this.createNewObject({model:"boiler", select: false});
+    //         boiler.rotationX = -90;
+    //     }
+    //     for (i=0; i<1;i++){
+    //         let roboticArm = this.createNewObject({model:"roboticArm", select: false});
+    //         roboticArm.scaleX = 2.5;
+    //         roboticArm.scaleY = 2.5;
+    //         roboticArm.scaleZ = 2.5;
+    //     }
 
 
 
@@ -668,8 +704,16 @@ class SceneManager {
         // END OF FACTORY
         //
 
-        for (const id of Object.keys(SceneManager.MODELS)) {
-            const model = await Engine3D.res.loadGltf(SceneManager.MODELS[id]);
+        // logan's version
+
+        // for (const id of Object.keys(SceneManager.MODELS)) {
+        //     const model = await Engine3D.res.loadGltf(SceneManager.MODELS[id]);
+        //     this.models.set(id, model);
+        // }
+
+        // mongodb version
+        for (const id of Object.keys(this.modelsMap)) {
+            const model = await Engine3D.res.loadGltf(this.modelsMap[id]);
             this.models.set(id, model);
         }
 
@@ -779,16 +823,13 @@ class SceneManager {
             object.mouseDown();
         }, this);
 
-        this.createNewObject({model: 'dragon',pos:new Vector3(0,0,0)})
+        //this.createNewObject({model: 'dragon',pos:new Vector3(0,0,0)})
 
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, this._onOver, this);
 
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_DOWN, this._onMouseDown, this, null, 999);
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_MOVE, this._onMouseMove, this);
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_UP, this._onMouseUp, this);
-
-        // mongodb init
-        //await this.modelLoader.loadModelsFromMongoDB();
     }
 
 
