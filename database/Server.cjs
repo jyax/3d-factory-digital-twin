@@ -5,8 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 //import ModelLoader from './ModelLoader';
-const { AddToMongoDBServer } = require('./AddToMongoDBServer.cjs');
-//const { AddToDirectory } = require('./AddToDirectory.cjs');
+//const { AddToMongoDBServer } = require('./AddToMongoDBServer.cjs');
 
 const app = express();
 app.use(cors());
@@ -22,7 +21,7 @@ const StartServer = async () => {
             console.log('Received request at /api/loadModels');
             console.log(req.body);
             try {
-                const databaseUrl = 'mongodb://root:password@35.9.22.105:27017';
+                const databaseUrl = 'mongodb://root:password@localhost:27017';
                 const databaseName = 'local';
                 const modelLoader = new ModelLoader(databaseUrl, databaseName);
                 await modelLoader.GetModels();
