@@ -3,7 +3,7 @@
   <div class="model-parent">
     <p class="label">Data Type</p>
 
-    <select class="dropdown" v-model="current" @change="doChange()">
+    <select class="dropdown" v-model="current" @change="doChange()" :disabled="false">
       <option v-for="id of options" :value="id.toLowerCase()">{{id}}</option>
     </select>
   </div>
@@ -72,8 +72,10 @@ export default {
 
   data() {
     return {
-      options: ["Single Value", "Position", "Rotation"],
-      current: "single value"
+      options: ["single Value", "position", "Rotation"],
+      current: "single value",
+
+      enableUpdate: true
     }
   },
 
@@ -83,7 +85,16 @@ export default {
       this.onChange(this.current);
     },
 
-    update() {}
+    update() {},
+
+    switchView() {
+        this.enableUpdate = !(this.enableUpdate);
+        console.log("switch 1", this.enableUpdate);
+    }
+  },
+
+  created() {
+    this.mgr.events.on("switch view", this.switchView); 
   }
 }
 
