@@ -3,7 +3,7 @@
   <div class="model-parent">
     <p class="label">Model</p>
 
-    <select class="dropdown" v-model="current" @change="doChange()">
+    <select class="dropdown" v-model="current" @change="doChange()" :disabled="!enableUpdate">
       <option value="">Default</option>
       <option v-for="id of options" :value="id">{{id}}</option>
     </select>
@@ -73,7 +73,9 @@ export default {
       options: Array.from(this.mgr.models.keys()).filter(id => id[0] !== '.'),
       current: this.mgr.getFirstSelected().modelID,
 
-      listener: null
+      listener: null,
+
+      enableUpdate: true
     }
   },
 
@@ -91,11 +93,17 @@ export default {
       }
 
       this.current = s.modelID;
+    },
+
+    switchView() {
+        this.enableUpdate = !(this.enableUpdate);
+        console.log("switch", this.enableUpdate);
     }
   },
 
   created() {
     this.listener = this.mgr.events.on("select", sel => this.update());
+    this.mgr.events.on("switch view", this.switchView);
 
     this.update();
   },
