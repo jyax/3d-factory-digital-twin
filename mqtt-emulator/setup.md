@@ -12,7 +12,7 @@
 ## Python and Packages
 - Install python3
 - to get mqtt- emqx plugin
-	- `pip install paho-mqtt`
+	- `pip install paho-mqtt==1.6.1`
 
 
 

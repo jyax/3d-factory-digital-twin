@@ -21,7 +21,7 @@ topic = "python/mqtt"
 # Generate a Client ID with the publish prefix.
 client_id = f'publish-{random.randint(0, 1000)}'
 username = 'root'
-password = 'M0nG0$$w0rd'
+password = 'password'
 
 ## Connect to client
 def connect_mqtt():

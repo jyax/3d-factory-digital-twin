@@ -1,5 +1,5 @@
-.idea/
-./mqtt-emulator/notes.md
-./mqtt-emulator/__pycache__
+.idea/*
+.vscode/*
+./mqtt-emulator/__pycache__/*
 ./node_modules/.vite/deps/_metadata.json
 
