@@ -1,0 +1,35 @@
+/// <reference types="@webgpu/types" />
+import { Texture } from '../gfx/graphics/webGpu/core/texture/Texture';
+/**
+ * @internal
+ * Render target texture
+ * Render what we want to render onto a texture instead of rendering it onto the screen as we usually do
+ * @group Texture
+ */
+export declare class RenderTexture extends Texture {
+    resolveTarget: GPUTextureView;
+    sampleCount: number;
+    autoResize?: boolean;
+    clear?: boolean;
+    /**
+     * create virtual texture
+     * @param width width of texture
+     * @param height height of texture
+     * @param format GPUTextureFormat, default value is rgba8unorm
+     * @param useMipmap whether or not gen mipmap
+     * @returns
+     */
+    constructor(width: number, height: number, format?: GPUTextureFormat, useMipMap?: boolean, usage?: GPUFlagsConstant, numberLayer?: number, sampleCount?: number, clear?: boolean, autoResize?: boolean);
+    resize(width: any, height: any): void;
+    /**
+    * create rt texture
+    * @param width texture width
+    * @param height texture height
+    * @param data  texture pixel data
+    * @param useMipmap texture use mipmap switch
+    * @returns
+    */
+    create(width: number, height: number, useMiamp?: boolean): void;
+    clone(): RenderTexture;
+    readTextureToImage(): ArrayBuffer;
+}
