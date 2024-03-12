@@ -1,2 +1,4 @@
 .idea/
 mqtt-emulator/notes.md
+node_modules/
+.vscode/
