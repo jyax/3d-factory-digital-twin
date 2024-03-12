@@ -47,7 +47,7 @@ import ObjectInfoRotation from "./info/ObjectInfoRotation.vue";
         <object-info-i-d :mgr="mgr" label="ID" placeholder="Optional"/>
         <p class="hint">Objects will not receive live data unless they have an ID.</p>
 
-        <object-info-dropdown label="Data type" :options="data_type_options" :default="data_type"
+        <object-info-dropdown :mgr="mgr" label="Data type" :options="data_type_options" :default="data_type"
                               :on-change="onDataTypeChange"/>
         <object-info-input :mgr="mgr" v-show="data_type === 'single value'" label="Default value" placeholder="0"
                            :on-change="value => this.default = value"/>
@@ -308,7 +308,7 @@ export default {
       selected: [],
       tab: "general",
 
-      data_type_options: ["None", "Single value", "Position"],
+      data_type_options: ["None", "Single Value", "Position"],
       data_type: "none",
 
       min: 0,

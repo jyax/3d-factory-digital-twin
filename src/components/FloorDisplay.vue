@@ -5,9 +5,7 @@
   import Toolbar from "./Toolbar.vue";
   import Alert from "./Alert.vue";
   import LoadBar from "./LoadBar.vue";
-
-  let mgr = new SceneManager();
-  window.manager = mgr;
+  import Pancake from "./ViewButton.vue";
   
   const canvas = ref("canvas");
 
@@ -19,7 +17,7 @@
 <template>
 
   <canvas id="canvas" ref="canvas" @mousedown="mgr.startDrag" @mouseleave="mgr.stopDrag" @mouseup="mgr.stopDrag"></canvas>
-
+  <pancake :mgr="mgr"/>
   <object-info :mgr="mgr"/>
   <toolbar :mgr="mgr"/>
   <outline :mgr="mgr"/>
