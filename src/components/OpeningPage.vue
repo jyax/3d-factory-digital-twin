@@ -1,5 +1,24 @@
 <script setup>
+import { ref } from 'vue';
+
+// Define a reference to store the file name
+const fileName = ref('');
+
+// Function to handle file drop event
+const handleDrop = (event) => {
+  event.preventDefault();
+  const file = event.dataTransfer.files[0];
+  fileName.value = file.name;
+  // Process the dropped file here
+};
+
+// Function to handle file dragover event
+const handleDragOver = (event) => {
+  event.preventDefault();
+};
+
 </script>
+
 
 <template>
   <div class="container">
@@ -86,7 +105,8 @@
           </div>
         </div>
         <div class="drag-drop-container">
-          <div class="drag-drop-box">
+          <!-- Use v-if to conditionally render drag-drop-box -->
+          <div class="drag-drop-box" v-if="!fileName" @drop="handleDrop" @dragover="handleDragOver">
             <img src="../assets/icon/drag-drop.svg" alt="Arrow" draggable="false" class="icon">
             <h2 class="drag-drop-text">
               Click here or drag and drop a factory JSON file to upload.
