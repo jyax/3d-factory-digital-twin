@@ -79,7 +79,6 @@ import ObjectInfoSync from "./info/sync/ObjectInfoSync.vue";
   flex: 1;
   display: flex;
   flex-direction: row;
-
   margin-left: 4px;
 }
 
