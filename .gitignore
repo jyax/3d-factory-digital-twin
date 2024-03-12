@@ -1,2 +1,5 @@
-.idea/
-mqtt-emulator/notes.md
+.idea/*
+.vscode/*
+./mqtt-emulator/__pycache__/*
+./node_modules/.vite/deps/_metadata.json
+

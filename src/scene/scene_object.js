@@ -473,6 +473,26 @@ class SceneObject {
             }
         }
     }
+
+
+    // Serialization / Save File
+    /**
+     * Serialize the object for saving
+     * @return {} Plain Object
+     */
+    serializeObject() {
+        return {
+            id: this._id,
+            name: this.name,
+            modelID: this.modelID,
+            liveData: this.liveData,
+            pos: {
+                x: this._object.x,
+                y: this._object.y,
+                z: this._object.z
+            }
+        }
+    }
 }
 
 export default SceneObject;

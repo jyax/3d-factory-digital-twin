@@ -21,7 +21,9 @@
   <canvas id="canvas" ref="canvas" @mousedown="mgr.startDrag" @mouseleave="mgr.stopDrag" @mouseup="mgr.stopDrag"></canvas>
 
   <object-info :mgr="mgr"/>
-  <toolbar :mgr="mgr"/>
+  <div v-if="mgr.editMode">
+    <toolbar :mgr="mgr"/>
+  </div>
   <outline :mgr="mgr"/>
   <alert :mgr="mgr"/>
 
