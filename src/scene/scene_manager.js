@@ -52,6 +52,7 @@ class SceneManager {
         "boiler": "./src/assets/glb_models/downloadsGLB/boiler_from_the_puffer_vic_32 (1).glb",
         "roboticArm": "./src/assets/glb_models/downloadsGLB/black_honey_-_robotic_arm (1).glb",
         "pallet cell": "./src/assets/glb_models/pallet cell.glb",
+        "fl":"./src/assets/glb_models/factory_layout.glb",
         // Hidden models for editor use only
 
         ".translation-handle": "/glb_models/translation_handle.glb"
@@ -195,13 +196,16 @@ class SceneManager {
         floor.transform.localPosition = new Vector3(0, -2, 0);
        
  
-         let pallet = this.createNewObject({model:"pallet cell", select: false});
-         pallet.scaleX = 0.01;
-         pallet.scaleY = 0.01;
-         pallet.scaleZ = 0.01;
-         pallet.transform.localPosition = new Vector3(-15, -3.5, -29);
+         let fl = this.createNewObject({model:"fl", select: false});
+         fl.scaleX = 0.01;
+         fl.scaleY = 0.01;
+         fl.scaleZ = 0.01;
+         fl.transform.localPosition = new Vector3(-9, -2.337, -14);
  
-  
+         let pallet = this.createNewObject({model:"pallet cell", select: false});
+         pallet.scaleX = pallet.scaleY = pallet.scaleZ = 0.01;
+         pallet.rotationY = -90;
+         pallet.transform.localPosition = new Vector3(10, -3.5, -20);
 
         // let conveyor = this.createNewObject({model:"conveyor", select: false});
         // conveyor.scaleX = pallet.scaleY = pallet.scaleZ = 0.01;
