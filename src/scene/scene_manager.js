@@ -16,6 +16,7 @@ import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
 import Util from "../util/Util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
+import DragComponent from "./drag_component.js";
 
 /**
  * @module SceneManager
@@ -34,17 +35,10 @@ class SceneManager {
         //"rack": "/glb_models/JM_Rack_A.glb",
         "bin": "/glb_models/Slatwall_Bin_5.5in.glb",
         "floor": "/glb_models/factory_floor_sample_1.glb",
-        //"workstation1": "/glb_models/workstation.glb",
-        //"workstation1_whole": "/glb_models/workstation_whole.glb",
-        //"workstation2": "/glb_models/Station 10x Layout v31.glb",
 
         "chair": "/glb_models/metal_folding_chair.glb",
         "desk": "/glb_models/metal_desk.glb",
-        "lamp": "/glb_models/vintage_desk_lamp.glb",
-
-        // Hidden models for editor use only
-
-        ".translation-handle": "/glb_models/translation_handle.glb"
+        "lamp": "/glb_models/vintage_desk_lamp.glb"
     };
 
     static ROTATIONS = {
@@ -65,10 +59,13 @@ class SceneManager {
         this.view = null;
 
         this.camera = null;
+        this.cam = null;
 
         this.objects = new Set();
         this.revObjects = new Map();
         this._selected = new Set();
+
+        this.dragging = false;
 
         this.models = new Map();
 
@@ -109,8 +106,12 @@ class SceneManager {
         this.scene.envMap = new SolidColorSky(this._skyColor);
 
         let camObj = new Object3D();
-        let cam = camObj.addComponent(Camera3D);
+        this.cam = camObj.addComponent(Camera3D);
+        const dc = camObj.addComponent(DragComponent);
+        dc.mgr = this;
         this.camera = camObj;
+
+        this.camera.addEventListener(Event)
 
         this._cameraController = this.camera.addComponent(OrbitController);
         this._cameraController.smooth = 0;
@@ -119,13 +120,13 @@ class SceneManager {
 
         camObj.localPosition = new Vector3(0, 0, 4);
 
-        cam.perspective(60, c.width / c.height, 0.1, 5000);
+        this.cam.perspective(60, c.width / c.height, 0.1, 5000);
 
         this.scene.addChild(camObj);
 
         this.view = new View3D();
         this.view.scene = this.scene;
-        this.view.camera = cam;
+        this.view.camera = this.cam;
 
         const promises = [];
         const total = Object.keys(SceneManager.MODELS).length;
@@ -153,9 +154,7 @@ class SceneManager {
         await Promise.all(promises);
 
         this.createNewObject({
-            pos: new Vector3(),
-            select: true,
-            model: "bin"
+            pos: new Vector3()
         });
 
         setTimeout(() => {
@@ -176,6 +175,14 @@ class SceneManager {
                     event.preventDefault();
                     this.selectAll();
 
+                    break;
+                }
+
+                case "e": {
+                    if (this.selectedCount > 0) {
+                        this.events.do("drag", true);
+                        this.dragging = true;
+                    }
                     break;
                 }
 
@@ -236,22 +243,33 @@ class SceneManager {
         document.addEventListener("keyup", (event) => {
             this._pressedKeys.delete(event.key.toLowerCase());
 
-            if (event.key === "Control")
-                this._ctrlPressed = false;
+            switch (event.key) {
+                case "e": {
+                    this.events.do("drag", false);
+                    this.dragging = false;
+                    break;
+                }
+
+                case "Control": {
+                    this._ctrlPressed = false;
+                    break;
+                }
+            }
         });
 
         Engine3D.startRenderView(this.view);
 
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_CLICK, e => {
+            if (this.isKeyDown('e'))
+                return;
+
             const object = this.revObjects.get(e.target);
             object.click();
         }, this);
-
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, e => {
             const object = this.revObjects.get(e.target);
             object.mouseOver();
         }, this);
-
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_OUT, e => {
             const object = this.revObjects.get(e.target);
             object.mouseOff();
@@ -302,6 +320,15 @@ class SceneManager {
             return new Vector3();
 
         return this.camera.transform.forward;
+    }
+
+    /**
+     * Get the forward vector of the camera at the mouse position.
+     * @returns {Vector3} Forward vector at mouse position
+     */
+    getMouseForward() {
+        const input = Engine3D.inputSystem;
+        return this.cam.screenPointToRay(input.mouseX, input.mouseY).direction;
     }
 
     /**
@@ -410,7 +437,7 @@ class SceneManager {
         model = ""
     } = {}) {
         if (pos === null)
-            pos = this.getCameraForward().mul(8).add(this.camera.transform.worldPosition);
+            pos = this.getMouseForward().mul(8).add(this.camera.transform.worldPosition);
 
         const object = new SceneObject({
             manager: this,
@@ -422,7 +449,7 @@ class SceneManager {
 
         if (select) {
             object.select();
-            this.focusOnSelected();
+            //this.focusOnSelected();
         }
 
         return object;
@@ -476,6 +503,9 @@ class SceneManager {
      * @param {SceneObject} object Object to select
      */
     select(object) {
+        if (this.dragging)
+            return;
+
         if (!this._ctrlPressed) {
             this.clearSelection();
             this._selected.add(object);
@@ -601,7 +631,7 @@ class SceneManager {
         if (this.selectedCount === 0)
             return;
 
-        const bounds = this._getSelectedBounds();
+        const bounds = this.getSelectedBounds();
         const pos = bounds.min.add(bounds.max).div(2);
         this._cameraController.target = pos;
 
@@ -628,7 +658,7 @@ class SceneManager {
         if (this.selectedCount === 0)
             return;
 
-        const bb = this._getSelectedBounds();
+        const bb = this.getSelectedBounds();
 
         this.view.graphic3D.drawBox("selection", bb.min, bb.max);
     }
@@ -638,7 +668,7 @@ class SceneManager {
      * @returns {BoundingBox}
      * @private
      */
-    _getSelectedBounds() {
+    getSelectedBounds() {
         let bb = null;
 
         for (const object of this._selected.values()) {
@@ -676,13 +706,8 @@ class SceneManager {
     }
 
     _onMouseDown(e) {
-        if (e.mouseCode === 0 && this._pressedKeys.has("e")) {
-            this.lastTime = Date.now();
-            this.canMove = true;
-            const pos = this.camera.screenPointToWorld(e.mouseX, e.mouseY, 0);
-            this.lastX = pos.x;
-            this.lastY = pos.y;
-            this.lastZ = pos.z;
+        if (e.mouseCode === 0 && this.isKeyDown('e')) {
+            const ray = this.cam.screenPointToRay(e.mouseX, e.mouseY);
         }
     }
 

@@ -26,7 +26,7 @@
 </template>
 
 <script>
-  import Outline from "./Outline.vue";
+  import Outline from "./outline/Outline.vue";
   
   export default {
     components: {

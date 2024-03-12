@@ -4,9 +4,9 @@
     <p class="listing-name anonymous" v-if="name === ''">Object</p>
     <p class="listing-name" v-if="name !== ''">{{name}}</p>
     <div class="listing-buttons">
-      <img class="listing-button" src="../assets/icon/lock-slash.svg" alt="Lock" @click.stop="object.toggleLock()"
+      <img class="listing-button" src="../../assets/icon/lock-slash.svg" alt="Lock" @click.stop="object.toggleLock()"
            v-if="!locked">
-      <img class="listing-button locked-button" src="../assets/icon/lock.svg" alt="Lock" @click.stop="object.toggleLock()"
+      <img class="listing-button locked-button" src="../../assets/icon/lock.svg" alt="Lock" @click.stop="object.toggleLock()"
            v-if="locked">
       <!--
       <img class="listing-button" src="../assets/icon/trash.svg" alt="Delete" @click.stop="doDelete()">
@@ -88,7 +88,7 @@
 </style>
 
 <script>
-  import SceneObject from "../scene/scene_object.js";
+  import SceneObject from "../../scene/scene_object.js";
 
   export default {
     name: "OutlineListing",

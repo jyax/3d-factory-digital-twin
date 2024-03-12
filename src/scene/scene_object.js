@@ -130,6 +130,14 @@ class SceneObject {
     }
 
     /**
+     * Get the position vector.
+     * @returns {Vector3} Position/translation vector
+     */
+    get pos() {
+        return this._object.localPosition;
+    }
+
+    /**
      * Get the event handler.
      * @returns {EventHandler} Event handler
      */

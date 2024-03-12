@@ -1,6 +1,6 @@
 <template>
   <div class="section" id="tools">
-    <div class="tools-icon">
+    <div class="tools-icon" v-if="!dragMode">
       <img class="section-header-icon" id="tools-icon" src="../assets/icon/wrench.svg" alt="Wrench" draggable="false">
       <span class="tooltip">
 
@@ -9,6 +9,12 @@
         <span>Select all - <span class="soft">Ctrl + A</span></span>
         <span>Invert selection - <span class="soft">Ctrl + I</span></span>
 
+      </span>
+    </div>
+    <div class="tools-icon drag-icon" v-else>
+      <img class="section-header-icon" id="tools-icon" src="../assets/icon/drag-hand-gesture.svg" alt="Wrench" draggable="false">
+      <span class="tooltip">
+        <span>Drag Mode - <span class="soft">Release [E] to cancel</span></span>
       </span>
     </div>
     <div class="section-inner tools-inner">
@@ -92,6 +98,12 @@
   position: relative;
 
   padding: 6px;
+}
+
+.drag-icon {
+  background-color: rgba(255, 255, 255, 0.1);
+  outline: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50em;
 }
 
 .section-header {
@@ -230,12 +242,14 @@
 
     data() {
       return {
-        selected: []
+        selected: [],
+        dragMode: false
       }
     },
 
     created() {
       this.mgr.events.on("select", sel => this.selected = [...sel]);
+      this.mgr.events.on("drag", val => this.dragMode = val);
     }
   }
 </script>
