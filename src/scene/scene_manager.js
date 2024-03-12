@@ -914,7 +914,7 @@ class SceneManager {
         if (pos === null)
             pos = this.getCameraForward().mul(8).add(this.camera.transform.worldPosition);
 
-        const object = new SceneObject({
+        const object = new SceneObject.SceneObject({
             manager: this,
             pos: pos,
             id: this.count.toString(),
@@ -985,7 +985,7 @@ class SceneManager {
     LoadScene(sceneFile) {
         this.clearObjects()
         for (const objectInfo in sceneFile) {
-            const object = new SceneObject({
+            const object = new SceneObject.SceneObject({
                 manager: this,
                 pos: new Vector3(objectInfo.pos.x,
                                 objectInfo.pos.y,

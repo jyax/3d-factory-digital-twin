@@ -5,6 +5,7 @@
   import Toolbar from "./Toolbar.vue";
   import Alert from "./Alert.vue";
   import LoadBar from "./LoadBar.vue";
+  import Login from "./Login.vue";
 
   let mgr = new SceneManager();
   window.manager = mgr;
@@ -21,9 +22,8 @@
   <canvas id="canvas" ref="canvas" @mousedown="mgr.startDrag" @mouseleave="mgr.stopDrag" @mouseup="mgr.stopDrag"></canvas>
 
   <object-info :mgr="mgr"/>
-  <div v-if="mgr.editMode">
-    <toolbar :mgr="mgr"/>
-  </div>
+  <toolbar :mgr="mgr"/>
+  <login :mgr="mgr"/>
   <outline :mgr="mgr"/>
   <alert :mgr="mgr"/>
 
