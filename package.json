@@ -4,18 +4,30 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "start": "node vite.config.js",
+    "dev": "concurrently \"node database/server.cjs\" vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "@orillusion/core": "^0.7.2",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.3",
     "gltf-pipeline": "^4.1.0",
-    "mongodb": "^6.3.0",
+    "gridfs-stream": "^1.1.1",
+    "mongodb": "^6.4.0",
+    "multer": "^1.4.5-lts.1",
+    "realm": "^12.6.2",
+    "realm-web": "^2.0.0",
+    "socket.io": "^4.7.4",
+    "util": "^0.12.5",
+    "util.promisify": "^1.1.2",
     "vue": "^3.3.11"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.5.2",
-    "vite": "^5.0.8"
+    "@vitejs/plugin-vue": "^4.6.2",
+    "concurrently": "^8.2.2",
+    "vite": "^5.1.4"
   }
 }

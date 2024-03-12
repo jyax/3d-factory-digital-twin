@@ -14,12 +14,57 @@ import {
     SolidColorSky,
     Vector3,
     View3D,
-    FlyCameraController
+    FlyCameraController,
+    AtmosphericComponent,
+    KeyEvent,
+    KeyCode
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
 import Util from "../util/Util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
+
+class keyboardScript extends ComponentBase
+{
+    right = false;
+    left = false;
+
+    start() {
+        Engine3D.inputSystem.addEventListener(KeyEvent.KEY_UP, this.keyUp, this);
+        Engine3D.inputSystem.addEventListener(KeyEvent.KEY_DOWN, this.keyDown, this);
+    }
+    keyDown(e) {
+        if (e.keyCode == KeyCode.Key_Right){
+            this.right = true;
+        }
+        else if(e.keyCode = KeyCode.Key_Left){
+            this.left = true;
+        }
+    }
+    keyUp(e) {
+        let trans = this.object3D.transform;
+        console.log(this.transform.rotationY);
+
+        if(e.keyCode == KeyCode.Key_Right){
+            this.right = false;
+        }
+        else if(e.keyCode = KeyCode.Key_Left){
+            this.left = false;
+        }
+        else {
+            trans.rotationY = 0;
+            console.log(trans.rotationY);
+        }
+    }
+
+    onUpdate() {
+        if(!this.enable) return;
+
+        let trans = this.object3D.transform;
+        if(this.left) trans.rotationY -= 5;
+        if(this.right) trans.rotationY += 5;
+    }
+}
 
 /**
  * @module SceneManager
@@ -46,7 +91,6 @@ class SceneManager {
         "forklift": "./src/assets/glb_models/downloadsGLB/forklift_gameready.glb",
         "picaMachine": "./src/assets/glb_models/downloadsGLB/pica_pica_-_machines.glb",
         "robot": "./src/assets/glb_models/FANUC-430 Robot.glb",
-        "rack": "./src/assets/glb_models/JM_Rack_A.glb",
         "bin": "./src/assets/glb_models/Slatwall_Bin_5.5in.glb",
         "tank": "./src/assets/glb_models/UN-COMPLIANT IBC TANK.glb",
         "boiler": "./src/assets/glb_models/downloadsGLB/boiler_from_the_puffer_vic_32 (1).glb",
@@ -106,6 +150,44 @@ class SceneManager {
             mgr: this,
             server: false
         });
+
+        this.editMode = false;
+
+        // mongodb stuff
+        let receivedModels = []; // Variable to store the received models
+        fetch('http://localhost:3000/api/loadModels', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                thing: "yes"
+            })
+        })
+            .then(response => {
+                // Log the raw response for inspection
+                console.log(response);
+
+                // Check the response status
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                // Parse JSON data from response
+                return response.json();
+            })
+            .then(data => {
+                // Log parsed JSON data
+                console.log(data);
+                receivedModels = data.models;
+            })
+            .catch(error => {
+                // Handle errors
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                console.log("Models:")
+                console.log(receivedModels);
+            });
     }
 
     /**
@@ -579,11 +661,12 @@ class SceneManager {
                     break;
                 }
 
+                // Create an object with 'r'
                 case "r": {
                     if (event.ctrlKey) {
                         event.preventDefault();
                         this.resetCamera();
-                    } else{
+                    } else if(this.editMode){
                         this.createNewObject();
                     }
 
@@ -608,9 +691,10 @@ class SceneManager {
                 }
 
                 case "Delete": {
-                    this.deleteSelected();
-                    event.preventDefault();
-
+                    if(this.editMode){
+                        this.deleteSelected();
+                        event.preventDefault();
+                    }
                     break;
                 }
 
@@ -655,6 +739,9 @@ class SceneManager {
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_DOWN, this._onMouseDown, this, null, 999);
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_MOVE, this._onMouseMove, this);
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_UP, this._onMouseUp, this);
+
+        // mongodb init
+        //await this.modelLoader.loadModelsFromMongoDB();
     }
 
 
@@ -967,6 +1054,8 @@ class SceneManager {
         }
 
         this.events.do("select", Array.from(this._selected.values()));
+        console.log(object);
+        object.getObject3D().addComponent(keyboardScript);
 
         this.updateSelectBox();
     }
@@ -1230,8 +1319,8 @@ class SceneManager {
     }
 
     _onMouseMove(e){
-        // If right mouse is being clicked on a moveable object then continue else return
-        if (this.canMove && this.ObjectToMove != undefined){
+        // If right mouse is being clicked on a movable object then continue else return
+        if (this.canMove && this.ObjectToMove !== undefined){
             // Stop camera movement with mouse
             e.stopImmediatePropagation();
 
@@ -1256,49 +1345,8 @@ class SceneManager {
         this.ObjectToMove = undefined;
         this.canMove = false;
     }
-
 }
 
-// class keyboardScript extends ComponentBase
-// {
-//     #right = false;
-//     #left = false;
 
-//     start() {
-//         Engine3D.inputSystem.addEventListener(KeyEvent.KEY_UP, this.keyup, this);
-//         Engine3D.inputSystem.addEventListener(KeyEvent.KEY_DOWN, this.keyDown, this);
-//     }
-//     keyDown(e) {
-//         if (e.keyCode == KeyCode.Key_Right){
-//             this.right = true;
-//         }
-//         else if(e.keyCode = KeyCode.Key_Left){
-//             this.left = true;
-//         }
-//     }
-//     keyUp(e) {
-//         let trans = this.object3D.transform;
-//         console.log(this.transform.rotationY);
-
-//         if(e.keyCode == KeyCode.Key_Right){
-//             this.right = false;
-//         }
-//         else if(e.keyCode = KeyCode.Key_Left){
-//             this.left = false;
-//         }
-//         else {
-//             trans.rotationY = 0;
-//             console.log(trans.rotationY);
-//         }
-//     }
-
-//     onUpdate() {
-//         if(!this.enable) return;
-
-//         let trans = this.object3D.transform;
-//         if(this.left) trans.rotationY -= 5;
-//         if(this.right) trans.rotationY += 5;
-//     }
-// }
 
 export default SceneManager;
