@@ -104,10 +104,6 @@
 </template>
 
 <style scoped>
-.filter-green {
-  filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
-}
-
 .outside-box {
   border: 2px solid #ccc;
   border-radius: 5px;
@@ -171,7 +167,7 @@
   text-align: center;
   width: 100vw; /* Set width to viewport width */
   height: 100vh; /* Set height to viewport height */
-  background-color: #888888; /* Set grey background color */
+  background-color: #666666; /* Set grey background color */
 }
 
 .container-with-name {
