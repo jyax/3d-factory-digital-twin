@@ -4,7 +4,6 @@ const socket = require('socket.io');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-//import ModelLoader from './ModelLoader';
 const { AddToMongoDBServer } = require('./AddToMongoDBServer.cjs');
 //const { AddToDirectory } = require('./AddToDirectory.cjs');
 
@@ -13,7 +12,6 @@ app.use(cors());
 app.use(bodyParser.json());
 const PORT = 3000;
 
-// Dynamically import GetModelsFromMongoDB.cjs
 const StartServer = async () => {
     try {
         const { ModelLoader } = await import('./GetModelsFromMongoDB.cjs');

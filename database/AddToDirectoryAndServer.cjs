@@ -57,7 +57,6 @@ class AddToDirectoryAndServer {
             const bucket = new GridFSBucket(db);
             const filesCursor = bucket.find();
             const fileList = await filesCursor.toArray();
-            console.log('File list:', fileList);
 
             const downloadAndTransferPromises = [];
             for (const file of fileList) {
@@ -99,7 +98,7 @@ const localDirectory = '../glb_models_2';
 const remoteHost = '35.9.22.105';
 const remotePort = 22;
 const remoteUsername = 'magna_user';
-const remoteDirectory = './shared_files/glb_models'; // Update with desired remote directory
+const remoteDirectory = './shared_files/glb_models';
 
 const addToDirectoryAndServer = new AddToDirectoryAndServer(url, dbName, localDirectory, remoteHost, remotePort, remoteUsername, remoteDirectory);
 addToDirectoryAndServer.DownloadAndTransferFiles();
