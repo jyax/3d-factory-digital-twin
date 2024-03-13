@@ -43,6 +43,7 @@ class keyboardScript extends ComponentBase
     }
     keyUp(e) {
         let trans = this.object3D.transform;
+        console.log(this.transform);
         console.log(this.transform.rotationY);
 
         if(e.keyCode === KeyCode.Key_Right){
