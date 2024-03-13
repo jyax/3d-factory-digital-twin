@@ -47,7 +47,7 @@ class AddToMongoDBServer {
         const metadata = {
             contentType: 'model/gltf-binary',
             filename: `${fileName}.glb`,
-            filePath: filePath // Add the file path to metadata
+            filePath: filePath
         };
 
         const fileStream = fs.createReadStream(filePath);
