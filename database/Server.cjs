@@ -12,6 +12,11 @@ app.use(cors());
 app.use(bodyParser.json());
 const PORT = 3000;
 
+/**
+ * Load models from MongoDB on the capstone server to the scene
+ * @returns {Promise<void>}
+ * @constructor
+ */
 const StartServer = async () => {
     try {
         const { ModelLoader } = await import('./GetModelsFromMongoDB.cjs');

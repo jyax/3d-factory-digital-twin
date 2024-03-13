@@ -6,7 +6,7 @@ const { MongoClient, GridFSBucket } = require('mongodb');
 
 /**
  * @class
- * Move from MongoDB to local computer and remote server
+ * Move from MongoDB to local computer and capstone server
  */
 class AddToDirectoryAndServer {
     /**
@@ -31,7 +31,8 @@ class AddToDirectoryAndServer {
 
     /**
      * Connect to MongoDB
-     * @returns {Promise<Db>} - A promise that resolves to the MongoDB database object
+     * @returns {Promise<*>}
+     * @constructor
      */
     async ConnectToDatabase() {
         const client = new MongoClient(this.url);
@@ -46,8 +47,8 @@ class AddToDirectoryAndServer {
     }
 
     /**
-     * Download files from MongoDB, transfer them to a remote server via SCP, and remove local copies
-     * @returns {Promise<void>} - A promise that resolves when all files are downloaded, transferred, and local copies are removed
+     * Download files from MongoDB, transfer to capstone server
+     * @returns {Promise<void>}
      */
     async DownloadAndTransferFiles() {
         const db = await this.ConnectToDatabase();
@@ -94,7 +95,7 @@ class AddToDirectoryAndServer {
 
 const url = 'mongodb://root:password@35.9.22.105:27017';
 const dbName = 'local';
-const localDirectory = '../glb_models_2';
+const localDirectory = '../src/assets/glb_models';
 const remoteHost = '35.9.22.105';
 const remotePort = 22;
 const remoteUsername = 'magna_user';
