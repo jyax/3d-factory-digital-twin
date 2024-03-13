@@ -8,7 +8,7 @@ const path = require('path');
 
 /**
  * @class
- * Upload files to MongoDB on capstone server from local computer
+ * Upload files from local computer to MongoDB
  */
 class AddToMongoDBServer {
     constructor(url, dbName, modelPath) {
@@ -34,7 +34,7 @@ class AddToMongoDBServer {
     }
 
     /**
-     * Upload a file to MongoDB on capstone server from local computer
+     * Upload a file from local computer to MongoDB on capstone server
      * @param filePath Path of file to upload
      * @param fileName Name of file to upload
      * @returns {Promise<unknown>}
@@ -74,7 +74,7 @@ class AddToMongoDBServer {
     }
 
     /**
-     * Upload all GLB files to MongoDB on capstone server from local computer
+     * Upload all GLB files from local computer to MongoDB on capstone server
      * @returns {Promise<void>}
      */
     async UploadGLBFiles() {
@@ -126,7 +126,7 @@ const url = 'mongodb://root:password@35.9.22.105:27017';
 // use name of database
 const dbName = 'local';
 // path of models
-const modelPath = './glb_models';
+const modelPath = './src/assets/glb_models';
 
 const addToMongoDBServer = new AddToMongoDBServer(url, dbName, modelPath);
 addToMongoDBServer.run();

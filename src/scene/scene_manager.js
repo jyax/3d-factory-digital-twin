@@ -106,8 +106,8 @@ class SceneManager {
      * @param {Color} skyColor Color of sky (optional)
      */
     constructor({
-        skyColor = new Color(200, 200, 200)
-    } = {}) {
+                    skyColor = new Color(200, 200, 200)
+                } = {}) {
         this._skyColor = skyColor;
 
         this.sky = null;
@@ -129,13 +129,13 @@ class SceneManager {
         this._events = new EventHandler();
 
         this._ctrlPressed = false;
-        
-        this.moveInterval = 30;     
-        
+
+        this.moveInterval = 30;
+
         this.depth = 0;
-        
+
         this.lastX = -1;
-        
+
         this.lastY = -1;
 
         this.ObjectToMove = undefined;
@@ -151,12 +151,18 @@ class SceneManager {
             server: false
         });
 
+        this.editMode = false;
+
         // mongodb stuff
         this.modelsMap = {};
-        this.loadData();
+        this.LoadModels();
     }
 
-    loadData() {
+    /**
+     * Load models from MongoDB
+     * @constructor
+     */
+    LoadModels() {
         fetch('http://localhost:3000/api/loadModels', {
             method: "POST",
             headers: {
@@ -167,23 +173,15 @@ class SceneManager {
             })
         })
             .then(response => {
-                // Log the raw response for inspection
-                console.log(response);
-
-                // Check the response status
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                // Parse JSON data from response
                 return response.json();
             })
             .then(data => {
-                // Log parsed JSON data
-                console.log(data);
                 this.modelsMap = data.models;
             })
             .catch(error => {
-                // Handle errors
                 console.error('Error:', error);
             });
     }
@@ -241,37 +239,6 @@ class SceneManager {
         console.log("scene manager models:");
         console.log(SceneManager.MODELS);
 
-        // logan's version
-
-        // const promises = [];
-        // const total = Object.keys(SceneManager.MODELS).length;
-        // let i = 0;
-        //
-        // for (const id of Object.keys(SceneManager.MODELS)) {
-        //     const model = Engine3D.res.loadGltf(SceneManager.MODELS[id]);
-        //     promises.push(model);
-        //
-        //     model.then(object => {
-        //         this.models.set(id, object)
-        //
-        //         i++;
-        //
-        //         let progress = 0;
-        //         if (total !== 0)
-        //             progress = i / total;
-        //         this.events.do("load_models", progress);
-        //     });
-        // }
-        //
-        // await Promise.all(promises);
-        //
-        // this.createNewObject({
-        //     pos: new Vector3(),
-        //     select: false
-        // });
-        // this.view.camera = this.cam;
-
-        // mongodb version
         const promises = [];
         const total = Object.keys(this.modelsMap).length;
         let i = 0;
@@ -299,73 +266,66 @@ class SceneManager {
             select: false
         });
         this.view.camera = this.cam;
-
         //
         // HARDCODING THE SCENE
         //
-        
+
         // Creating a Plane/floor
-    //     let floor = this.createNewObject({model:"floor", pos: new Vector3(0, 1, 0), select: false});
-    //     floor.scaleX = 0.01;
-    //     floor.scaleY = 0.01;
-    //     floor.scaleZ = 0.01;
-    //     floor.rotationY = 90;
-    //     floor.transform.localPosition = new Vector3(0, -2, 0);
-    //     for (i=0; i<3;i++){
-    //         let lathe = this.createNewObject({model:"lathe", select: false});
-    //         lathe.scaleX = 3;
-    //         lathe.scaleY = 3;
-    //         lathe.scaleZ = 3;
-    //     }
-    //     let ladder = this.createNewObject({model:"ladder", select: false});
-    //     for (i=0; i<3;i++){
-    //         let forklift = this.createNewObject({model:"forklift", select: false});
-    //         forklift.scaleX = 1.3;
-    //         forklift.scaleY = 1.3;
-    //         forklift.scaleZ = 1.3;
-    // }
-    //
-    //     for (i=0; i<2;i++){
-    //         let picaMachine = this.createNewObject({model:"picaMachine", select: false});
-    //         picaMachine.scaleX = 0.2;
-    //         picaMachine.scaleY = 0.2;
-    //         picaMachine.scaleZ = 0.2;
-    //     }
-    //     for (i=0; i<3;i++){
-    //         let robot = this.createNewObject({model:"robot", select: false});
-    //         robot.scaleX = 0.04;
-    //         robot.scaleY = 0.04;
-    //         robot.scaleZ = 0.04;
-    //     }
-    //     let bin = this.createNewObject({model:"bin", select: false});
-    //     bin.scaleX = 0.06;
-    //     bin.scaleY = 0.06;
-    //     bin.scaleZ = 0.06;
-    //     bin.rotationX = 90;
-    //
-    //     for (i=0; i<3;i++){
-    //         let tank = this.createNewObject({model:"tank", select: false});
-    //         tank.scaleX = 0.025;
-    //         tank.scaleY = 0.025;
-    //         tank.scaleZ = 0.025;
-    //     }
-    //
-    //     for (i=0; i<3;i++){
-    //         let boiler = this.createNewObject({model:"boiler", select: false});
-    //         boiler.rotationX = -90;
-    //     }
-    //     for (i=0; i<1;i++){
-    //         let roboticArm = this.createNewObject({model:"roboticArm", select: false});
-    //         roboticArm.scaleX = 2.5;
-    //         roboticArm.scaleY = 2.5;
-    //         roboticArm.scaleZ = 2.5;
-    //     }
-
-
-
-
-
-
+        // let floor = this.createNewObject({model:"floor", pos: new Vector3(0, 1, 0), select: false});
+        // floor.scaleX = 0.01;
+        // floor.scaleY = 0.01;
+        // floor.scaleZ = 0.01;
+        // floor.rotationY = 90;
+        // floor.transform.localPosition = new Vector3(0, -2, 0);
+        // for (i=0; i<3;i++){
+        //     let lathe = this.createNewObject({model:"lathe", select: false});
+        //     lathe.scaleX = 3;
+        //     lathe.scaleY = 3;
+        //     lathe.scaleZ = 3;
+        // }
+        // let ladder = this.createNewObject({model:"ladder", select: false});
+        // for (i=0; i<3;i++){
+        //     let forklift = this.createNewObject({model:"forklift", select: false});
+        //     forklift.scaleX = 1.3;
+        //     forklift.scaleY = 1.3;
+        //     forklift.scaleZ = 1.3;
+        // }
+        //
+        // for (i=0; i<2;i++){
+        //     let picaMachine = this.createNewObject({model:"picaMachine", select: false});
+        //     picaMachine.scaleX = 0.2;
+        //     picaMachine.scaleY = 0.2;
+        //     picaMachine.scaleZ = 0.2;
+        // }
+        // for (i=0; i<3;i++){
+        //     let robot = this.createNewObject({model:"robot", select: false});
+        //     robot.scaleX = 0.04;
+        //     robot.scaleY = 0.04;
+        //     robot.scaleZ = 0.04;
+        // }
+        // let bin = this.createNewObject({model:"bin", select: false});
+        // bin.scaleX = 0.06;
+        // bin.scaleY = 0.06;
+        // bin.scaleZ = 0.06;
+        // bin.rotationX = 90;
+        //
+        // for (i=0; i<3;i++){
+        //     let tank = this.createNewObject({model:"tank", select: false});
+        //     tank.scaleX = 0.025;
+        //     tank.scaleY = 0.025;
+        //     tank.scaleZ = 0.025;
+        // }
+        //
+        // for (i=0; i<3;i++){
+        //     let boiler = this.createNewObject({model:"boiler", select: false});
+        //     boiler.rotationX = -90;
+        // }
+        // for (i=0; i<1;i++){
+        //     let roboticArm = this.createNewObject({model:"roboticArm", select: false});
+        //     roboticArm.scaleX = 2.5;
+        //     roboticArm.scaleY = 2.5;
+        //     roboticArm.scaleZ = 2.5;
+        // }
 
 
 
@@ -406,43 +366,33 @@ class SceneManager {
         // data10.scaleX = 2.5;
         // data10.scaleY = 2.5;
         // data10.scaleZ = 2.5;
-
         // let lathe1 = data1.clone();
         // lathe1.transform.localPosition = new Vector3(35, 0, -11);
         // this.scene.addChild(lathe1);
-
         // let lathe2 = data1.clone();
         // lathe2.transform.localPosition = new Vector3(35, 0, 0);
         // this.scene.addChild(lathe2);
-
         // let lathe3 = data1.clone();
         // lathe3.transform.localPosition = new Vector3(35, 0, 11);
         // this.scene.addChild(lathe3);
-
         // let forklift1 = data3.clone();
         // forklift1.transform.localPosition = new Vector3(-45, 0, 20);
         // this.scene.addChild(forklift1);
-
         // let forklift2 = data3.clone();
         // forklift2.transform.localPosition = new Vector3(-40, 0, 20);
         // this.scene.addChild(forklift2);
-
         // let forklift3 = data3.clone();
         // forklift3.transform.localPosition = new Vector3(-35, 0, 20);
         // this.scene.addChild(forklift3);
-
         // let forklift4 = data3.clone();
         // forklift4.transform.localPosition = new Vector3(-45, 0, 10);
         // this.scene.addChild(forklift4);
-
         // let forklift5 = data3.clone();
         // forklift5.transform.localPosition = new Vector3(-40, 0, 10);
         // this.scene.addChild(forklift5);
-
         // let forklift6 = data3.clone();
         // forklift6.transform.localPosition = new Vector3(-35, 0, 10);
         // this.scene.addChild(forklift6);
-
         // // Machine Processing Zone - Giant Factory Machines and CNC Machines
         // let factoryMachine1 = data5.clone();
         // factoryMachine1.transform.localPosition = new Vector3(-15, 0, 0);
@@ -450,274 +400,232 @@ class SceneManager {
         // let ladder1 = data2.clone();
         // ladder1.transform.localPosition = new Vector3(-18.5, 0, 0);
         // this.scene.addChild(ladder1);
-
         // let factoryMachine2 = data5.clone();
         // factoryMachine2.transform.localPosition = new Vector3(-5, 0, 0);
         // this.scene.addChild(factoryMachine2);
         // let ladder2 = data2.clone();
         // ladder2.transform.localPosition = new Vector3(-8.5, 0, 0);
         // this.scene.addChild(ladder2);
-
         // let factoryMachine3 = data5.clone();
         // factoryMachine3.transform.localPosition = new Vector3(5, 0, 0);
         // this.scene.addChild(factoryMachine3);
         // let ladder3 = data2.clone();
         // ladder3.transform.localPosition = new Vector3(1.5, 0, 0);
         // this.scene.addChild(ladder3);
-
         // let factoryMachine4 = data5.clone();
         // factoryMachine4.transform.localPosition = new Vector3(15, 0, 0);
         // this.scene.addChild(factoryMachine4);
         // let ladder4 = data2.clone();
         // ladder4.transform.localPosition = new Vector3(11.5, 0, 0);
         // this.scene.addChild(ladder4);
-
         // let factoryMachine5 = data5.clone();
         // factoryMachine5.transform.localPosition = new Vector3(-15, 0, 10);
         // this.scene.addChild(factoryMachine5);
         // let ladder5 = data2.clone();
         // ladder5.transform.localPosition = new Vector3(-18.5, 0, 10);
         // this.scene.addChild(ladder5);
-
         // let factoryMachine6 = data5.clone();
         // factoryMachine6.transform.localPosition = new Vector3(-5, 0, 10);
         // this.scene.addChild(factoryMachine6);
         // let ladder6 = data2.clone();
         // ladder6.transform.localPosition = new Vector3(-8.5, 0, 10);
         // this.scene.addChild(ladder6);
-
         // let factoryMachine7 = data5.clone();
         // factoryMachine7.transform.localPosition = new Vector3(5, 0, 10);
         // this.scene.addChild(factoryMachine7);
         // let ladder7 = data2.clone();
         // ladder7.transform.localPosition = new Vector3(1.5, 0, 10);
         // this.scene.addChild(ladder7);
-
         // let factoryMachine8 = data5.clone();
         // factoryMachine8.transform.localPosition = new Vector3(15, 0, 10);
         // this.scene.addChild(factoryMachine8);
         // let ladder8 = data2.clone();
         // ladder8.transform.localPosition = new Vector3(11.5, 0, 10);
         // this.scene.addChild(ladder8);
-
         // let factoryMachine9 = data5.clone();
         // factoryMachine9.transform.localPosition = new Vector3(-15, 0, 20);
         // this.scene.addChild(factoryMachine9);
         // let ladder9 = data2.clone();
         // ladder9.transform.localPosition = new Vector3(-18.5, 0, 20);
         // this.scene.addChild(ladder9);
-
         // let factoryMachine10 = data5.clone();
         // factoryMachine10.transform.localPosition = new Vector3(-5, 0, 20);
         // this.scene.addChild(factoryMachine10);
         // let ladder10 = data2.clone();
         // ladder10.transform.localPosition = new Vector3(-8.5, 0, 20);
         // this.scene.addChild(ladder10);
-
         // let factoryMachine11 = data5.clone();
         // factoryMachine11.transform.localPosition = new Vector3(5, 0, 20);
         // this.scene.addChild(factoryMachine11);
         // let ladder11 = data2.clone();
         // ladder11.transform.localPosition = new Vector3(1.5, 0, 20);
         // this.scene.addChild(ladder11);
-
         // let factoryMachine12 = data5.clone();
         // factoryMachine12.transform.localPosition = new Vector3(15, 0, 20);
         // this.scene.addChild(factoryMachine12);
         // let ladder12 = data2.clone();
         // ladder12.transform.localPosition = new Vector3(11.5, 0, 20);
         // this.scene.addChild(ladder12);
-
-
         // let cncMachine1 = data4.clone();
         // cncMachine1.transform.localPosition = new Vector3(-42, -1.1, -10);
         // this.scene.addChild(cncMachine1);
-
         // let cncMachine2 = data4.clone();
         // cncMachine2.transform.localPosition = new Vector3(-39, -1.1, -10);
         // this.scene.addChild(cncMachine2);
-
         // let cncMachine3 = data4.clone();
         // cncMachine3.transform.localPosition = new Vector3(-36, -1.1, -10);
         // this.scene.addChild(cncMachine3);
-
         // let cncMachine4 = data4.clone();
         // cncMachine4.transform.localPosition = new Vector3(-33, -1.1, -10);
         // this.scene.addChild(cncMachine4);
-
         // let cncMachine5 = data4.clone();
         // cncMachine5.transform.localPosition = new Vector3(-30, -1.1, -10);
         // this.scene.addChild(cncMachine5);
-
         // let cncMachine6 = data4.clone();
         // cncMachine6.transform.localPosition = new Vector3(-27, -1.1, -10);
         // this.scene.addChild(cncMachine6);
-
         // // // Assembly Zone - Robotic Arms and Scaffolding
         // let roboticArm1 = data10.clone();
         // roboticArm1.transform.localPosition = new Vector3(-36, -1, -15);
         // this.scene.addChild(roboticArm1);
-
         // let roboticArm2 = data10.clone();
         // roboticArm2.transform.localPosition = new Vector3(-30, -1, -15);
         // this.scene.addChild(roboticArm2);
-
         // let bin1 = data7.clone();
         // bin1.transform.localPosition = new Vector3(-30, -0.5, -20);
         // this.scene.addChild(bin1);
-
         // let bin2 = data7.clone();
         // bin2.transform.localPosition = new Vector3(-31, -0.5, -20);
         // this.scene.addChild(bin2);
-
         // let bin3 = data7.clone();
         // bin3.transform.localPosition = new Vector3(-30, -0.5, -21);
         // this.scene.addChild(bin3);
-
         // let bin4 = data7.clone();
         // bin4.transform.localPosition = new Vector3(-31, -0.5, -21);
         // this.scene.addChild(bin4);
-        
         // let bin5 = data7.clone();
         // bin5.transform.localPosition = new Vector3(-30, -0.5, -22);
         // this.scene.addChild(bin5);
-
         // let bin6 = data7.clone();
         // bin6.transform.localPosition = new Vector3(-31, -0.5, -22);
         // this.scene.addChild(bin6);
-
         // let bin7 = data7.clone();
         // bin7.transform.localPosition = new Vector3(-30, -0.5, -23);
         // this.scene.addChild(bin7);
-
         // let bin8 = data7.clone();
         // bin8.transform.localPosition = new Vector3(-31, -0.5, -23);
         // this.scene.addChild(bin8);
-        
         // let bin9 = data7.clone();
         // bin9.transform.localPosition = new Vector3(-30, -0.5, -24);
         // this.scene.addChild(bin9);
-
         // let bin10 = data7.clone();
         // bin10.transform.localPosition = new Vector3(-31, -0.5, -24);
         // this.scene.addChild(bin10);
-
         // let bin11 = data7.clone();
         // bin11.transform.localPosition = new Vector3(-30, -0.5, -25);
         // this.scene.addChild(bin11);
-
         // let bin12 = data7.clone();
         // bin12.transform.localPosition = new Vector3(-31, -0.5, -25);
         // this.scene.addChild(bin12);
-
         // let bin13 = data7.clone()
         // bin13.transform.localPosition = new Vector3(-34, -0.5, -20);
         // this.scene.addChild(bin13);
-
         // let bin14 = data7.clone()
         // bin14.transform.localPosition = new Vector3(-33, -0.5, -20);
         // this.scene.addChild(bin14);
-
         // let bin15 = data7.clone()
         // bin15.transform.localPosition = new Vector3(-34, -0.5, -21);
         // this.scene.addChild(bin15);
-
         // let bin16 = data7.clone()
         // bin16.transform.localPosition = new Vector3(-33, -0.5, -21);
         // this.scene.addChild(bin16);
-
         // let bin17 = data7.clone()
         // bin17.transform.localPosition = new Vector3(-34, -0.5, -22);
         // this.scene.addChild(bin17);
-
         // let bin18 = data7.clone()
         // bin18.transform.localPosition = new Vector3(-33, -0.5, -22);
         // this.scene.addChild(bin18);
-
         // let bin19 = data7.clone()
         // bin19.transform.localPosition = new Vector3(-34, -0.5, -23);
         // this.scene.addChild(bin19);
-
         // let bin20 = data7.clone()
         // bin20.transform.localPosition = new Vector3(-33, -0.5, -23);
         // this.scene.addChild(bin20);
-
         // let bin21 = data7.clone()
         // bin21.transform.localPosition = new Vector3(-34, -0.5, -24);
         // this.scene.addChild(bin21);
-
         // let bin22 = data7.clone()
         // bin22.transform.localPosition = new Vector3(-33, -0.5, -24);
         // this.scene.addChild(bin22);
-
         // let bin23 = data7.clone()
         // bin23.transform.localPosition = new Vector3(-34, -0.5, -25);
         // this.scene.addChild(bin23);
-
         // let bin24 = data7.clone()
         // bin24.transform.localPosition = new Vector3(-33, -0.5, -25);
         // this.scene.addChild(bin24);
-
-
         // // // Storage and Utility Zone - Water Tanks and Boiler
         // let waterTank1 = data8.clone();
         // waterTank1.transform.localPosition = new Vector3(-15, 2, -10);
         // this.scene.addChild(waterTank1);
-
         // let waterTank2 = data8.clone();
         // waterTank2.transform.localPosition = new Vector3(-12.5, 2, -12.5);
         // this.scene.addChild(waterTank2);
-
         // let waterTank3 = data8.clone();
         // waterTank3.transform.localPosition = new Vector3(-10, 2, -10);
         // this.scene.addChild(waterTank3);
-
         // let waterTank4 = data8.clone();
         // waterTank4.transform.localPosition = new Vector3(-7.5, 2, -12.5);
         // this.scene.addChild(waterTank4);
-
         // let waterTank5 = data8.clone();
         // waterTank5.transform.localPosition = new Vector3(-5, 2, -10);
         // this.scene.addChild(waterTank5);
-
         // let waterTank6 = data8.clone();
         // waterTank6.transform.localPosition = new Vector3(-2.5, 2, -12.5);
         // this.scene.addChild(waterTank6);
-
         // let boiler1 = data9.clone();
         // boiler1.transform.localPosition = new Vector3(10, -1.5, -11);
         // this.scene.addChild(boiler1);
-
         // let boiler2 = data9.clone();
         // boiler2.transform.localPosition = new Vector3(12, -1.5, -11);
         // this.scene.addChild(boiler2);
-
         // let boiler3 = data9.clone();
         // boiler3.transform.localPosition = new Vector3(10, -1.5, -13);
         // this.scene.addChild(boiler3);
-
         // let boiler4 = data9.clone();
         // boiler4.transform.localPosition = new Vector3(12, -1.5, -13);
         // this.scene.addChild(boiler4);
-
         //
         // END OF FACTORY
         //
 
-        // logan's version
 
-        // for (const id of Object.keys(SceneManager.MODELS)) {
-        //     const model = await Engine3D.res.loadGltf(SceneManager.MODELS[id]);
-        //     this.models.set(id, model);
-        // }
 
-        // mongodb version
         for (const id of Object.keys(this.modelsMap)) {
             const model = await Engine3D.res.loadGltf(this.modelsMap[id]);
             this.models.set(id, model);
         }
 
         this.createNewObject(new Vector3(), false);
+
+        /**
+         * Event listener for File Input
+         */
+
+        // WAITING ON UPLOAD PAGE
+        // document.getElementById('fileInput').addEventListener('drop', (event) => {
+        //     event.preventDefault()
+        //     let file = event.dataTransfer.files[0]
+        //
+        //     if (file.type.match('application/json')) {
+        //         let reader = new FileReader()
+        //         reader.onloadend = (event) => {
+        //             let jsonString = JSON.parse(String(event.target.result));
+        //             this.LoadScene(jsonString)
+        //         }
+        //         reader.readAsText()
+        //     }
+        //     this.LoadScene()
+        // })
 
         document.addEventListener("keydown", (event) => {
             switch (event.key) {
@@ -754,11 +662,12 @@ class SceneManager {
                     break;
                 }
 
+                // Create an object with 'r'
                 case "r": {
                     if (event.ctrlKey) {
                         event.preventDefault();
                         this.resetCamera();
-                    } else{
+                    } else if(this.editMode){
                         this.createNewObject();
                     }
 
@@ -783,9 +692,10 @@ class SceneManager {
                 }
 
                 case "Delete": {
-                    this.deleteSelected();
-                    event.preventDefault();
-
+                    if(this.editMode){
+                        this.deleteSelected();
+                        event.preventDefault();
+                    }
                     break;
                 }
 
@@ -817,23 +727,25 @@ class SceneManager {
             const object = this.revObjects.get(e.target);
             object.mouseOff();
         }, this);
-            
+
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_DOWN, e => {
             const object = this.revObjects.get(e.target);
             object.mouseDown();
         }, this);
 
-        //this.createNewObject({model: 'dragon',pos:new Vector3(0,0,0)})
+        this.createNewObject({model: 'dragon',pos:new Vector3(0,0,0)})
 
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, this._onOver, this);
 
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_DOWN, this._onMouseDown, this, null, 999);
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_MOVE, this._onMouseMove, this);
         Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_UP, this._onMouseUp, this);
+
     }
 
-
+    // --------
     // Getters
+    // --------
 
     /**
      * Get an object in the manager by its global ID.
@@ -874,8 +786,9 @@ class SceneManager {
         return this.camera.transform.forward;
     }
 
-
+    // --------
     // Setters
+    // --------
 
     /**
      * Set the color of the sky in the scene.
@@ -887,8 +800,9 @@ class SceneManager {
         this.sky.map = colorSky;
     }
 
-
+    // ------
     // Input
+    // ------
 
     /**
      * Handle the mouse clicking on the canvas for cursor effects.
@@ -919,8 +833,9 @@ class SceneManager {
         this.camera.localPosition = pos.add(dir.mul(mag));
     }
 
-
+    // ----------------
     // User Interfaces
+    // ----------------
 
     /**
      * Signal an alert to the event listener.
@@ -932,8 +847,9 @@ class SceneManager {
         this.events.do("alert", description, id);
     }
 
-
+    // -----------------
     // Objects - Access
+    // -----------------
 
     /**
      * Get an object by its ID.
@@ -955,31 +871,9 @@ class SceneManager {
         return Array.from(this.objects.values());
     }
 
-    /**
-     * Save scene information to JSON.
-     * @returns JSON Downloadable JSON file
-     */
-    saveScene() {
-        let currentScene = this.getAllObjects().map(obj => obj.serializeObject())
-        let jsonString = JSON.stringify(currentScene, null, 3)
-
-        let sceneBlob = new Blob([jsonString], {type: "application/json"})
-        const blobUrl = URL.createObjectURL(sceneBlob);
-
-        // Create element to do a click event for blobUrl
-        const downloadLink = document.createElement("a")
-        downloadLink.href = blobUrl
-
-        // Need to add for it to ask for file name if none set
-        let saveName = "scene"
-        downloadLink.download = `${saveName}.json`
-        downloadLink.click()
-
-        // Remove the URL from usage
-        URL.revokeObjectURL(blobUrl)
-    }
-
+    // -------------------
     // Objects - Creation
+    // -------------------
 
     /**
      * Create a new basic object and add it to the scene.
@@ -988,14 +882,14 @@ class SceneManager {
      * @param {string} model ID/name of mesh to use
      */
     createNewObject({
-        pos = null,
-        select = true,
-        model = ""
-    } = {}) {
+                        pos = null,
+                        select = true,
+                        model = ""
+                    } = {}) {
         if (pos === null)
             pos = this.getCameraForward().mul(8).add(this.camera.transform.worldPosition);
 
-        const object = new SceneObject({
+        const object = new SceneObject.SceneObject({
             manager: this,
             pos: pos,
             id: this.count.toString(),
@@ -1028,8 +922,58 @@ class SceneManager {
         this.events.do("add", object);
     }
 
+    // -----------------------
+    // Scene Saving & Loading
+    // -----------------------
 
+    /**
+     * Save scene information to JSON.
+     * @returns JSON Downloadable JSON file
+     */
+    saveScene() {
+        let currentScene = this.getAllObjects().map(obj => obj.serializeObject())
+        let jsonString = JSON.stringify(currentScene, null, 3)
+
+        let sceneBlob = new Blob([jsonString], {type: "application/json"})
+        const blobUrl = URL.createObjectURL(sceneBlob);
+
+        // Create element to do a click event for blobUrl
+        const downloadLink = document.createElement("a")
+        downloadLink.href = blobUrl
+
+        // Need to add for it to ask for file name if none set
+        let saveName = "scene"
+        downloadLink.download = `${saveName}.json`
+        downloadLink.click()
+
+        // Remove the URL from usage
+        URL.revokeObjectURL(blobUrl)
+    }
+
+    /**
+     * Load scene information from JSON
+     */
+    LoadScene(sceneFile) {
+        this.clearObjects()
+        for (const objectInfo in sceneFile) {
+            const object = new SceneObject.SceneObject({
+                manager: this,
+                pos: new Vector3(objectInfo.pos.x,
+                    objectInfo.pos.y,
+                    objectInfo.pos.z),
+                id: objectInfo.id,
+                name: objectInfo.name,
+                model: objectInfo.modelID,
+                locked: objectInfo.locked
+            })
+
+            this.addObject(object)
+        }
+    }
+
+    // -------------------
     // Objects - Deletion
+    // -------------------
 
     /**
      * Remove an object from the scene.
@@ -1053,8 +997,9 @@ class SceneManager {
             object.delete();
     }
 
-
+    // --------------------
     // Objects - Selection
+    // --------------------
 
     /**
      * Select an object. Will add to group selection if control is pressed.
@@ -1260,7 +1205,7 @@ class SceneManager {
             return new BoundingBox();
 
         return bb;
-    }    
+    }
     _onOver(e) {
         console.log('onOver: Name-', this.revObjects);
         // console.log('onOver: Parent-', e.target.parent.object3D.name, e.data.pickInfo);
@@ -1328,7 +1273,7 @@ class SceneManager {
         if (e.mouseCode === 2) {
             // console.log("Scene click down");
             this.lastTime = Date.now();
-            this.canMove = true; 
+            this.canMove = true;
             const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, 0);
             this.lastX = pos.x;
             this.lastY = pos.y;
@@ -1346,7 +1291,7 @@ class SceneManager {
             // Update the position of the selected object to the mouse position
             const now = Date.now();
             if (now - this.lastTime > this.moveInterval) {
-                this.lastTime = now;                
+                this.lastTime = now;
                 const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, 0);
                 this.ObjectToMove.setX(this.ObjectToMove.getObject3D().x + (pos.x - this.lastX) * this._dragMult);
                 this.ObjectToMove.setY(this.ObjectToMove.getObject3D().y + (pos.y - this.lastY) * this._dragMult);
@@ -1365,7 +1310,5 @@ class SceneManager {
         this.canMove = false;
     }
 }
-
-
 
 export default SceneManager;
