@@ -1,24 +1,42 @@
 <script setup>
 import { ref } from 'vue';
 
-// Define a reference to store the file name
 const fileName = ref('');
+const isDraggingOver = ref(false);
+const isEditing = ref(false);
+const editedName = ref('');
 
-// Function to handle file drop event
-const handleDrop = (event) => {
+const HandleDrop = (event) => {
   event.preventDefault();
   const file = event.dataTransfer.files[0];
   fileName.value = file.name;
-  // Process the dropped file here
+  isDraggingOver.value = false;
 };
 
-// Function to handle file dragover event
-const handleDragOver = (event) => {
+const HandleDragOver = (event) => {
   event.preventDefault();
+  isDraggingOver.value = true;
 };
 
-</script>
+const ClearFileName = () => {
+  fileName.value = '';
+  isDraggingOver.value = false;
+};
 
+const StartEditing = () => {
+  isEditing.value = true;
+  editedName.value = ''; // Clear previously edited name if any
+  focusInput(); // Focus the input field when editing starts
+};
+
+const FinishEditing = () => {
+  isEditing.value = false;
+}
+
+const HandleNameBoxClick = () => {
+  StartEditing();
+}
+</script>
 
 <template>
   <div class="container">
@@ -26,7 +44,8 @@ const handleDragOver = (event) => {
     <div class="outside-box">
       <div class="box-content">
         <div class="item-container">
-          <img src="../assets/icon/recent.svg" alt="Recent" draggable="false" class="icon" style="filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);"/>
+          <img src="../assets/icon/recent.svg" alt="Recent" draggable="false" class="icon" style="filter:
+          invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);"/>
           <div class="default-text">
             <h2>
               Recently Opened
@@ -36,7 +55,7 @@ const handleDragOver = (event) => {
         <div class="recent-box-1">
           <div class="name-box">
             <div class="box-content">
-              <h2 class="name-create-text">
+              <h2 class="factory-create-text">
                 Factory 1
               </h2>
             </div>
@@ -45,7 +64,7 @@ const handleDragOver = (event) => {
         <div class="recent-box-1">
           <div class="name-box">
             <div class="box-content">
-              <h2 class="name-create-text">
+              <h2 class="factory-create-text">
                 Factory 2
               </h2>
             </div>
@@ -54,7 +73,7 @@ const handleDragOver = (event) => {
         <div class="recent-box-1">
           <div class="name-box">
             <div class="box-content">
-              <h2 class="name-create-text">
+              <h2 class="factory-create-text">
                 Factory 3
               </h2>
             </div>
@@ -63,7 +82,7 @@ const handleDragOver = (event) => {
         <div class="recent-box-1">
           <div class="name-box">
             <div class="box-content">
-              <h2 class="name-create-text">
+              <h2 class="factory-create-text">
                 Factory 4
               </h2>
             </div>
@@ -72,7 +91,7 @@ const handleDragOver = (event) => {
         <div class="recent-box-1">
           <div class="name-box">
             <div class="box-content">
-              <h2 class="name-create-text">
+              <h2 class="factory-create-text">
                 Factory 5
               </h2>
             </div>
@@ -95,26 +114,30 @@ const handleDragOver = (event) => {
           </div>
         </div>
         <!-- Name -->
-        <div class="container-with-name">
-          <div class="name-box">
-            <div class="box-content">
-              <h2 class="name-create-text">
-                Name...
-              </h2>
-            </div>
-          </div>
+        <div class="name-box" @click="HandleNameBoxClick">
+          <input v-if="!isEditing" type="text" class="name-text" value="Name..." :readonly="!isEditing">
+          <input v-else v-model="editedName" type="text" class="name-text" @blur="FinishEditing">
         </div>
+        <!-- Drag and Drop -->
         <div class="drag-drop-container">
-          <!-- Use v-if to conditionally render drag-drop-box -->
-          <div class="drag-drop-box" v-if="!fileName" @drop="handleDrop" @dragover="handleDragOver">
+          <div v-if="!fileName" class="drag-drop-box" @drop="HandleDrop" @dragover="HandleDragOver">
             <img src="../assets/icon/drag-drop.svg" alt="Arrow" draggable="false" class="icon">
             <h2 class="drag-drop-text">
               Click here or drag and drop a factory JSON file to upload.
             </h2>
           </div>
+          <div v-else class="filename-container">
+            <h2 class="filename-text">
+              {{ fileName }}
+            </h2>
+            <!-- X icon -->
+            <img @click="ClearFileName" src="../assets/icon/xmark.svg" alt="X" draggable="false" class="icon" style="filter:
+            invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);"/>
+          </div>
         </div>
+        <!-- Create -->
         <div class="create-box">
-          <h2 class="name-create-text">
+          <h2 class="factory-create-text">
             Create
           </h2>
         </div>
@@ -127,10 +150,10 @@ const handleDragOver = (event) => {
 .outside-box {
   border: 2px solid #ccc;
   border-radius: 5px;
-  padding: 10px; /* Increase padding for bigger boxes */
-  margin-right: 20px; /* Add margin to create space between boxes */
-  width: 500px; /* Set width of boxes */
-  height: 450px; /* Set height of boxes */
+  padding: 10px;
+  margin-right: 20px;
+  width: 500px;
+  height: 450px;
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -139,25 +162,25 @@ const handleDragOver = (event) => {
 .name-box {
   border: 2px solid #ccc;
   border-radius: 5px;
-  padding: 5px; /* Adjust padding for smaller box */
-  margin-top: 10px; /* Add margin to create space between boxes */
-  width: 300px; /* Set smaller width of the box */
-  height: 40px; /* Set smaller height of the box */
-  text-align: start; /* Align text horizontally */
-  display: flex; /* Add display flex */
-  align-items: center; /* Align items vertically */
+  padding: 5px;
+  margin-top: 10px;
+  width: 300px;
+  height: 40px;
+  text-align: start;
+  display: flex;
+  align-items: center;
 }
 
 .drag-drop-box {
   display: flex;
   border: 2px dashed #ccc;
   border-radius: 5px;
-  padding: 5px; /* Increase padding for bigger boxes */
-  margin-top: 20px; /* Add margin to create space between boxes */
-  width: 300px; /* Set width of boxes */
-  height: 150px; /* Set height of boxes */
-  align-items: center; /* Center horizontally */
-  justify-content: center; /* Center vertically */
+  padding: 5px;
+  margin-top: 20px;
+  width: 300px;
+  height: 150px;
+  align-items: center;
+  justify-content: center;
   flex-direction: column;
 }
 
@@ -165,19 +188,19 @@ const handleDragOver = (event) => {
   display: flex;
   border: 2px solid #ccc;
   border-radius: 5px;
-  padding: 5px; /* Increase padding for bigger boxes */
-  margin-top: 20px; /* Add margin to create space between boxes */
-  width: 80px; /* Set width of boxes */
-  height: 30px; /* Set height of boxes */
-  align-items: center; /* Center horizontally */
-  text-align: start; /* Align text horizontally */
+  padding: 5px;
+  margin-top: 20px;
+  width: 80px;
+  height: 30px;
+  align-items: center;
+  text-align: start;
 }
 
 .box-content {
   display: flex;
-  flex-direction: column; /* Set flex-direction to column */
-  align-items: center; /* Align items vertically */
-  justify-content: center; /* Align items to the top */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .container {
@@ -185,28 +208,28 @@ const handleDragOver = (event) => {
   justify-content: center;
   align-items: center;
   text-align: center;
-  width: 100vw; /* Set width to viewport width */
-  height: 100vh; /* Set height to viewport height */
-  background-color: #666666; /* Set grey background color */
+  width: 100vw;
+  height: 100vh;
+  background-color: #666666;
 }
 
 .container-with-name {
   display: flex;
-  flex-direction: column; /* Stack items vertically */
-  align-items: flex-start; /* Align items horizontally */
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .item-container {
   display: flex;
-  align-items: center; /* Align items vertically */
-  justify-content: center; /* Align items horizontally */
+  align-items: center;
+  justify-content: center;
 }
 
 .new-name-container {
   display: flex;
-  flex-direction: column; /* Stack items vertically */
-  align-items: center; /* Align items horizontally */
-  justify-content: center; /* Align items vertically */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .drag-drop-container {
@@ -215,31 +238,66 @@ const handleDragOver = (event) => {
   justify-content: center;
 }
 
-.icon {
-  width: 30px; /* Set the width of the icon */
-  height: auto; /* Automatically adjust height to maintain aspect ratio */
-  margin-right: 5px; /* Add margin between the icon and text */
-  color: white !important;
+.filename-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
 }
 
-/* Remove margin from the last box to prevent extra space */
+.icon {
+  width: 30px;
+  height: auto;
+  margin-right: 5px;
+}
+
 .outside-box:last-child {
   margin-right: 0;
 }
 
 .drag-drop-text {
-  font-size: 14px; /* Set the font size to smaller */
+  font-size: 14px;
   font-weight: normal;
   color: white;
 }
 
-.name-create-text {
+.name-text {
+  font-weight: normal;
+  color: white;
+  background-color: transparent;
+  font-size: 22px;
+  border: none;
+  width: 100%;
+  height: 100%;
+}
+
+.name-box input {
+  font-weight: normal;
+  color: white;
+  background-color: transparent;
+  font-size: 16px;
+  border: none;
+  outline: none;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.factory-create-text {
   font-weight: normal;
   color: white;
   margin-left: 5px;
 }
 
 .default-text {
+  color: white;
+}
+
+.filename-text {
+  font-size: 18px;
+  text-decoration: underline;
   color: white;
 }
 </style>
