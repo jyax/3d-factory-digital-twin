@@ -34,10 +34,10 @@ class keyboardScript extends ComponentBase
         Engine3D.inputSystem.addEventListener(KeyEvent.KEY_DOWN, this.keyDown, this);
     }
     keyDown(e) {
-        if (e.keyCode == KeyCode.Key_Right){
+        if (e.keyCode === KeyCode.Key_Right){
             this.right = true;
         }
-        else if(e.keyCode = KeyCode.Key_Left){
+        else if(e.keyCode === KeyCode.Key_Left){
             this.left = true;
         }
     }
@@ -45,10 +45,10 @@ class keyboardScript extends ComponentBase
         let trans = this.object3D.transform;
         console.log(this.transform.rotationY);
 
-        if(e.keyCode == KeyCode.Key_Right){
+        if(e.keyCode === KeyCode.Key_Right){
             this.right = false;
         }
-        else if(e.keyCode = KeyCode.Key_Left){
+        else if(e.keyCode === KeyCode.Key_Left){
             this.left = false;
         }
         else {
@@ -733,7 +733,7 @@ class SceneManager {
             object.mouseDown();
         }, this);
 
-        this.createNewObject({model: 'dragon',pos:new Vector3(0,0,0)})
+        //this.createNewObject({model: 'dragon',pos:new Vector3(0,0,0)})
 
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, this._onOver, this);
 
