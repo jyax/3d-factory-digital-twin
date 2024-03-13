@@ -93,13 +93,13 @@ class AddToDirectoryAndServer {
     }
 }
 
-const url = 'mongodb://root:password@localhost:27017';
+const url = 'mongodb://root:password@35.9.22.105:27017';
 const dbName = 'local';
 const localDirectory = '../glb_models_2';
 const remoteHost = '35.9.22.105';
 const remotePort = 22;
 const remoteUsername = 'magna_user';
-const remoteDirectory = './shared_files'; // Update with desired remote directory
+const remoteDirectory = './shared_files/glb_models'; // Update with desired remote directory
 
 const addToDirectoryAndServer = new AddToDirectoryAndServer(url, dbName, localDirectory, remoteHost, remotePort, remoteUsername, remoteDirectory);
 addToDirectoryAndServer.DownloadAndTransferFiles();
