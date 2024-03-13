@@ -5,6 +5,7 @@
   import Toolbar from "./Toolbar.vue";
   import Alert from "./Alert.vue";
   import LoadBar from "./LoadBar.vue";
+  import Login from "./Login.vue";
 
   let mgr = new SceneManager();
   window.manager = mgr;
@@ -22,6 +23,7 @@
 
   <object-info :mgr="mgr"/>
   <toolbar :mgr="mgr"/>
+  <login :mgr="mgr"/>
   <outline :mgr="mgr"/>
   <alert :mgr="mgr"/>
 
