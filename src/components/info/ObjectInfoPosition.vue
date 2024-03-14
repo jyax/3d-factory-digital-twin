@@ -3,13 +3,13 @@
   <div class="input-vector">
 
     <input class="input-vector-comp c-x" v-model="xVal" type="text" placeholder="x"
-           @input="doX" v-on:keyup.enter="blurInput">
+           @input="doX" v-on:keyup.enter="blurInput" :disabled="!enableUpdate">
 
     <input class="input-vector-comp c-y" v-model="yVal" type="text" placeholder="y"
-           @input="doY" v-on:keyup.enter="blurInput">
+           @input="doY" v-on:keyup.enter="blurInput" :disabled="!enableUpdate">
 
     <input class="input-vector-comp c-z" v-model="zVal" type="text" placeholder="z"
-           @input="doZ" v-on:keyup.enter="blurInput" style="margin-right: 0;">
+           @input="doZ" v-on:keyup.enter="blurInput" style="margin-right: 0;" :disabled="!enableUpdate">
 
   </div>
 </template>
@@ -96,21 +96,29 @@ export default {
 
       xVal: 0,
       yVal: 0,
-      zVal: 0
+      zVal: 0,
+
+      enableUpdate: true
     }
   },
 
   methods: {
     doX() {
-      this.mgr.getFirstSelected().setX(parseFloat(this.xVal));
+      if(this.enableUpdate){
+        this.mgr.getFirstSelected().setX(parseFloat(this.xVal));
+      }
     },
 
     doY() {
-      this.mgr.getFirstSelected().setY(parseFloat(this.yVal));
+      if(this.enableUpdate){
+        this.mgr.getFirstSelected().setY(parseFloat(this.yVal));
+      }
     },
 
     doZ() {
-      this.mgr.getFirstSelected().setZ(parseFloat(this.zVal));
+      if(this.enableUpdate){
+        this.mgr.getFirstSelected().setZ(parseFloat(this.zVal));
+      }
     },
 
     blurInput(e) {
@@ -118,19 +126,27 @@ export default {
     },
 
     update(selected) {
-      if (selected.length !== 1)
-        this.pos = new Vector3();
-      else
-        this.pos = selected[0].getObject3D().localPosition;
+      if(this.enableUpdate){
+        if (selected.length !== 1)
+          this.pos = new Vector3();
+        else
+          this.pos = selected[0].getObject3D().localPosition;
 
-      this.xVal = Math.floor(this.pos.x * 100) / 100;
-      this.yVal = Math.floor(this.pos.y * 100) / 100;
-      this.zVal = Math.floor(this.pos.z * 100) / 100;
+        this.xVal = Math.floor(this.pos.x * 100) / 100;
+        this.yVal = Math.floor(this.pos.y * 100) / 100;
+        this.zVal = Math.floor(this.pos.z * 100) / 100;
+      }
+    },
+
+    switchView() {
+        this.enableUpdate = !(this.enableUpdate);
+        console.log("switch", this.enableUpdate);
     }
-  },
+  },  
 
   created() {
     this.mgr.events.on("select", selected => this.update(selected));
+    this.mgr.events.on('switch view', this.switchView);
 
     this.update(this.mgr.getSelected());
   }

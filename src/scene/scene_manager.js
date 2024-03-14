@@ -35,6 +35,7 @@ import keyboardScript from "./keyboardScript.js";
  * Main manager of entire scene. Responsible for managing all currently loaded objects and assets.
  */
 class SceneManager {
+
     static MODELS = {
         "dragon": "https://cdn.orillusion.com/PBR/DragonAttenuation/DragonAttenuation.gltf",
         "table": "/glb_models/Assembly Warehouse Table.glb",
@@ -110,7 +111,7 @@ class SceneManager {
             server: false
         });
 
-        this.editMode = false;
+        this.editMode = true;
 
         // mongodb stuff
         this.modelsMap = {};
@@ -658,6 +659,13 @@ class SceneManager {
                     break;
                 }
 
+                // Switches between view and edit mode
+                case "q": {
+                    this.editMode = !this.editMode;
+                    console.log(this.editMode);
+                    this.events.do('switch view');
+                }
+
                 case "Control": {
                     this._ctrlPressed = true;
                     break;
@@ -841,10 +849,10 @@ class SceneManager {
      * @param {string} model ID/name of mesh to use
      */
     createNewObject({
-                        pos = null,
-                        select = true,
-                        model = ""
-                    } = {}) {
+        pos = null,
+        select = true,
+        model = ""
+    } = {}) {
         if (pos === null)
             pos = this.getCameraForward().mul(8).add(this.camera.transform.worldPosition);
 
@@ -857,7 +865,7 @@ class SceneManager {
 
         object.getObject3D().name = this.count.toString();
         this.count += 1;
-        console.log("Object "+object.getObject3D().name, object)
+        // console.log("Object "+object.getObject3D().name, object)
 
         this.addObject(object);
 
@@ -918,8 +926,8 @@ class SceneManager {
             const object = new SceneObject.SceneObject({
                 manager: this,
                 pos: new Vector3(objectInfo.pos.x,
-                    objectInfo.pos.y,
-                    objectInfo.pos.z),
+                                objectInfo.pos.y,
+                                objectInfo.pos.z),
                 id: objectInfo.id,
                 name: objectInfo.name,
                 model: objectInfo.modelID,
@@ -977,7 +985,7 @@ class SceneManager {
         }
 
         this.events.do("select", Array.from(this._selected.values()));
-        console.log(object);
+        // console.log(object);
         object.getObject3D().addComponent(keyboardScript);
 
         this.updateSelectBox();
@@ -1230,7 +1238,7 @@ class SceneManager {
 
     _onMouseDown(e) {
         if (e.mouseCode === 2) {
-            console.log("Scene click down");
+            // console.log("Scene click down");
             this.lastTime = Date.now();
             this.canMove = true;
             const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, 0);
