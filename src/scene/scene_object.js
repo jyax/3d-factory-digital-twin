@@ -219,6 +219,13 @@ class SceneObject {
     }
 
 
+    /**
+     * Getter for pos
+     */
+    getPos(){
+        return this.pos
+    }
+
     // Setters
 
     /**
@@ -331,6 +338,8 @@ class SceneObject {
                 obj.getComponent(MeshRenderer).material.baseColor = color;
         });
     }
+
+
 
 
     // Iteration
@@ -461,6 +470,22 @@ class SceneObject {
     }
 
 
+
+    temp_check(temp){
+        const min = this.liveData.min;
+        const max = this.liveData.max;
+        
+        const d = (val - min) / (max - min);
+
+        const color = this.liveData.gradient.get(d);
+
+        this.setSolidColor(color);
+
+        if (val >= this.liveData.max) {
+            this.mgr.alert("Temperature exceeded maximum threshold.", this.id);
+        }
+    }
+
     // Live Data
 
     /**
@@ -468,42 +493,80 @@ class SceneObject {
      * @param {Object} data Live data from MQTT
      */
     handleLiveData(data) {
-        switch (this.liveData.type) {
-            case "single value": {
-                const min = this.liveData.min;
-                const max = this.liveData.max;
-                let val = data["temp"];
 
-                const d = (val - min) / (max - min);
+        keys = ['x','y','z', 'rotationX', 'rotationY', 'rotationZ', 'temp','voltage', 'qty', 'capacity']
 
-                const color = this.liveData.gradient.get(d);
+        for(key in keys){
+            if (key in data){
+                switch (key) {
 
-                this.setSolidColor(color);
+                    ///SENSOR VARIABLES
+                    case "temp": {
+                        if(this.liveData.type === "single value")
+                        this.temp_check(data[key])
+                        break;
+                    }
+                    case "qty": {
+                        if(this.liveData.type === "single value")
+                        this.temp_check(data[key])
+                        break;
+                    }
+                    case "voltage": {
+                        if(this.liveData.type === "single value")
+                        this.temp_check(data[key])
+                        break;
+                    }
+                    case "capacity": {
+                        if(this.liveData.type === "single value")
+                        this.temp_check(data[key])
+                        break;
+                    }
 
-                if (val >= this.liveData.max) {
-                    this.mgr.alert("Temperature exceeded maximum threshold.", this.id);
+                    ///POSTIONS
+                    case "x": {
+                        this.setPos(data[key])
+                        break;
+                    }
+                    case "y": {
+                        this.setPos(data[key])
+                        break;
+                    }
+                    case "z": {
+                        this.setPos(data[key])
+                        break;
+                    }
+
+
+                    ///ROTATIONS
+                    case "rotationX": {
+                        this.setPos(data[key])
+                        break;
+                    }
+                    case "rotationY": {
+                        this.setPos(data[key])
+                        break;
+                    }
+                    case "rotationZ": {
+                        this.setPos(data[key])
+                        break;
+                    }
+                    
                 }
-
-                break;
+                }
+                }
+                }
             }
-
-            case "position": {
-                this.setPos(new Vector3(
-                    parseFloat(data["x"]),
-                    parseFloat(data["y"]),
-                    parseFloat(data["z"])
-                ));
-            }
-        }
-    }
+        
 
 
+        
+        
     // Serialization / Save File
     /**
      * Serialize the object for saving
      * @return {} Plain Object
      */
-    serializeObject() {
+    serializeObject(){
         return {
             id: this._id,
             name: this.name,
@@ -514,8 +577,9 @@ class SceneObject {
                 y: this._object.y,
                 z: this._object.z
             }
-        }
-    }
-}
+        };
+    };
+
+
 
 export default {SceneObject, store};
