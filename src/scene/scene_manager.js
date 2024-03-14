@@ -36,19 +36,20 @@ class keyboardScript extends ComponentBase
     keyDown(e) {
         if (e.keyCode == KeyCode.Key_Right){
             this.right = true;
+            console.log("right", this.transform.rotationY);
         }
-        else if(e.keyCode = KeyCode.Key_Left){
+        else if(e.keyCode == KeyCode.Key_Left){
             this.left = true;
+            console.log("left", this.transform.rotationY);
         }
     }
     keyUp(e) {
         let trans = this.object3D.transform;
-        console.log(this.transform.rotationY);
 
         if(e.keyCode == KeyCode.Key_Right){
             this.right = false;
         }
-        else if(e.keyCode = KeyCode.Key_Left){
+        else if(e.keyCode == KeyCode.Key_Left){
             this.left = false;
         }
         else {
@@ -76,6 +77,7 @@ class keyboardScript extends ComponentBase
  * Main manager of entire scene. Responsible for managing all currently loaded objects and assets.
  */
 class SceneManager {
+
     static MODELS = {
         "dragon": "https://cdn.orillusion.com/PBR/DragonAttenuation/DragonAttenuation.gltf",
         "table": "/glb_models/Assembly Warehouse Table.glb",
@@ -130,13 +132,13 @@ class SceneManager {
         this._events = new EventHandler();
 
         this._ctrlPressed = false;
-        
-        this.moveInterval = 30;     
-        
+
+        this.moveInterval = 30;
+
         this.depth = 0;
-        
+
         this.lastX = -1;
-        
+
         this.lastY = -1;
 
         this.ObjectToMove = undefined;
@@ -152,7 +154,7 @@ class SceneManager {
             server: false
         });
 
-        this.editMode = false;
+        this.editMode = true;
 
         // mongodb stuff
         let receivedModels = []; // Variable to store the received models
@@ -269,7 +271,7 @@ class SceneManager {
         //
         // HARDCODING THE SCENE
         //
-        
+
         // Creating a Plane/floor
         let floor = this.createNewObject({model:"floor", pos: new Vector3(0, 1, 0), select: false});
         floor.scaleX = 0.01;
@@ -308,12 +310,34 @@ class SceneManager {
         // END OF FACTORY
         //
 
+
+
         for (const id of Object.keys(SceneManager.MODELS)) {
             const model = await Engine3D.res.loadGltf(SceneManager.MODELS[id]);
             this.models.set(id, model);
         }
 
         this.createNewObject(new Vector3(), false);
+
+        /**
+         * Event listener for File Input
+         */
+
+        // WAITING ON UPLOAD PAGE
+        // document.getElementById('fileInput').addEventListener('drop', (event) => {
+        //     event.preventDefault()
+        //     let file = event.dataTransfer.files[0]
+        //
+        //     if (file.type.match('application/json')) {
+        //         let reader = new FileReader()
+        //         reader.onloadend = (event) => {
+        //             let jsonString = JSON.parse(String(event.target.result));
+        //             this.LoadScene(jsonString)
+        //         }
+        //         reader.readAsText()
+        //     }
+        //     this.LoadScene()
+        // })
 
         document.addEventListener("keydown", (event) => {
             switch (event.key) {
@@ -387,6 +411,13 @@ class SceneManager {
                     break;
                 }
 
+                // Switches between view and edit mode
+                case "q": {
+                    this.editMode = !this.editMode;
+                    console.log(this.editMode);
+                    this.events.do('switch view');
+                }
+
                 case "Control": {
                     this._ctrlPressed = true;
                     break;
@@ -415,7 +446,7 @@ class SceneManager {
             const object = this.revObjects.get(e.target);
             object.mouseOff();
         }, this);
-            
+
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_DOWN, e => {
             const object = this.revObjects.get(e.target);
             object.mouseDown();
@@ -434,7 +465,12 @@ class SceneManager {
     }
 
 
+
+
+
+    // --------
     // Getters
+    // --------
 
     /**
      * Get an object in the manager by its global ID.
@@ -476,7 +512,12 @@ class SceneManager {
     }
 
 
+
+
+
+    // --------
     // Setters
+    // --------
 
     /**
      * Set the color of the sky in the scene.
@@ -489,7 +530,12 @@ class SceneManager {
     }
 
 
+
+
+
+    // ------
     // Input
+    // ------
 
     /**
      * Handle the mouse clicking on the canvas for cursor effects.
@@ -521,7 +567,12 @@ class SceneManager {
     }
 
 
+
+
+
+    // ----------------
     // User Interfaces
+    // ----------------
 
     /**
      * Signal an alert to the event listener.
@@ -534,7 +585,12 @@ class SceneManager {
     }
 
 
+
+
+
+    // -----------------
     // Objects - Access
+    // -----------------
 
     /**
      * Get an object by its ID.
@@ -555,6 +611,69 @@ class SceneManager {
     getAllObjects() {
         return Array.from(this.objects.values());
     }
+
+
+
+
+
+    // -------------------
+    // Objects - Creation
+    // -------------------
+
+    /**
+     * Create a new basic object and add it to the scene.
+     * @param {Vector3} pos Initial position of object (optional)
+     * @param {boolean} select Whether to select object after adding
+     * @param {string} model ID/name of mesh to use
+     */
+    createNewObject({
+        pos = null,
+        select = true,
+        model = ""
+    } = {}) {
+        if (pos === null)
+            pos = this.getCameraForward().mul(8).add(this.camera.transform.worldPosition);
+
+        const object = new SceneObject.SceneObject({
+            manager: this,
+            pos: pos,
+            id: this.count.toString(),
+            model: model
+        });
+
+        object.getObject3D().name = this.count.toString();
+        this.count += 1;
+        // console.log("Object "+object.getObject3D().name, object)
+
+        this.addObject(object);
+
+        if (select) {
+            object.select();
+            this.focusOnSelected();
+        }
+        return object.getObject3D();
+    }
+
+    /**
+     * Add an object to the scene.
+     * @param {SceneObject} object Object to add
+     */
+    addObject(object) {
+        this.objects.add(object);
+
+        this.scene.addChild(object.getObject3D());
+        this.revObjects.set(object.getObject3D(), object);
+
+        this.events.do("add", object);
+    }
+
+
+
+
+
+    // -----------------------
+    // Scene Saving & Loading
+    // -----------------------
 
     /**
      * Save scene information to JSON.
@@ -580,57 +699,33 @@ class SceneManager {
         URL.revokeObjectURL(blobUrl)
     }
 
-    // Objects - Creation
-
     /**
-     * Create a new basic object and add it to the scene.
-     * @param {Vector3} pos Initial position of object (optional)
-     * @param {boolean} select Whether to select object after adding
-     * @param {string} model ID/name of mesh to use
+     * Load scene information from JSON
      */
-    createNewObject({
-        pos = null,
-        select = true,
-        model = ""
-    } = {}) {
-        if (pos === null)
-            pos = this.getCameraForward().mul(8).add(this.camera.transform.worldPosition);
+    LoadScene(sceneFile) {
+        this.clearObjects()
+        for (const objectInfo in sceneFile) {
+            const object = new SceneObject.SceneObject({
+                manager: this,
+                pos: new Vector3(objectInfo.pos.x,
+                                objectInfo.pos.y,
+                                objectInfo.pos.z),
+                id: objectInfo.id,
+                name: objectInfo.name,
+                model: objectInfo.modelID,
+                locked: objectInfo.locked
+            })
 
-        const object = new SceneObject({
-            manager: this,
-            pos: pos,
-            id: this.count.toString(),
-            model: model
-        });
-
-        object.getObject3D().name = this.count.toString();
-        this.count += 1;
-        console.log("Object "+object.getObject3D().name, object)
-
-        this.addObject(object);
-
-        if (select) {
-            object.select();
-            this.focusOnSelected();
+            this.addObject(object)
         }
-        return object.getObject3D();
-    }
-
-    /**
-     * Add an object to the scene.
-     * @param {SceneObject} object Object to add
-     */
-    addObject(object) {
-        this.objects.add(object);
-
-        this.scene.addChild(object.getObject3D());
-        this.revObjects.set(object.getObject3D(), object);
-
-        this.events.do("add", object);
     }
 
 
+
+
+    // -------------------
     // Objects - Deletion
+    // -------------------
 
     /**
      * Remove an object from the scene.
@@ -655,7 +750,12 @@ class SceneManager {
     }
 
 
+
+
+
+    // --------------------
     // Objects - Selection
+    // --------------------
 
     /**
      * Select an object. Will add to group selection if control is pressed.
@@ -674,7 +774,7 @@ class SceneManager {
         }
 
         this.events.do("select", Array.from(this._selected.values()));
-        console.log(object);
+        // console.log(object);
         object.getObject3D().addComponent(keyboardScript);
 
         this.updateSelectBox();
@@ -861,7 +961,7 @@ class SceneManager {
             return new BoundingBox();
 
         return bb;
-    }    
+    }
     _onOver(e) {
         console.log('onOver: Name-', this.revObjects);
         // console.log('onOver: Parent-', e.target.parent.object3D.name, e.data.pickInfo);
@@ -929,7 +1029,7 @@ class SceneManager {
         if (e.mouseCode === 2) {
             // console.log("Scene click down");
             this.lastTime = Date.now();
-            this.canMove = true; 
+            this.canMove = true;
             const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, 0);
             this.lastX = pos.x;
             this.lastY = pos.y;
@@ -947,7 +1047,7 @@ class SceneManager {
             // Update the position of the selected object to the mouse position
             const now = Date.now();
             if (now - this.lastTime > this.moveInterval) {
-                this.lastTime = now;                
+                this.lastTime = now;
                 const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, 0);
                 this.ObjectToMove.setX(this.ObjectToMove.getObject3D().x + (pos.x - this.lastX) * this._dragMult);
                 this.ObjectToMove.setY(this.ObjectToMove.getObject3D().y + (pos.y - this.lastY) * this._dragMult);
