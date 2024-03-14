@@ -692,7 +692,7 @@ class SceneManager {
             object.mouseDown();
         }, this);
 
-        //this.createNewObject({model: 'dragon',pos:new Vector3(0,0,0)})
+        this.createNewObject({model: 'Assembly Warehouse Table.glb',pos:new Vector3(0,0,0)})
 
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, this._onOver, this);
 
@@ -1230,7 +1230,7 @@ class SceneManager {
 
     _onMouseDown(e) {
         if (e.mouseCode === 2) {
-            // console.log("Scene click down");
+            console.log("Scene click down");
             this.lastTime = Date.now();
             this.canMove = true;
             const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, 0);
