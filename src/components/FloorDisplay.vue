@@ -5,33 +5,22 @@
   import Toolbar from "./Toolbar.vue";
   import Alert from "./Alert.vue";
   import LoadBar from "./LoadBar.vue";
-<<<<<<< HEAD
-  import View from "./ViewButton.vue";
-=======
   import Login from "./Login.vue";
-
-  let mgr = new SceneManager();
-  window.manager = mgr;
->>>>>>> origin/Cody
   
   const canvas = ref("canvas");
 
 </script>
 
-
 <template>
 
   <canvas id="canvas" ref="canvas" @mousedown="mgr.startDrag" @mouseleave="mgr.stopDrag" @mouseup="mgr.stopDrag"></canvas>
+
   <view :mgr="mgr"/>
   <object-info :mgr="mgr"/>
-<<<<<<< HEAD
   <div v-if="editOn">
     <toolbar :mgr="mgr"/>
   </div>
-=======
-  <toolbar :mgr="mgr"/>
   <login :mgr="mgr"/>
->>>>>>> origin/Cody
   <outline :mgr="mgr"/>
   <alert :mgr="mgr"/>
 
