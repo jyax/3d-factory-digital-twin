@@ -3,13 +3,13 @@
   <div class="input-vector">
 
     <input class="input-vector-comp c-x" v-model="xVal" type="text" placeholder="x"
-           @input="doChange" v-on:keyup.enter="blurInput">
+           @input="doChange" v-on:keyup.enter="blurInput" :disabled="!enableUpdate">
 
     <input class="input-vector-comp c-y" v-model="yVal" type="text" placeholder="y"
-           @input="doChange" v-on:keyup.enter="blurInput">
+           @input="doChange" v-on:keyup.enter="blurInput" :disabled="!enableUpdate">
 
     <input class="input-vector-comp c-z" v-model="zVal" type="text" placeholder="z"
-           @input="doChange" v-on:keyup.enter="blurInput" style="margin-right: 0;">
+           @input="doChange" v-on:keyup.enter="blurInput" style="margin-right: 0;" :disabled="!enableUpdate">
 
   </div>
 </template>
@@ -96,7 +96,9 @@ export default {
 
       xVal: 0,
       yVal: 0,
-      zVal: 0
+      zVal: 0,
+
+      enableUpdate: true
     }
   },
 
@@ -124,11 +126,17 @@ export default {
       this.xVal = Math.floor(this.rot.x * 100) / 100;
       this.yVal = Math.floor(this.rot.y * 100) / 100;
       this.zVal = Math.floor(this.rot.z * 100) / 100;
+    },
+
+    switchView() {
+        this.enableUpdate = !(this.enableUpdate);
+        console.log("switch", this.enableUpdate);
     }
   },
 
   created() {
     this.mgr.events.on("select", selected => this.update(selected));
+    this.mgr.events.on('switch view', this.switchView);
 
     this.update(this.mgr.getSelected());
   }
