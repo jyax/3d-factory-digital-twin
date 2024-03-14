@@ -14,8 +14,7 @@
 <template>
 
   <canvas id="canvas" ref="canvas" @mousedown="mgr.startDrag" @mouseleave="mgr.stopDrag" @mouseup="mgr.stopDrag"></canvas>
-
-  <view :mgr="mgr"/>
+  <pancake :mgr="mgr"/>
   <object-info :mgr="mgr"/>
   <div v-if="editOn">
     <toolbar :mgr="mgr"/>
