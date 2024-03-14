@@ -14,7 +14,7 @@
     import SceneManager from "../scene/scene_manager.js";
 
   export default {
-    name: "View",
+    name: "Pancake",
 
     props: {
       mgr: {
