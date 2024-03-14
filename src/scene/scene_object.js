@@ -12,6 +12,7 @@ import {
 import EventHandler from "../event/event_handler.js";
 import ColorGradient from "../color/color_gradient.js";
 import { createStore } from 'vuex';
+import keyboardScript from "./keyboardScript.js";
 
 //
 // Login/Logout Functionality
@@ -319,6 +320,8 @@ class SceneObject {
             this.mgr.updateSelectBox();
 
         this.modelID = id;
+
+        this._object.addComponent(keyboardScript);
     }
 
     /**

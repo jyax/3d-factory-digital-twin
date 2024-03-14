@@ -23,53 +23,7 @@ import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
 import Util from "../util/Util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
-
-class keyboardScript extends ComponentBase
-{
-    right = false;
-    left = false;
-
-    start() {
-        Engine3D.inputSystem.addEventListener(KeyEvent.KEY_UP, this.keyUp, this);
-        Engine3D.inputSystem.addEventListener(KeyEvent.KEY_DOWN, this.keyDown, this);
-    }
-    keyDown(e) {
-        if (e.keyCode === KeyCode.Key_Right){
-            this.right = true;
-        }
-        else if(e.keyCode === KeyCode.Key_Left){
-            this.left = true;
-        }
-    }
-    keyUp(e) {
-        let trans = this.object3D.transform;
-        try {
-            console.log(this.transform.rotationY);
-        }
-        catch {
-            console.log("could not find y rotation");
-        }
-
-        if(e.keyCode === KeyCode.Key_Right){
-            this.right = false;
-        }
-        else if(e.keyCode === KeyCode.Key_Left){
-            this.left = false;
-        }
-        else {
-            trans.rotationY = 0;
-            console.log(trans.rotationY);
-        }
-    }
-
-    onUpdate() {
-        if(!this.enable) return;
-
-        let trans = this.object3D.transform;
-        if(this.left) trans.rotationY -= 5;
-        if(this.right) trans.rotationY += 5;
-    }
-}
+import keyboardScript from "./keyboardScript.js";
 
 /**
  * @module SceneManager
