@@ -5,7 +5,20 @@ const fileName = ref('');
 const isDraggingOver = ref(false);
 const isEditing = ref(false);
 const editedName = ref('');
+const isEmpty = ref(true);
 
+// recent files
+const recent1 = ref('Factory 1');
+const recent2 = ref('Factory 2');
+const recent3 = ref('Factory 3');
+const recent4 = ref('Factory 4');
+const recent5 = ref('Factory 5');
+
+/**
+ * Get file name when a file is dropped
+ * @param event Drop event
+ * @constructor
+ */
 const HandleDrop = (event) => {
   event.preventDefault();
   const file = event.dataTransfer.files[0];
@@ -13,29 +26,61 @@ const HandleDrop = (event) => {
   isDraggingOver.value = false;
 };
 
+/**
+ * Set isDraggingOver to true when user drags a file over drag-drop-box
+ * @param event Drag over event
+ * @constructor
+ */
 const HandleDragOver = (event) => {
   event.preventDefault();
   isDraggingOver.value = true;
 };
 
+/**
+ * Clear file name when user chooses to cancel their file
+ * @constructor
+ */
 const ClearFileName = () => {
   fileName.value = '';
   isDraggingOver.value = false;
 };
 
+/**
+ * Starting editing the file name
+ * @constructor
+ */
 const StartEditing = () => {
   isEditing.value = true;
-  editedName.value = ''; // Clear previously edited name if any
-  focusInput(); // Focus the input field when editing starts
 };
 
+/**
+ * Finish editing the file name
+ * @constructor
+ */
 const FinishEditing = () => {
   isEditing.value = false;
+  isEmpty.value = editedName.value.trim() === '';
 }
 
-const HandleNameBoxClick = () => {
-  StartEditing();
+/**
+ * Open file explorer when user clicks drag-drop-box
+ * @constructor
+ */
+const OpenFileExplorer = () => {
+  const fileInput = document.querySelector('.drag-drop-box input[type="file"]');
+  fileInput.click();
 }
+
+/**
+ * Change file name when user selects it in file explorer
+ * @param event
+ * @constructor
+ */
+const HandleFileChange = (event) => {
+  const file = event.target.files[0];
+  fileName.value = file.name;
+}
+
 </script>
 
 <template>
@@ -56,7 +101,7 @@ const HandleNameBoxClick = () => {
           <div class="name-box">
             <div class="box-content">
               <h2 class="factory-create-text">
-                Factory 1
+                {{ recent1 }}
               </h2>
             </div>
           </div>
@@ -65,7 +110,7 @@ const HandleNameBoxClick = () => {
           <div class="name-box">
             <div class="box-content">
               <h2 class="factory-create-text">
-                Factory 2
+                {{ recent2 }}
               </h2>
             </div>
           </div>
@@ -74,7 +119,7 @@ const HandleNameBoxClick = () => {
           <div class="name-box">
             <div class="box-content">
               <h2 class="factory-create-text">
-                Factory 3
+                {{ recent3 }}
               </h2>
             </div>
           </div>
@@ -83,7 +128,7 @@ const HandleNameBoxClick = () => {
           <div class="name-box">
             <div class="box-content">
               <h2 class="factory-create-text">
-                Factory 4
+                {{ recent4 }}
               </h2>
             </div>
           </div>
@@ -92,7 +137,7 @@ const HandleNameBoxClick = () => {
           <div class="name-box">
             <div class="box-content">
               <h2 class="factory-create-text">
-                Factory 5
+                {{ recent5 }}
               </h2>
             </div>
           </div>
@@ -114,13 +159,14 @@ const HandleNameBoxClick = () => {
           </div>
         </div>
         <!-- Name -->
-        <div class="name-box" @click="HandleNameBoxClick">
-          <input v-if="!isEditing" type="text" class="name-text" value="Name..." :readonly="!isEditing">
+        <div class="name-box" @click="StartEditing">
+          <input v-if="!isEditing && isEmpty" type="text" class="name-text" value="Name..." :readonly="!isEditing">
           <input v-else v-model="editedName" type="text" class="name-text" @blur="FinishEditing">
         </div>
         <!-- Drag and Drop -->
         <div class="drag-drop-container">
-          <div v-if="!fileName" class="drag-drop-box" @drop="HandleDrop" @dragover="HandleDragOver">
+          <div v-if="!fileName" class="drag-drop-box" @click="OpenFileExplorer" @drop="HandleDrop" @dragover="HandleDragOver" @change="HandleFileChange">
+            <input type="file" style="display: none;" />
             <img src="../assets/icon/drag-drop.svg" alt="Arrow" draggable="false" class="icon">
             <h2 class="drag-drop-text">
               Click here or drag and drop a factory JSON file to upload.
