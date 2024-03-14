@@ -19,7 +19,7 @@ class AddToDirectory {
      * Constructor
      * @param url MongoDB connection URL
      * @param dbName Database name
-     * @param localDirectory Local directory path for file storage
+     * @param localDirectory Local directory path
      */
     constructor(url, dbName, localDirectory) {
         this.url = url;
@@ -36,10 +36,10 @@ class AddToDirectory {
         const client = new MongoClient(this.url);
         try {
             await client.connect();
-            console.log('Connected to MongoDB');
+            console.log('connected to MongoDB');
             return client.db(this.dbName);
         } catch (err) {
-            console.error('Error connecting to MongoDB', err);
+            console.error('error connecting to MongoDB', err);
             throw err;
         }
     }
@@ -52,8 +52,6 @@ class AddToDirectory {
     async DownloadFiles() {
         const db = await this.ConnectToDatabase();
         try {
-            console.log('MongoDB connection established');
-
             const bucket = new GridFSBucket(db);
             const filesCursor = bucket.find();
             const fileList = await filesCursor.toArray();
@@ -71,20 +69,20 @@ class AddToDirectory {
                     const fileStream = fs.createWriteStream(outputFilePath);
                     downloadStream.pipe(fileStream);
                     fileStream.on('finish', () => {
-                        console.log(`File "${fileName}" downloaded and saved to "${outputFilePath}"`);
+                        console.log(`file "${fileName}" downloaded and saved to "${outputFilePath}"`);
                         resolve();
                     });
                     fileStream.on('error', (err) => {
-                        console.error(`Error saving file "${fileName}" to "${outputFilePath}":`, err);
+                        console.error(`error saving file "${fileName}" to "${outputFilePath}":`, err);
                         reject(err);
                     });
                 }));
             }
 
             await Promise.all(downloadAndTransferPromises);
-            console.log('All files downloaded and saved to local directory successfully');
+            console.log('all files downloaded and saved to local directory');
         } catch (err) {
-            console.error('Error downloading and transferring files', err);
+            console.error('error downloading and transferring files', err);
         } finally {
             await db.client.close();
             process.exit();

@@ -22,7 +22,7 @@ const StartServer = async () => {
         const { ModelLoader } = await import('./GetModelsFromMongoDB.cjs');
 
         app.post('/api/loadModels', async (req, res) => {
-            console.log('Received request at /api/loadModels');
+            console.log('received request at /api/loadModels');
             console.log(req.body);
             try {
                 const databaseUrl = 'mongodb://root:password@35.9.22.105:27017';
@@ -31,18 +31,18 @@ const StartServer = async () => {
                 await modelLoader.GetModels();
 
                 // Send the loaded models as JSON in the response
-                res.json({ message: 'Models loaded successfully.', models: modelLoader.models });
+                res.json({ message: 'models loaded successfully', models: modelLoader.models });
             } catch (error) {
-                console.error('Error loading models:', error);
-                res.status(500).json({ error: 'Failed to load models.' });
+                console.error('error loading models:', error);
+                res.status(500).json({ error: 'Failed to load models' });
             }
         });
 
         app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
+            console.log(`server running on port ${PORT}`);
         });
     } catch (error) {
-        console.error('Error starting server:', error);
+        console.error('error starting server:', error);
     }
 };
 

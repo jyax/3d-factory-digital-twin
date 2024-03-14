@@ -37,13 +37,13 @@ class GetModelsFromMongoDB {
                 if (filePath) {
                     this.models[modelName] = filePath;
                 } else {
-                    console.warn(`File path not found for model "${modelName}".`);
+                    console.warn(`file path not found for model "${modelName}"`);
                 }
             }
 
-            console.log('All models loaded successfully.');
+            console.log('all models loaded');
         } catch (error) {
-            console.error('Error loading models from MongoDB:', error);
+            console.error('error loading models from MongoDB:', error);
         } finally {
             await client.close();
         }
