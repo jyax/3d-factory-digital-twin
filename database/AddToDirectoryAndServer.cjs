@@ -11,13 +11,13 @@ const { MongoClient, GridFSBucket } = require('mongodb');
 class AddToDirectoryAndServer {
     /**
      * Constructor
-     * @param {string} url - MongoDB connection URL
-     * @param {string} dbName - Database name
-     * @param {string} localDirectory - Local directory path for file storage
-     * @param {string} remoteHost - Remote server hostname or IP address
-     * @param {number} remotePort - Remote server SSH port
-     * @param {string} remoteUsername - Username for SSH authentication
-     * @param {string} remoteDirectory - Directory on the remote server to transfer files to
+     * @param url MongoDB connection URL
+     * @param dbName Database name
+     * @param localDirectory Local directory path
+     * @param remoteHost Remote server hostname or ip
+     * @param remotePort Remote server port
+     * @param remoteUsername Username for remote server
+     * @param remoteDirectory Directory on remote server to transfer files to
      */
     constructor(url, dbName, localDirectory, remoteHost, remotePort, remoteUsername, remoteDirectory) {
         this.url = url;
@@ -38,10 +38,10 @@ class AddToDirectoryAndServer {
         const client = new MongoClient(this.url);
         try {
             await client.connect();
-            console.log('Connected to MongoDB');
+            console.log('connected to MongoDB');
             return client.db(this.dbName);
         } catch (err) {
-            console.error('Error connecting to MongoDB', err);
+            console.error('error connecting to MongoDB', err);
             throw err;
         }
     }
@@ -53,13 +53,11 @@ class AddToDirectoryAndServer {
     async DownloadAndTransferFiles() {
         const db = await this.ConnectToDatabase();
         try {
-            console.log('MongoDB connection established');
-
             const bucket = new GridFSBucket(db);
             const filesCursor = bucket.find();
             const fileList = await filesCursor.toArray();
 
-            const downloadAndTransferPromises = [];
+            const promises = [];
             for (const file of fileList) {
                 let fileName = file.filename;
                 if (!fileName.endsWith('.glb')) {
@@ -72,21 +70,21 @@ class AddToDirectoryAndServer {
                 const transferPromise = new Promise((resolve, reject) => {
                     exec(command)
                         .then(() => {
-                            console.log(`File "${fileName}" transferred successfully`);
+                            console.log(`file "${fileName}" transferred successfully`);
                             resolve();
                         })
                         .catch((err) => {
-                            console.error(`Error transferring file "${fileName}"`, err);
+                            console.error(`error transferring file "${fileName}"`, err);
                             reject(err);
                         });
                 });
-                downloadAndTransferPromises.push(transferPromise);
+                promises.push(transferPromise);
             }
 
-            await Promise.all(downloadAndTransferPromises);
-            console.log('All files downloaded and transferred successfully');
+            await Promise.all(promises);
+            console.log('all files downloaded and transferred');
         } catch (err) {
-            console.error('Error downloading and transferring files', err);
+            console.error('error downloading and transferring files', err);
         } finally {
             await db.client.close();
         }

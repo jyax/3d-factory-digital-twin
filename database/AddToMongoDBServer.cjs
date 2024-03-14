@@ -26,9 +26,9 @@ class AddToMongoDBServer {
         this.client = new MongoClient(this.url);
         try {
             await this.client.connect();
-            console.log('Connected to MongoDB');
+            console.log('connected to MongoDB');
         } catch (err) {
-            console.error('Error connecting to MongoDB', err);
+            console.error('error connecting to MongoDB', err);
             throw err;
         }
     }
@@ -54,7 +54,7 @@ class AddToMongoDBServer {
         const stats = fs.statSync(filePath);
 
         if (stats.size === 0) {
-            console.error(`File "${fileName}" is empty. Skipping upload.`);
+            console.error(`file "${fileName}" is empty, skipping upload`);
             return;
         }
 
@@ -63,11 +63,11 @@ class AddToMongoDBServer {
         return new Promise((resolve, reject) => {
             fileStream.pipe(uploadStream);
             uploadStream.on('error', err => {
-                console.error(`Error uploading file "${fileName}":`, err);
+                console.error(`error uploading file "${fileName}":`, err);
                 reject(err);
             });
             uploadStream.on('finish', () => {
-                console.log(`File "${fileName}" uploaded successfully`);
+                console.log(`file "${fileName}" uploaded successfully`);
                 resolve();
             });
         });
@@ -79,39 +79,39 @@ class AddToMongoDBServer {
      */
     async UploadGLBFiles() {
         try {
-            console.log('Starting file upload process...');
+            console.log('starting file upload process');
             const files = fs.readdirSync(this.modelPath);
             const glbFiles = files.filter(file => path.extname(file).toLowerCase() === '.glb');
 
-            console.log(`Found ${glbFiles.length} .glb files to upload.`);
+            console.log(`found ${glbFiles.length} .glb files to upload`);
 
             for (const glbFile of glbFiles) {
                 const filePath = path.join(this.modelPath, glbFile);
                 const fileName = path.basename(glbFile, path.extname(glbFile));
 
                 if (path.extname(glbFile).toLowerCase() !== '.glb') {
-                    console.error(`File "${fileName}" does not have a .glb extension. Skipping upload.`);
+                    console.error(`file "${fileName}" does not have a .glb extension, skipping upload`);
                     continue;
                 }
 
-                console.log(`Processing file: ${fileName}.glb`);
+                console.log(`processing file: ${fileName}.glb`);
 
                 try {
-                    console.log(`Uploading file: ${fileName}.glb`);
+                    console.log(`uploading file: ${fileName}.glb`);
                     await this.UploadFile(filePath, fileName);
-                    console.log(`File upload completed: ${fileName}.glb`);
+                    console.log(`file upload completed: ${fileName}.glb`);
                 } catch (error) {
-                    console.error(`Error uploading file "${fileName}.glb":`, error);
+                    console.error(`error uploading file "${fileName}.glb":`, error);
                 }
             }
 
-            console.log('File upload process completed.');
+            console.log('file upload process completed');
         } catch (err) {
-            console.error('Error during file upload process:', err);
+            console.error('error during file upload process:', err);
         } finally {
-            console.log('Closing MongoDB connection...');
+            console.log('closing MongoDB connection');
             await this.client.close();
-            console.log('MongoDB connection closed.');
+            console.log('MongoDB connection closed');
         }
     }
 
