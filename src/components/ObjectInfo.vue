@@ -47,7 +47,7 @@ import ObjectInfoRotation from "./info/ObjectInfoRotation.vue";
         <object-info-i-d :mgr="mgr" label="ID" placeholder="Optional"/>
         <p class="hint">Objects will not receive live data unless they have an ID.</p>
 
-        <object-info-dropdown label="Data type" :options="data_type_options" :default="data_type"
+        <object-info-dropdown :mgr="mgr" label="Data type" :options="data_type_options" :default="data_type"
                               :on-change="onDataTypeChange"/>
         <object-info-input :mgr="mgr" v-show="data_type === 'single value'" label="Default value" placeholder="0"
                            :on-change="value => this.default = value"/>
@@ -56,16 +56,16 @@ import ObjectInfoRotation from "./info/ObjectInfoRotation.vue";
           <div class="single-input-left">
             <div class="color-input">
               <p>Min</p>
-              <input class="input single-input-input" type="text" placeholder="0" v-model="min">
-              <input type="color" v-model="color_1">
+              <input class="input single-input-input" type="text" placeholder="0" v-model="min" :disabled="!enableUpdate">
+              <input type="color" v-model="color_1" :disabled="!enableUpdate">
             </div>
             <div class="gradient-dots">
               <img class="section-header-icon" src="../assets/icon/more-vert.svg" alt="Gradient">
             </div>
             <div class="color-input">
               <p>Max</p>
-              <input class="input single-input-input" type="text" placeholder="100" v-model="max">
-              <input type="color" v-model="color_2">
+              <input class="input single-input-input" type="text" placeholder="100" v-model="max" :disabled="!enableUpdate">
+              <input type="color" v-model="color_2" :disabled="!enableUpdate">
             </div>
           </div>
           <div class="single-input-right" id="color-gradient" :style="makeGradient()"></div>
@@ -308,7 +308,7 @@ export default {
       selected: [],
       tab: "general",
 
-      data_type_options: ["None", "Single value", "Position"],
+      data_type_options: ["None", "Single Value", "Position"],
       data_type: "none",
 
       min: 0,
@@ -318,7 +318,9 @@ export default {
       color_1: "#5dc938",
       color_2: "#f24f44",
 
-      gradient: new ColorGradient()
+      gradient: new ColorGradient(),
+
+      enableUpdate: true
     }
   },
 
@@ -353,7 +355,7 @@ export default {
 
           break;
         }
-
+        
         case "single value": {
           this.mgr.getFirstSelected().liveData = {
             type: "single value",
@@ -367,7 +369,7 @@ export default {
 
         case "position": {
           this.mgr.getFirstSelected().liveData = {
-            type: "position"
+            type: "Position"
           };
 
           break;
@@ -404,11 +406,17 @@ export default {
         return;
 
       this.data_type = obj.liveData.type;
+    },
+
+    switchView() {
+        this.enableUpdate = !(this.enableUpdate);
+        console.log("switch", this.enableUpdate);
     }
   },
 
   created() {
     this.listener = this.mgr.events.on("select", sel => this.update(sel));
+    this.mgr.events.on("switch view", this.switchView);
 
     this.update(this.mgr.getSelected());
   },
