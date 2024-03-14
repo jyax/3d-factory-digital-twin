@@ -4,7 +4,7 @@
     <p class="input-label">{{label}}</p>
 
     <input class="input" v-model="val" type="text" :placeholder="placeholder"
-           @input="doChange" v-on:keyup.enter="blurInput">
+           @input="doChange" v-on:keyup.enter="blurInput" :disabled="!enableUpdate">
   </div>
 
 </template>
@@ -94,7 +94,9 @@ export default {
 
   data() {
     return {
-      val: ""
+      val: "",
+
+      enableUpdate: true
     }
   },
 
@@ -105,11 +107,17 @@ export default {
 
     doChange() {
       this.onChange(this.val);
+    },
+
+    switchView() {
+        this.enableUpdate = !(this.enableUpdate);
+        console.log("switch", this.enableUpdate);
     }
   },
 
   created() {
     this.val = this.default;
+    this.mgr.events.on("switch view", this.switchView);
   }
 }
 

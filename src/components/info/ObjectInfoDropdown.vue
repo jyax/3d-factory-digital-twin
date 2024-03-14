@@ -3,7 +3,7 @@
   <div class="model-parent">
     <p class="label">{{label}}</p>
 
-    <select class="dropdown" v-model="current" @change="doChange()">
+    <select class="dropdown" v-model="current" @change="doChange()" :disabled="!enableUpdate">
       <option v-for="id of optionList" :value="id.toLowerCase()">{{id}}</option>
     </select>
   </div>
@@ -59,8 +59,15 @@ option {
 
 <script>
 
+import SceneManager from "../../scene/scene_manager.js";
+
 export default {
   props: {
+    mgr: {
+      type: SceneManager,
+      required: true
+    },
+
     label: {
       default: "Dropdown"
     },
@@ -82,17 +89,25 @@ export default {
   data() {
     return {
       optionList: [],
-      current: ""
+      current: "",
+      enableUpdate: true
     }
   },
 
   methods: {
     doChange() {
       this.onChange(this.current);
+    },
+
+    switchView() {
+        this.enableUpdate = !(this.enableUpdate);
+        console.log("switch 1", this.enableUpdate);
     }
   },
 
   created() {
+    this.mgr.events.on("switch view", this.switchView); 
+
     this.current = this.default;
     this.optionList = [...this.options];
   }

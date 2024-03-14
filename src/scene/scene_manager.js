@@ -36,19 +36,20 @@ class keyboardScript extends ComponentBase
     keyDown(e) {
         if (e.keyCode == KeyCode.Key_Right){
             this.right = true;
+            console.log("right", this.transform.rotationY);
         }
-        else if(e.keyCode = KeyCode.Key_Left){
+        else if(e.keyCode == KeyCode.Key_Left){
             this.left = true;
+            console.log("left", this.transform.rotationY);
         }
     }
     keyUp(e) {
         let trans = this.object3D.transform;
-        console.log(this.transform.rotationY);
 
         if(e.keyCode == KeyCode.Key_Right){
             this.right = false;
         }
-        else if(e.keyCode = KeyCode.Key_Left){
+        else if(e.keyCode == KeyCode.Key_Left){
             this.left = false;
         }
         else {
@@ -76,6 +77,7 @@ class keyboardScript extends ComponentBase
  * Main manager of entire scene. Responsible for managing all currently loaded objects and assets.
  */
 class SceneManager {
+
     static MODELS = {
         "dragon": "https://cdn.orillusion.com/PBR/DragonAttenuation/DragonAttenuation.gltf",
         "table": "/glb_models/Assembly Warehouse Table.glb",
@@ -151,7 +153,7 @@ class SceneManager {
             server: false
         });
 
-        this.editMode = false;
+        this.editMode = true;
 
         // mongodb stuff
         let receivedModels = []; // Variable to store the received models
@@ -698,6 +700,13 @@ class SceneManager {
                     break;
                 }
 
+                // Switches between view and edit mode
+                case "q": {
+                    this.editMode = !this.editMode;
+                    console.log(this.editMode);
+                    this.events.do('switch view');
+                }
+
                 case "Control": {
                     this._ctrlPressed = true;
                     break;
@@ -923,7 +932,7 @@ class SceneManager {
 
         object.getObject3D().name = this.count.toString();
         this.count += 1;
-        console.log("Object "+object.getObject3D().name, object)
+        // console.log("Object "+object.getObject3D().name, object)
 
         this.addObject(object);
 
@@ -1054,7 +1063,7 @@ class SceneManager {
         }
 
         this.events.do("select", Array.from(this._selected.values()));
-        console.log(object);
+        // console.log(object);
         object.getObject3D().addComponent(keyboardScript);
 
         this.updateSelectBox();
