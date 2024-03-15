@@ -1,5 +1,8 @@
-const { MongoClient, GridFSBucket } = require('mongodb');
-const path = require('path');
+// const { MongoClient, GridFSBucket } = require('mongodb');
+// const path = require('path');
+
+import { MongoClient, GridFSBucket } from "mongodb";
+import path from 'path';
 
 /**
  * @class
@@ -50,4 +53,5 @@ class GetModelsFromMongoDB {
     }
 }
 
-module.exports = { ModelLoader: GetModelsFromMongoDB };
+//module.exports = { ModelLoader: GetModelsFromMongoDB };
+export default GetModelsFromMongoDB;
