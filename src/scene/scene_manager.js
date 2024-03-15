@@ -134,7 +134,7 @@ class SceneManager {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error('network response was not ok');
                 }
                 return response.json();
             })
@@ -142,7 +142,7 @@ class SceneManager {
                 this.modelsMap = data.models;
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('error:', error);
             });
     }
 

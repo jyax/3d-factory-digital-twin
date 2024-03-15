@@ -5,7 +5,7 @@
 // const { MongoClient, GridFSBucket } = require('mongodb');
 
 import { promisify } from 'util';
-import { exec as execSync } from 'child_process';
+import { exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { MongoClient, GridFSBucket } from 'mongodb';
