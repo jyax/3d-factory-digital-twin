@@ -5,7 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { AddToMongoDBServer } = require('./AddToMongoDBServer.cjs');
-//const { AddToDirectory } = require('./AddToDirectory.cjs');
+//const { AddToDirectory } = require('./AddToDirectory.js');
 
 const app = express();
 app.use(cors());

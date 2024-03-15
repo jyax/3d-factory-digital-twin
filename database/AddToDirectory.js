@@ -1,14 +1,14 @@
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
-const fs = require('fs');
-const path = require('path');
-const { MongoClient, GridFSBucket } = require('mongodb');
+// const util = require('util');
+// const exec = util.promisify(require('child_process').exec);
+// const fs = require('fs');
+// const path = require('path');
+// const { MongoClient, GridFSBucket } = require('mongodb');
 
-// import { promisify } from 'util';
-// import { exec as execSync } from 'child_process';
-// import fs from 'fs';
-// import path from 'path';
-// import { MongoClient, GridFSBucket } from 'mongodb';
+import { promisify } from 'util';
+import { exec as execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { MongoClient, GridFSBucket } from 'mongodb';
 
 /**
  * @class
@@ -97,4 +97,5 @@ const localDirectory = '../src/assets/factory_floor_plan';
 const addToDirectory = new AddToDirectory(url, dbName, localDirectory);
 addToDirectory.DownloadFiles();
 
-module.exports = {AddToDirectory:AddToDirectory};
+// module.exports = {AddToDirectory:AddToDirectory};
+export default AddToDirectory;
