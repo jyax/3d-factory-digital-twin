@@ -11,6 +11,30 @@ import {
 } from "@orillusion/core";
 import EventHandler from "../event/event_handler.js";
 import ColorGradient from "../color/color_gradient.js";
+import { createStore } from 'vuex';
+import keyboardScript from "./keyboardScript.js";
+
+//
+// Login/Logout Functionality
+// This is exported to be used in App.vue
+//
+const store = createStore({
+    state: {
+        user : null,
+    },
+    mutations: {
+        setUser(state, userData){
+            state.user = userData;
+        },
+    },
+    getters : {
+        authenticated(state){
+            return !!state.user;
+        },
+    },
+    actions: {},
+    modules: {},
+});
 
 /**
  * @module SceneObject
@@ -296,6 +320,8 @@ class SceneObject {
             this.mgr.updateSelectBox();
 
         this.modelID = id;
+
+        this._object.addComponent(keyboardScript);
     }
 
     /**
@@ -495,4 +521,4 @@ class SceneObject {
     }
 }
 
-export default SceneObject;
+export default {SceneObject, store};

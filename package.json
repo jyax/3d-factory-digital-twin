@@ -5,12 +5,15 @@
   "type": "module",
   "scripts": {
     "start": "node vite.config.js",
-    "dev": "concurrently \"node database/server.cjs\" vite",
+    "dev": "concurrently \"node database/Server.js\" vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@auth0/auth0-spa-js": "^2.1.3",
     "@orillusion/core": "^0.7.2",
+    "auth": "^1.0.2",
+    "auth0": "^4.3.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "express": "^4.18.3",
@@ -23,7 +26,8 @@
     "socket.io": "^4.7.4",
     "util": "^0.12.5",
     "util.promisify": "^1.1.2",
-    "vue": "^3.3.11"
+    "vue": "^3.3.11",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.6.2",
