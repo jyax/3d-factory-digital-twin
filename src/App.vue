@@ -3,20 +3,20 @@ import FloorDisplay from './components/FloorDisplay.vue'
 import OpeningPage from './components/OpeningPage.vue'
 import { ref } from 'vue';
 
-// whether or not to show opening page
-const showOpeningPage = ref(false);
+// whether or not to show floor
+const showFloor = ref(false);
 
 /**
- * Show the opening page
+ * Show the floor
  * @constructor
  */
-const ShowOpeningPage = () => {
-  showOpeningPage.value = true;
+const ShowFloor = () => {
+  showFloor.value = true;
 }
 </script>
 
 <template>
-  <OpeningPage @create="ShowOpeningPage" v-if="!showOpeningPage"></OpeningPage>
+  <OpeningPage @create="ShowFloor" v-if="!showFloor"></OpeningPage>
   <FloorDisplay v-else></FloorDisplay>
 </template>
 

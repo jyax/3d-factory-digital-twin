@@ -9,11 +9,13 @@ const editedName = ref('');
 const isEmpty = ref(true);
 
 // recent files
-const recent1 = ref('Factory 1');
-const recent2 = ref('Factory 2');
-const recent3 = ref('Factory 3');
-const recent4 = ref('Factory 4');
-const recent5 = ref('Factory 5');
+const recentList = [
+  'Factory 1',
+  'Factory 2',
+  'Factory 3',
+  'Factory 4',
+  'Factory 5',
+];
 
 /**
  * Get file name when a file is dropped
@@ -135,7 +137,7 @@ const Load = () => {
           <div class="name-box">
             <div class="box-content">
               <h2 class="factory-create-text">
-                {{ recent1 }}
+                {{ recentList[0] }}
               </h2>
             </div>
           </div>
@@ -144,7 +146,7 @@ const Load = () => {
           <div class="name-box">
             <div class="box-content">
               <h2 class="factory-create-text">
-                {{ recent2 }}
+                {{ recentList[1] }}
               </h2>
             </div>
           </div>
@@ -153,7 +155,7 @@ const Load = () => {
           <div class="name-box">
             <div class="box-content">
               <h2 class="factory-create-text">
-                {{ recent3 }}
+                {{ recentList[2] }}
               </h2>
             </div>
           </div>
@@ -162,7 +164,7 @@ const Load = () => {
           <div class="name-box">
             <div class="box-content">
               <h2 class="factory-create-text">
-                {{ recent4 }}
+                {{ recentList[3] }}
               </h2>
             </div>
           </div>
@@ -171,7 +173,7 @@ const Load = () => {
           <div class="name-box">
             <div class="box-content">
               <h2 class="factory-create-text">
-                {{ recent5 }}
+                {{ recentList[4] }}
               </h2>
             </div>
           </div>
