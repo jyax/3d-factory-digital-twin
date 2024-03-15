@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue';
+//import { defineEmits } from 'vue';
 import SceneManager from '../scene/scene_manager.js';
 
 const fileInput = ref('');
@@ -7,6 +8,7 @@ const isDraggingOver = ref(false);
 const isEditing = ref(false);
 const editedName = ref('');
 const isEmpty = ref(true);
+const emit = defineEmits(['create']);
 
 // recent files
 const recentList = [
@@ -22,7 +24,7 @@ const recentList = [
  * @param event Drop event
  * @constructor
  */
-const HandleDrop = (event) => {
+const Drop = (event) => {
   event.preventDefault();
   const file = event.dataTransfer.files[0];
   fileInput.value = file.name;
@@ -34,7 +36,7 @@ const HandleDrop = (event) => {
  * @param event Drag over event
  * @constructor
  */
-const HandleDragOver = (event) => {
+const DragOver = (event) => {
   event.preventDefault();
   isDraggingOver.value = true;
 };
@@ -43,7 +45,7 @@ const HandleDragOver = (event) => {
  * Clear file name when user chooses to cancel their file
  * @constructor
  */
-const ClearFileName = () => {
+const ClearFile = () => {
   fileInput.value = '';
   isDraggingOver.value = false;
 };
@@ -79,9 +81,21 @@ const OpenFileExplorer = () => {
  * @param event
  * @constructor
  */
-const HandleFileChange = (event) => {
+const FileChange = (event) => {
   const file = event.target.files[0];
   fileInput.value = file.name;
+}
+
+/**
+ * Add the file they create to recent list
+ * @constructor
+ */
+const Create = () => {
+  console.log(fileInput.value);
+  recentList.unshift(fileInput.value);
+  console.log(recentList);
+  emit('create');
+  console.log("create called");
 }
 
 /**
@@ -201,7 +215,7 @@ const Load = () => {
         </div>
         <!-- Drag and Drop -->
         <div class="drag-drop-container">
-          <div v-if="!fileInput" class="drag-drop-box" @click="OpenFileExplorer" @drop="HandleDrop" @dragover="HandleDragOver" @change="HandleFileChange" id="fileInput">
+          <div v-if="!fileInput" class="drag-drop-box" @click="OpenFileExplorer" @drop="Drop" @dragover="DragOver" @change="FileChange" id="fileInput">
             <input type="file" id="fileInput" style="display: none;" />
             <img src="../assets/icon/drag-drop.svg" alt="Arrow" draggable="false" class="icon">
             <h2 class="drag-drop-text" id="fileInput">
@@ -213,12 +227,12 @@ const Load = () => {
               {{ fileInput }}
             </h2>
             <!-- X icon -->
-            <img @click="ClearFileName" src="../assets/icon/xmark.svg" alt="X" draggable="false" class="icon" style="filter:
+            <img @click="ClearFile" src="../assets/icon/xmark.svg" alt="X" draggable="false" class="icon" style="filter:
             invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);"/>
           </div>
         </div>
         <!-- Create -->
-        <div class="create-box" @click="$emit('create')">
+        <div class="create-box" @click="Create">
           <h2 class="factory-create-text">
             Create
           </h2>

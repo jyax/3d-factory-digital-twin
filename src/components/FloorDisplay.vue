@@ -6,6 +6,7 @@
   import Alert from "./Alert.vue";
   import LoadBar from "./LoadBar.vue";
   import Login from "./Login.vue";
+  import BackToOpeningPage from "./BackToOpeningPage.vue";
   
   const canvas = ref("canvas");
 
@@ -24,6 +25,8 @@
   <alert :mgr="mgr"/>
 
   <load-bar :mgr="mgr"/>
+
+  <BackToOpeningPage :mgr="mgr"/>
 
 </template>
 
