@@ -122,7 +122,7 @@ class AddToMongoDBServer {
 }
 
 // use username and password from docker compose and MongoDB port
-const url = 'mongodb://root:password@35.9.22.105:27017';
+const url = 'mongodb://root:password@localhost:27017';
 // use name of database
 const dbName = 'local';
 // path of models

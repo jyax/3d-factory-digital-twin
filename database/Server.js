@@ -29,7 +29,7 @@ const StartServer = async () => {
             console.log('received request at /api/loadModels');
             console.log(req.body);
             try {
-                const databaseUrl = 'mongodb://root:password@35.9.22.105:27017';
+                const databaseUrl = 'mongodb://root:password@localhost:27017';
                 const databaseName = 'local';
                 const getModelsFromMongoDB = new GetModelsFromMongoDB(databaseUrl, databaseName);
                 await getModelsFromMongoDB.GetModels();

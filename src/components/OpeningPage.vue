@@ -1,7 +1,8 @@
 <script setup>
 import { ref } from 'vue';
+import SceneManager from '../scene/scene_manager.js';
 
-const fileName = ref('');
+const fileInput = ref('');
 const isDraggingOver = ref(false);
 const isEditing = ref(false);
 const editedName = ref('');
@@ -22,7 +23,7 @@ const recent5 = ref('Factory 5');
 const HandleDrop = (event) => {
   event.preventDefault();
   const file = event.dataTransfer.files[0];
-  fileName.value = file.name;
+  fileInput.value = file.name;
   isDraggingOver.value = false;
 };
 
@@ -41,7 +42,7 @@ const HandleDragOver = (event) => {
  * @constructor
  */
 const ClearFileName = () => {
-  fileName.value = '';
+  fileInput.value = '';
   isDraggingOver.value = false;
 };
 
@@ -67,8 +68,8 @@ const FinishEditing = () => {
  * @constructor
  */
 const OpenFileExplorer = () => {
-  const fileInput = document.querySelector('.drag-drop-box input[type="file"]');
-  fileInput.click();
+  const input = document.querySelector('.drag-drop-box input[type="file"]');
+  input.click();
 }
 
 /**
@@ -78,7 +79,40 @@ const OpenFileExplorer = () => {
  */
 const HandleFileChange = (event) => {
   const file = event.target.files[0];
-  fileName.value = file.name;
+  fileInput.value = file.name;
+}
+
+/**
+ * Load scene
+ * @constructor
+ */
+const Load = () => {
+  if (fileInput.value !== '') {
+    // const sceneManager = new SceneManager();
+    // console.log(document.getElementById('fileInput'));
+    // try {
+    //   document.getElementById('fileInput').addEventListener('drop', (event) => {
+    //     event.preventDefault()
+    //     let file = event.dataTransfer.files[0]
+    //
+    //     if (file.type.match('application/json')) {
+    //       let reader = new FileReader()
+    //       reader.onloadend = (event) => {
+    //         let jsonString = JSON.parse(String(event.target.result));
+    //         sceneManager.LoadScene(jsonString)
+    //       }
+    //       reader.readAsText()
+    //     }
+    //     else {
+    //       console.log("please use a valid JSON file")
+    //     }
+    //     //this.LoadScene()
+    //   })
+    // }
+    // catch {
+    //   console.log("error getting file input");
+    // }
+  }
 }
 
 </script>
@@ -165,16 +199,16 @@ const HandleFileChange = (event) => {
         </div>
         <!-- Drag and Drop -->
         <div class="drag-drop-container">
-          <div v-if="!fileName" class="drag-drop-box" @click="OpenFileExplorer" @drop="HandleDrop" @dragover="HandleDragOver" @change="HandleFileChange">
-            <input type="file" style="display: none;" />
+          <div v-if="!fileInput" class="drag-drop-box" @click="OpenFileExplorer" @drop="HandleDrop" @dragover="HandleDragOver" @change="HandleFileChange" id="fileInput">
+            <input type="file" id="fileInput" style="display: none;" />
             <img src="../assets/icon/drag-drop.svg" alt="Arrow" draggable="false" class="icon">
-            <h2 class="drag-drop-text">
+            <h2 class="drag-drop-text" id="fileInput">
               Click here or drag and drop a factory JSON file to upload.
             </h2>
           </div>
           <div v-else class="filename-container">
             <h2 class="filename-text">
-              {{ fileName }}
+              {{ fileInput }}
             </h2>
             <!-- X icon -->
             <img @click="ClearFileName" src="../assets/icon/xmark.svg" alt="X" draggable="false" class="icon" style="filter:
@@ -182,7 +216,7 @@ const HandleFileChange = (event) => {
           </div>
         </div>
         <!-- Create -->
-        <div class="create-box">
+        <div class="create-box" @click="$emit('create')">
           <h2 class="factory-create-text">
             Create
           </h2>
