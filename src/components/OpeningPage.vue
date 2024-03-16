@@ -3,12 +3,19 @@ import { ref } from 'vue';
 //import { defineEmits } from 'vue';
 import SceneManager from '../scene/scene_manager.js';
 
+// file name they choose
 const fileInput = ref('');
+// whether user is dragging over or not
 const isDraggingOver = ref(false);
+// whether user is editing or not
 const isEditing = ref(false);
+// name user chooses
 const editedName = ref('');
+// whether name field is empty of not
 const isEmpty = ref(true);
+// for allowing create button to show another page
 const emit = defineEmits(['create']);
+// whether they chose a file or not
 const emptyError = ref(false);
 
 // recent files
@@ -93,6 +100,7 @@ const FileChange = (event) => {
  */
 const Create = () => {
   if (fileInput.value !== '') {
+    emptyError.value = false;
     recentList.value.unshift(fileInput.value);
     localStorage.setItem('recentList', JSON.stringify(recentList.value));
     emit('create');
@@ -160,7 +168,7 @@ const Load = () => {
             </div>
           </div>
         </div>
-        <div class="recent-box-1">
+        <div class="recent-box-2">
           <div class="name-box">
             <div class="box-content">
               <h2 class="factory-create-text">
@@ -169,7 +177,7 @@ const Load = () => {
             </div>
           </div>
         </div>
-        <div class="recent-box-1">
+        <div class="recent-box-3">
           <div class="name-box">
             <div class="box-content">
               <h2 class="factory-create-text">
@@ -178,7 +186,7 @@ const Load = () => {
             </div>
           </div>
         </div>
-        <div class="recent-box-1">
+        <div class="recent-box-4">
           <div class="name-box">
             <div class="box-content">
               <h2 class="factory-create-text">
@@ -187,7 +195,7 @@ const Load = () => {
             </div>
           </div>
         </div>
-        <div class="recent-box-1">
+        <div class="recent-box-5">
           <div class="name-box">
             <div class="box-content">
               <h2 class="factory-create-text">
@@ -227,11 +235,12 @@ const Load = () => {
             </h2>
           </div>
           <div v-else class="filename-container">
+            <!-- File name -->
             <h2 class="filename-text">
               {{ fileInput }}
             </h2>
             <!-- X icon -->
-            <img @click="ClearFile" src="../assets/icon/xmark.svg" alt="X" draggable="false" class="icon" style="filter:
+            <img @click="ClearFile" src="../assets/icon/xmark.svg" alt="X" draggable="false" class="x-icon" style="filter:
             invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);"/>
           </div>
         </div>
@@ -361,6 +370,13 @@ const Load = () => {
   margin-right: 5px;
 }
 
+.x-icon {
+  width: 30px;
+  height: auto;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
 .outside-box:last-child {
   margin-right: 0;
 }
@@ -409,6 +425,7 @@ const Load = () => {
   font-size: 18px;
   text-decoration: underline;
   color: white;
+  cursor: pointer;
 }
 
 .empty-error-text {
@@ -416,5 +433,14 @@ const Load = () => {
   color: red;
   font-weight: normal;
 }
+
+.create-box:hover {
+  background-color: rgba(23, 23, 23, 0.67);
+}
+
+.name-box:hover {
+  background-color: rgba(23, 23, 23, 0.67);
+}
+
 </style>
 

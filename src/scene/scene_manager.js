@@ -27,7 +27,7 @@ import keyboardScript from "./keyboardScript.js";
 
 // DEVELOPMENT PURPOSES ONLY
 // whether to load models from mongodb or locally
-let loadModelsFromMongoDB = false;
+let loadModelsFromMongoDB = true;
 
 /**
  * @module SceneManager
