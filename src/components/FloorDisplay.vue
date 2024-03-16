@@ -1,32 +1,29 @@
 <script setup>
-  import {onMounted, ref} from "vue";
-  import SceneManager from "../scene/scene_manager.js";
+  import {onMounted} from "vue";
   import ObjectInfo from "./ObjectInfo.vue";
   import Toolbar from "./Toolbar.vue";
   import Alert from "./Alert.vue";
   import LoadBar from "./LoadBar.vue";
   import Login from "./Login.vue";
   import BackToOpeningPage from "./BackToOpeningPage.vue";
-
-  const canvas = ref("canvas");
-
+  import OpeningPage from "./OpeningPage.vue";
 </script>
 
 <template>
 
-  <canvas id="canvas" ref="canvas" @mousedown="mgr.startDrag" @mouseleave="mgr.stopDrag" @mouseup="mgr.stopDrag"></canvas>
-  <pancake :mgr="mgr"/>
-  <object-info :mgr="mgr"/>
-  <div v-if="editOn">
+  <object-info v-show="!openingPage" :mgr="mgr"/>
+  <div v-show="!openingPage" v-if="editOn">
     <toolbar :mgr="mgr"/>
   </div>
   <login :mgr="mgr"/>
-  <outline :mgr="mgr"/>
-  <alert :mgr="mgr"/>
+  <outline v-show="!openingPage" :mgr="mgr"/>
+  <alert v-show="!openingPage" :mgr="mgr"/>
 
-  <load-bar :mgr="mgr"/>
+  <load-bar v-show="!openingPage" :mgr="mgr"/>
 
-  <BackToOpeningPage :mgr="mgr"/>
+  <BackToOpeningPage v-show="!openingPage" :mgr="mgr" @back="openingPage = true"/>
+
+  <OpeningPage v-show="openingPage" @create="openingPage = false"></OpeningPage>
 
 </template>
 
@@ -45,20 +42,27 @@
     },
 
     data () {
-      return{
+      return {
+        openingPage: true,
         editOn: true,
         mgr : new SceneManager()
       }
     },
 
-    methods : {
+    methods: {
       switchView() {
           this.editOn = !(this.editOn);
           console.log("switch", this.editOn);
       }
     },
 
-    created() {
+    watch: {
+      openingPage(n, o) {
+        this.mgr.setCanvasVisibility(!n);
+      }
+    },
+
+    mounted() {
       this.mgr.init();
       this.mgr.events.on('switch view', this.switchView);
       window.manager = this.mgr;

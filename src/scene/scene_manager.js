@@ -70,8 +70,8 @@ class SceneManager {
      * @param {Color} skyColor Color of sky (optional)
      */
     constructor({
-                    skyColor = new Color(200, 200, 200)
-                } = {}) {
+        skyColor = new Color(200, 200, 200)
+    } = {}) {
         this._skyColor = skyColor;
 
         this.sky = null;
@@ -111,14 +111,15 @@ class SceneManager {
         this.count = 0;
 
         this._mqttHandler = new MQTTHandler({
-            mgr: this,
-            server: false
+        mgr: this,
+        server: false
         });
 
         this.editMode = true;
 
         // mongodb stuff
         this.modelsMap = {};
+        if (loadModelsFromMongoDB)
         this.LoadModels();
     }
 
@@ -168,6 +169,8 @@ class SceneManager {
 
         c.width = window.innerWidth;
         c.height = window.innerHeight;
+
+        this.setCanvasVisibility(false);
 
         this.scene = new Scene3D();
 
@@ -807,6 +810,21 @@ class SceneManager {
         let colorSky = new SolidColorSky(color);
         this.sky = this.scene.addComponent(SkyRenderer);
         this.sky.map = colorSky;
+    }
+
+    setCanvasVisibility(val) {
+        const canvas = Engine3D.inputSystem.canvas;
+
+        if (!canvas)
+            return;
+
+        if (val) {
+            canvas.style.opacity = "100%";
+            canvas.style.pointerEvents = "all";
+        } else {
+            canvas.style.opacity = "0%";
+            canvas.style.pointerEvents = "none";
+        }
     }
 
     // ------

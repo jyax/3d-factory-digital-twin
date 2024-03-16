@@ -273,6 +273,8 @@ const Load = () => {
   text-align: start;
   display: flex;
   align-items: center;
+
+  cursor: pointer;
 }
 
 .drag-drop-box {
@@ -286,6 +288,8 @@ const Load = () => {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+
+  cursor: pointer;
 }
 
 .create-box {
@@ -298,6 +302,8 @@ const Load = () => {
   height: 30px;
   align-items: center;
   text-align: start;
+
+  cursor: pointer;
 }
 
 .box-content {
