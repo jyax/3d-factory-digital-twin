@@ -7,7 +7,7 @@
   import LoadBar from "./LoadBar.vue";
   import Login from "./Login.vue";
   import BackToOpeningPage from "./BackToOpeningPage.vue";
-  
+
   const canvas = ref("canvas");
 
 </script>
@@ -36,7 +36,9 @@
 
 <script>
   import Outline from "./Outline.vue";
-  
+  import {onMounted } from "vue";
+  import SceneManager from "../scene/scene_manager.js";
+
   export default {
     components: {
       Outline
@@ -48,7 +50,7 @@
         mgr : new SceneManager()
       }
     },
-    
+
     methods : {
       switchView() {
           this.editOn = !(this.editOn);

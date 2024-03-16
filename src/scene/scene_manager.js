@@ -27,7 +27,7 @@ import keyboardScript from "./keyboardScript.js";
 
 // DEVELOPMENT PURPOSES ONLY
 // whether to load models from mongodb or locally
-let loadModelsFromMongoDB = true;
+let loadModelsFromMongoDB = false;
 
 /**
  * @module SceneManager
@@ -138,7 +138,7 @@ class SceneManager {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('network response was not ok');
+                    throw new Error('network response not ok');
                 }
                 return response.json();
             })
@@ -193,15 +193,9 @@ class SceneManager {
 
         this.scene.addChild(camObj);
 
-
         this.view = new View3D();
         this.view.scene = this.scene;
         this.view.camera = this.cam;
-
-        console.log("database models:");
-        console.log(this.modelsMap);
-        console.log("scene manager models:");
-        console.log(SceneManager.MODELS);
 
         let i = 0;
         const promises = [];
@@ -1008,6 +1002,7 @@ class SceneManager {
      * Delete all objects from the scene.
      */
     clearObjects() {
+        console.log(this.objects);
         for (const object of this.objects.values())
             object.delete();
     }

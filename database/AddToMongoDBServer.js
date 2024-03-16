@@ -8,7 +8,7 @@ import path from 'path';
 
 /**
  * @class
- * Upload files from local computer to MongoDB
+ * Upload files from local computer to MongoDB on capstone server
  */
 class AddToMongoDBServer {
     constructor(url, dbName, modelPath) {
@@ -50,7 +50,7 @@ class AddToMongoDBServer {
             filePath: filePath
         };
 
-        const fileStream = fs.createReadStream(filePath);
+        const readStream = fs.createReadStream(filePath);
         const stats = fs.statSync(filePath);
 
         if (stats.size === 0) {
@@ -58,16 +58,16 @@ class AddToMongoDBServer {
             return;
         }
 
-        const uploadStream = bucket.openUploadStream(`${fileName}.glb`, { metadata });
+        const writeStream = bucket.openUploadStream(`${fileName}.glb`, { metadata });
 
         return new Promise((resolve, reject) => {
-            fileStream.pipe(uploadStream);
-            uploadStream.on('error', err => {
+            readStream.pipe(writeStream);
+            writeStream.on('error', err => {
                 console.error(`error uploading file "${fileName}":`, err);
                 reject(err);
             });
-            uploadStream.on('finish', () => {
-                console.log(`file "${fileName}" uploaded successfully`);
+            writeStream.on('finish', () => {
+                console.log(`file "${fileName}" uploaded`);
                 resolve();
             });
         });

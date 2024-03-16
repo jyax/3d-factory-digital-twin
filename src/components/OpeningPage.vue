@@ -9,15 +9,16 @@ const isEditing = ref(false);
 const editedName = ref('');
 const isEmpty = ref(true);
 const emit = defineEmits(['create']);
+const emptyError = ref(false);
 
 // recent files
-const recentList = [
+const recentList = ref(JSON.parse(localStorage.getItem('recentList')) || [
   'Factory 1',
   'Factory 2',
   'Factory 3',
   'Factory 4',
   'Factory 5',
-];
+]);
 
 /**
  * Get file name when a file is dropped
@@ -91,11 +92,14 @@ const FileChange = (event) => {
  * @constructor
  */
 const Create = () => {
-  console.log(fileInput.value);
-  recentList.unshift(fileInput.value);
-  console.log(recentList);
-  emit('create');
-  console.log("create called");
+  if (fileInput.value !== '') {
+    recentList.value.unshift(fileInput.value);
+    localStorage.setItem('recentList', JSON.stringify(recentList.value));
+    emit('create');
+  }
+  else {
+    emptyError.value = true;
+  }
 }
 
 /**
@@ -237,6 +241,10 @@ const Load = () => {
             Create
           </h2>
         </div>
+        <!-- Error -->
+        <h2 class="empty-error-text" v-if="emptyError">
+          Please select a file before creating.
+        </h2>
       </div>
     </div>
   </div>
@@ -395,6 +403,12 @@ const Load = () => {
   font-size: 18px;
   text-decoration: underline;
   color: white;
+}
+
+.empty-error-text {
+  font-size: 18px;
+  color: red;
+  font-weight: normal;
 }
 </style>
 
