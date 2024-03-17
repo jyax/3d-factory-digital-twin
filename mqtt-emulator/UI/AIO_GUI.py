@@ -3,8 +3,6 @@ import json
 import Publisher
 from asset import Asset
 
-
-
 assetList = []
 
 def save(data, filepath):
@@ -17,11 +15,15 @@ def save(data, filepath):
         outfile.write(parsed)
 
 def readIn(filepath):
+    global assetList
     with open(filepath, "r") as read: 
         dictList = json.load(read)
-    
-    for i in dictList:
-        assetList.append(Asset(i['id'],i['x'],i['y'],i['z'],i['temp']))
+
+        for asset in dictList:
+            temp =Asset()
+            temp.UpdateSelf(*asset.values())
+            assetList.append(temp)
+
         
 def updateAll(client,assetList):
     for obj in assetList:
@@ -30,13 +32,15 @@ def updateAll(client,assetList):
 def addRow(assetList):
     assetList.append(Asset())
 
-   
 
 entries = []
 
-def main(client):
+def main():
+    global assetList
     filepath = './mqtt-emulator/sample.json'
+   
     readIn(filepath)
+
     
     def handle_entry_change(event,AssetID,row,col):
             unpacked = AssetID.unpacked()
@@ -51,12 +55,13 @@ def main(client):
 
 
     # Create labels and entry fields for x, y, z positions, and temperature
-    attributes = ["Asset ID", "X Position", "Y Position", "Z Position", "Temperature"]
-    nextAttr = ["Asset ID", "X Position", "Y Position", "Z Position", "Temperature"]
+    attributes = ['id','x','y','z','rot_x','rot_y','rot_z','temp','voltage','qty','qty_MAX']
+    nextAttr = attributes
     
-    for row, obj in enumerate(assetList):
+    row =0
+    for obj in assetList:
         row+=1 #offset for column headers 
-
+        
         for col, attribute in enumerate(obj.asDict().values()):
             header_label = tk.Label(root, text=attributes[col])
             header_label.grid(row=0, column=col, padx=5, pady=5)
@@ -68,21 +73,24 @@ def main(client):
             entry.bind("<FocusOut>", lambda event, col=col, AssetID=obj,row= row:
                         handle_entry_change(event,AssetID,row,col))
             
-        button = tk.Button(text='Update',command=lambda obj=obj, client=client:obj.liveUpdate(client))
-        button.grid(row=row, column=len(attributes)+1,padx=5,pady=5,)
+    #     button = tk.Button(text='Update',command=lambda obj=obj, client=client:obj.liveUpdate(client))
+    #     button.grid(row=row, column=len(attributes)+1,padx=5,pady=5,)
 
-    button= tk.Button(text='Save', command=lambda filepath=filepath, assetList=assetList:save(assetList,filepath))
-    button.grid(row=len(assetList)+2,column=0)
+    # button= tk.Button(text='Save', command=lambda filepath=filepath, assetList=assetList:save(assetList,filepath))
+    # button.grid(row=len(assetList)+2,column=0)
     
-    button= tk.Button(text='Update All', command=lambda client=client, assetList=assetList:updateAll(client,assetList))
-    button.grid(row=len(assetList)+2,column=1)
+    # button= tk.Button(text='Update All', command=lambda client=client, assetList=assetList:updateAll(client,assetList))
+    # button.grid(row=len(assetList)+2,column=1)
 
     # button= tk.Button(text='Add Row', command=lambda assetList=assetList: addRow(assetList))
     # button.grid(row=len(assetList)+2,column=2)
 
        
-            
-    
              
 
     root.mainloop()
+
+
+# if __name__ == '__main__':
+#     filepath = './mqtt-emulator/sample.json'
+#     main()

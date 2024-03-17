@@ -482,7 +482,7 @@ class SceneObject {
       "temp",
       "voltage",
       "qty",
-      "capacity"
+      "qty_MAX"
     ];
 
     for (key in keys) {
@@ -504,7 +504,7 @@ class SceneObject {
               this.temp_check(data[key]);
             break;
           }
-          case "capacity": {
+          case "qty_MAX": {
             if (this.liveData.type === "single value")
               this.temp_check(data[key]);
             break;
@@ -526,15 +526,15 @@ class SceneObject {
 
           ///ROTATIONS
           case "rotationX": {
-            this.setPos(data[key]);
+            this.getObject3D.transform.rotationX(data[key]);
             break;
           }
           case "rotationY": {
-            this.setPos(data[key]);
+            this.getObject3D.transform.rotationY(data[key]);
             break;
           }
           case "rotationZ": {
-            this.setPos(data[key]);
+            this.getObject3D.transform.rotationZ(data[key]);
             break;
           }
         }
