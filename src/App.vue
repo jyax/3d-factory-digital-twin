@@ -4,8 +4,4 @@ import FloorDisplay from './components/FloorDisplay.vue'
 
 <template>
   <FloorDisplay></FloorDisplay>
-  
 </template>
-
-<style scoped>
-</style>
