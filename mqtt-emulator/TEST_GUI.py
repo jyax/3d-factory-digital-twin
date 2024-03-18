@@ -1,7 +1,7 @@
 # import tkinter as tk
 # import json
 # import Publisher
-# # from asset import Asset, tempSpikeDemo, animate3cube
+# from asset import Asset, tempSpikeDemo, animate3cube
 
 
 
@@ -32,17 +32,17 @@
 #     assetList.append(Asset())
 
 # def factoryDemo(client):
-#     readIn('./mqtt-emulator/alphaDemo.json')
+#     readIn('./mqtt-emulator/factory_jsons/alphaDemo.json')
 #     updateAll(client,assetList)
-#     readIn('./mqtt-emulator/sample.json')
+#     readIn('./mqtt-emulator/factory_jsons/sample.json')
 
 
    
 
 # entries = []
 
-# def mains(client):
-#     filepath = './mqtt-emulator/sample.json'
+# def main(client):
+#     filepath = './mqtt-emulator/factory_jsons/sample.json'
 #     readIn(filepath)
     
 #     def handle_entry_change(event,AssetID,row,col):

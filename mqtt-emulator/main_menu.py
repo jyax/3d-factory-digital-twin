@@ -5,7 +5,8 @@ from asset import Asset
 from PIL import Image, ImageTk
 
 
-##COLOR SCHEME## -> from Discord themes
+
+##COLOR SCHEME## -> sampled from Discord
 NOTIFICATION = '#7289da'
 TEXTBOX = '#424549'	
 PANE = '#36393e'	
@@ -13,6 +14,23 @@ SIDEBAR = '#282b30'
 BACKDROP = '#1e2124'
 
 SERVERLESS = True
+assetList = []
+
+def loadFromFile():
+	filepath = './mqtt-emulator/factory_jsons/sample.json'
+	global assetList
+	with open(filepath, "r") as read: 
+		dictList = json.load(read)
+
+		for asset in dictList:
+			temp =Asset()
+			temp.UpdateSelf(*asset.values())
+			assetList.append(temp)
+
+	print(assetList[1].asDict())
+	print(assetList[2].asDict())
+	print(assetList[2].getDiffs(assetList[1]))
+	
 
 class toolbar(tk.Frame):
 	def __init__(self):
@@ -166,12 +184,12 @@ class footerBar(tk.Frame):
 		saveBtn = tk.Button(self,text='Save',bg=PANE,fg='white',width=10)
 		saveBtn.pack(padx=5,pady=5,side='right')
   
-		laodBtn = tk.Button(self,text='Load from file...',bg=PANE,fg='white',width=16)
-		laodBtn.pack(padx=5,pady=5,side='right')
+		loadBtn = tk.Button(self,text='Load from file...',bg=PANE,fg='white',width=16,command=loadFromFile)
+		loadBtn.pack(padx=5,pady=5,side='right')
 
 		self.pack(side='bottom',before=browser,expand=True,pady=2,fill='x')
 		
-     
+	 
 if __name__ == '__main__':
 
 	root = tk.Tk()

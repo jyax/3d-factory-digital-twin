@@ -61,6 +61,9 @@ class Asset:
         
     def getName(self):
         return self.name
+    
+    def getID(self):
+        return self.id
         
     def getLastUpdated(self):
         return self.last_updated
@@ -117,11 +120,11 @@ class Asset:
             return
         
         delta = {'id':self.id}
-        for i in enumerate(self.asDict()):
-            if self.asDict().values()[i] == other.asDict().values()[i]:
+        for key in self.asDict().keys():
+            if self.asDict()[key] == other.asDict()[key]:
                 pass
             else:
-                delta.update((self.asDict().keys()[i],other.asDict().values()[i]))
+                delta.update({str(key):other.asDict()[key]})
                 
         return delta
     
@@ -165,4 +168,6 @@ def animateLoop(client,animated_objects):
         for change_obj in animated_objects:
             for change in change_obj.get_states():
                 change.animate(client)
+                
+                
                 
