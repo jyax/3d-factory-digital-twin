@@ -6,6 +6,7 @@
   import Alert from "./Alert.vue";
   import LoadBar from "./LoadBar.vue";
   import Login from "./Login.vue";
+  import Pancake from "./ViewButton.vue";
   
   const canvas = ref("canvas");
 
@@ -59,4 +60,4 @@
       window.manager = this.mgr;
     }
   }
-</script>
+</script> 
