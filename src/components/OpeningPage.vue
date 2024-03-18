@@ -397,11 +397,17 @@ export default {
     },
 
     /**
-     * Add the file they create to recent list
+     * Create the file and add to recent list
      * @constructor
      */
     Create () {
-      if (this.fileInput !== '' && this.fileInput.endsWith('.json')) {
+      if (this.fileInput === '') {
+        this.showError = false;
+        this.mgr.clearSelection();
+        this.mgr.clearObjects();
+        this.$emit('create');
+      }
+      else if (this.fileInput.endsWith('.json')) {
         this.showError = false;
         fetch(this.fileInput)
             .then(response => response.json())

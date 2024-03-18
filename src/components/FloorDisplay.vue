@@ -20,7 +20,7 @@
   <outline v-show="!openingPage" :mgr="mgr"/>
   <alert v-show="!openingPage" :mgr="mgr"/>
 
-  <load-bar v-show="!openingPage" :mgr="mgr"/>
+  <load-bar :mgr="mgr"/>
 
   <BackToOpeningPage v-show="!openingPage" :mgr="mgr" @back="openingPage = true"/>
 
