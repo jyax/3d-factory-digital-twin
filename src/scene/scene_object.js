@@ -616,21 +616,21 @@ class SceneObject {
                 ));
             }
 
-            case "scale": {
-                this.setScale(new Vector3(
-                    parseFloat(data["x"]),
-                    parseFloat(data["y"]),
-                    parseFloat(data["z"])
-                ));
-            }
-
-            case "rotation": {
-                this.setRotation(new Vector3(
-                    parseFloat(data["x"]),
-                    parseFloat(data["y"]),
-                    parseFloat(data["z"])
-                ));
-            }
+            // case "scale": {
+            //     this.setScale(new Vector3(
+            //         parseFloat(data["x"]),
+            //         parseFloat(data["y"]),
+            //         parseFloat(data["z"])
+            //     ));
+            // }
+            //
+            // case "rotation": {
+            //     this.setRotation(new Vector3(
+            //         parseFloat(data["x"]),
+            //         parseFloat(data["y"]),
+            //         parseFloat(data["z"])
+            //     ));
+            // }
         }
     }
 

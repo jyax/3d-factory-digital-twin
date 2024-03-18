@@ -1,0 +1,25 @@
+[
+   {
+      "id": "3",
+      "name": "",
+      "modelID": "Assembly Warehouse Table.glb",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": -251.22196245193481,
+         "y": -376.65090322494507,
+         "z": 241.99299430847168
+      },
+      "scale": {
+         "x": 1,
+         "y": 1,
+         "z": 1
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   }
+]

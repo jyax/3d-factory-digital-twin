@@ -248,6 +248,7 @@ class SceneManager {
         this.createNewObject({
             pos: new Vector3(),
             scale: new Vector3(),
+            rotation: new Vector3(),
             select: false
         });
         this.view.camera = this.cam;
@@ -907,12 +908,14 @@ class SceneManager {
      * Create a new basic object and add it to the scene.
      * @param {Vector3} pos Initial position of object (optional)
      * @param {Vector3} scale Initial scale of object (optional)
+     * @param {Vector3} rotation Initial rotation of object (optional)
      * @param {boolean} select Whether to select object after adding
      * @param {string} model ID/name of mesh to use
      */
     createNewObject({
         pos = null,
         scale = null,
+        rotation = null,
         select = true,
         model = ""
     } = {}) {
@@ -920,11 +923,14 @@ class SceneManager {
             pos = this.getCameraForward().mul(8).add(this.camera.transform.worldPosition);
         if (scale === null)
             scale = new Vector3(1,1,1);
+        if (rotation === null)
+            rotation = new Vector3(0,0,0);
 
         const object = new SceneObject.SceneObject({
             manager: this,
             pos: pos,
             scale: scale,
+            rotation: rotation,
             id: this.count.toString(),
             model: model
         });
@@ -990,6 +996,7 @@ class SceneManager {
         this.clearSelection();
         this.clearObjects();
         for (const objectInfo of sceneFile) {
+            console.log(objectInfo);
             const object = new SceneObject.SceneObject({
                 manager: this,
                 pos: new Vector3(objectInfo.pos.x,

@@ -420,6 +420,7 @@ export default {
             })
             .catch(error => {
               this.showError = true;
+              console.log(error);
             });
       }
       else {
