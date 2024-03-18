@@ -29,6 +29,8 @@ class Asset:
 
     def __init__(self,id='0',x=0,y=0,z=0,rot_x=0,rot_y=0,rot_z=0,temp=25,voltage=12,qty=0,qty_MAX=10):
        
+        self.name = 'Thing'
+        self.last_updated = {}
         ## Unique Asset ID
         self.id = id
 
@@ -53,6 +55,15 @@ class Asset:
         
         #Capacity
         self.qty_MAX = qty_MAX
+        
+    def setName(self,str):
+        self.name = str
+        
+    def getName(self):
+        return self.name
+        
+    def getLastUpdated(self):
+        return self.last_updated
             
     def UpdateSelf(self,id,x,y,z,rot_x,rot_y,rot_z,temp,voltage,qty,qty_MAX):
         self.id = id
@@ -85,6 +96,9 @@ class Asset:
         
     def liveUpdate(self,client):
         pub.publish(client,json.dumps(self.asDict()))
+        self.last_updated = self.asDict()
+        #TODO get diff here before publish
+            
 
     def animateSelf(self, goalstate, start_time, duration):
         
@@ -110,7 +124,9 @@ class Asset:
                 delta.update((self.asDict().keys()[i],other.asDict().values()[i]))
                 
         return delta
-        
+    
+    def isSynced(self):
+        return self.last_updated.getDiffs(self) == {'id':self.id} 
         
 def animate3cube(client):
 
@@ -150,8 +166,3 @@ def animateLoop(client,animated_objects):
             for change in change_obj.get_states():
                 change.animate(client)
                 
-            
-
-           
-
-    

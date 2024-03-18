@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import json
 from asset import Asset
+from PIL import Image, ImageTk
 
 
 ##COLOR SCHEME## -> from Discord themes
@@ -16,13 +17,12 @@ SERVERLESS = True
 class toolbar(tk.Frame):
 	def __init__(self):
 		super().__init__()
-		
+	
 		self.addToolbar()
 		
 		
 	def addToolbar(self):
-		toolbar = tk.Frame(self.master,relief='raised')
-		toolbar.config(bg=SIDEBAR)
+		self.config(bg=SIDEBAR)
 		
 		
 		
@@ -35,17 +35,30 @@ class toolbar(tk.Frame):
 				target.config(text='SERVER_IP_HERE:8083')
 			
 
-		server_toggle = tk.Button(toolbar, text='Toggle Server',command=toggle)
-		server_toggle.config(bg=SIDEBAR,fg='white')
-		server_toggle.pack(side= 'left',padx=2,pady=2)
+		server_toggle = tk.Button(self, text='Toggle Server',command=toggle)
+		server_toggle.config(bg=PANE,fg='white')
+		server_toggle.pack(side= 'left',padx=5,pady=2)
 		
-		target = tk.Label(toolbar,text='localhost:8083',bg=TEXTBOX,fg='white',width=20,justify='left',anchor='w',padx=1)
+		target = tk.Label(self,text='localhost:8083',bg=TEXTBOX,fg='white',width=20,justify='left',anchor='w',padx=1)
 		target.pack(side= 'left',padx=2,pady=2)
 		
-		separator = ttk.Separator(toolbar, orient='vertical')
-		separator.pack(expand=True)
+		separator = ttk.Separator(self, orient='vertical')#,style={'color':TEXTBOX}
+		separator.pack(side='left', fill='y',expand=True,padx=2,pady=4)
+
+  
+		AnimationMode = tk.Button(self,text='Animation',bg=PANE,fg='white',width=15)
+		AnimationMode.pack(padx=5,pady=5,side='right')
+
+		DemoMode = tk.Button(self,text='Demo Mode',bg=PANE,fg='white',width=10)
+		DemoMode.pack(padx=5,pady=5,side='right')
+  
+		BaseMode = tk.Button(self,text='Live Data',bg=PANE,fg='white',width=10)
+		BaseMode.pack(padx=5,pady=5,side='right')
+  
+		modeLbl = tk.Label(self,text='Mode:',bg=SIDEBAR,fg='white')
+		modeLbl.pack(side='right',padx=2,pady=2)
 		
-		toolbar.pack(side='top',fill='x')
+		self.pack(side='top',fill='x',pady=2)
 
 class collectionPane(tk.Frame):
 	def __init__(self):
@@ -66,14 +79,25 @@ class collectionPane(tk.Frame):
 					assetList.append(temp)
 			return assetList
 		
-		filepath = './mqtt-emulator/sample.json'            
+		filepath = './mqtt-emulator/factory_jsons/sample.json'            
 		assetList = readIn(filepath)
 		
 		def createCard(asset,idx):
 			card = tk.Frame(self,bd=1,bg=PANE,width=30,height=40,padx=5,pady=5)
-			header = tk.Label(card,text='ASSET_ID: '+str(asset.asDict()['id']),bg=PANE,fg='white')
-			header.pack(side='top')
-			
+			header = tk.Label(card,text=asset.getName(),bg=PANE,fg='white')
+			header.grid(row = 0, column=0, columnspan=2)
+			idLbl = tk.Label(card,text='Asset ID:',bg=PANE,fg='white')
+			idLbl.grid(row = 1, column=0)
+			idVal = tk.Label(card,text=str(asset.asDict()['id']),bg=PANE,fg='white')
+			idVal.grid(row = 1, column=1)
+			statusLbl = tk.Label(card,text='Synced: ',bg=PANE,fg='white')
+			statusLbl.grid(row = 2, column=0)
+			status = tk.Canvas(card, bg=PANE, width=12, height=12,bd=0, highlightthickness=0)
+			status.grid(row=2,column=1,sticky='w',padx=15)
+			status.create_image(5, 7, image=SYNCED)
+			animateBtn = tk.Button(card,text='Run Animation',bg=NOTIFICATION,fg='white')
+			animateBtn.grid(row=3,column=0,columnspan=2)
+	
 			def on_click(event):
 				pass
 
@@ -85,11 +109,9 @@ class collectionPane(tk.Frame):
 			
 		for idx, asset in enumerate(assetList):
 			createCard(asset,idx)
-			
-		self.pack(side='left',anchor='nw')
-			
 		
-
+		self.pack(anchor='nw',side='left',pady=5)
+				
 class itemPane(tk.Frame):
 	def __init__(self,asset):
 		super().__init__()
@@ -114,21 +136,62 @@ class itemPane(tk.Frame):
 			# entry.bind("<FocusOut>", lambda event, col=col, AssetID=obj,row= row:
 			#              handle_entry_change(event,AssetID,row,col))
 			entry.grid(column=1,row=row,sticky='w')
+		updateBtn = tk.Button(self,text='Update',bg=NOTIFICATION,fg='white')
+		updateBtn.grid(row=row+1,column=0, columnspan=2,sticky='nsew',padx=1,pady=2)
+		editAnim = tk.Button(self,text='Edit Animation',bg=NOTIFICATION,fg='white')
+		editAnim.grid(row=row+2,column=0, columnspan=2,sticky='nsew',padx=1,pady=1)
+	
 			
-		self.pack(side='right',expand=True,anchor='e')
+		self.pack(anchor='e',expand=True,fill='y')
 
+class footerBar(tk.Frame):
+	def __init__(self):
+		super().__init__()
+		self.config(bg=SIDEBAR,bd=1)
+		self.createFooter()
+  
+	def createFooter(self):
+		footer= tk.Frame(self.master,relief='raised')
+		footer.config(bg=SIDEBAR)
+
+		animateAll = tk.Button(self,text='Animate All',bg=PANE,fg='white',width =12)
+		animateAll.pack(padx=5,pady=5,side='left')
+ 
+		resetAll = tk.Button(self,text='Reset/Update All',bg=PANE,fg='white',width=15)
+		resetAll.pack(padx=5,pady=5,side='left')
+
+		# separator = ttk.Separator(self, orient='vertical')#,style={'color':TEXTBOX}
+		# separator.pack(anchor='w', fill='y',expand=True,padx=2,pady=3)
+  
+		saveBtn = tk.Button(self,text='Save',bg=PANE,fg='white',width=10)
+		saveBtn.pack(padx=5,pady=5,side='right')
+  
+		laodBtn = tk.Button(self,text='Load from file...',bg=PANE,fg='white',width=16)
+		laodBtn.pack(padx=5,pady=5,side='right')
+
+		self.pack(side='bottom',before=browser,expand=True,pady=2,fill='x')
+		
+     
 if __name__ == '__main__':
 
 	root = tk.Tk()
+	img = Image.open("./mqtt-emulator/UI/UNSYNCED.png").resize((10,10))
+	UNSYNCED = ImageTk.PhotoImage(img)
+	img2 = Image.open("./mqtt-emulator/UI/SYNCED.png").resize((10,10))
+	SYNCED = ImageTk.PhotoImage(img2)
 	root.title("LiveData Simulator")
 	scale = 0.5         
-	root.geometry(str(int(root.winfo_screenwidth()*scale))+'x'+str(int( root.winfo_screenheight()*scale)))
+	root.geometry(str(int(root.winfo_screenwidth()*scale))+'x'+str(int( root.winfo_screenheight()*scale*1.05)))
 	root.config(bg=BACKDROP)
 	toolbar()
-	collectionPane()
-	separator = ttk.Separator(root, orient='vertical')
-	separator.pack(expand=True)
-	itemPane(Asset())
+	
+	browser = collectionPane()
+
+	viewframe = itemPane(Asset())
+	footer = footerBar()
+
 
 	root.mainloop()
 
+
+##TODO LOOK INTO TREEVIEW
