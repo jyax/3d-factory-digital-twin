@@ -17,7 +17,7 @@
           </div>
         </div>
         <div class="recent-box-1">
-          <div class="name-box">
+          <div class="name-box" @click="OpenRecent(0)">
             <div class="box-content">
               <h2 class="factory-create-text">
                 {{ recentList[0] }}
@@ -26,7 +26,7 @@
           </div>
         </div>
         <div class="recent-box-2">
-          <div class="name-box">
+          <div class="name-box" @click="OpenRecent(1)">
             <div class="box-content">
               <h2 class="factory-create-text">
                 {{ recentList[1] }}
@@ -35,7 +35,7 @@
           </div>
         </div>
         <div class="recent-box-3">
-          <div class="name-box">
+          <div class="name-box" @click="OpenRecent(2)">
             <div class="box-content">
               <h2 class="factory-create-text">
                 {{ recentList[2] }}
@@ -44,7 +44,7 @@
           </div>
         </div>
         <div class="recent-box-4">
-          <div class="name-box">
+          <div class="name-box" @click="OpenRecent(3)">
             <div class="box-content">
               <h2 class="factory-create-text">
                 {{ recentList[3] }}
@@ -53,7 +53,7 @@
           </div>
         </div>
         <div class="recent-box-5">
-          <div class="name-box">
+          <div class="name-box" @click="OpenRecent(4)">
             <div class="box-content">
               <h2 class="factory-create-text">
                 {{ recentList[4] }}
@@ -84,7 +84,7 @@
         </div>
         <!-- Drag and Drop -->
         <div class="drag-drop-container">
-          <div v-if="!fileInput" class="drag-drop-box" @click="OpenFileExplorer" @drop="Drop" @dragover="DragOver" @change="FileChange" id="fileInput">
+          <div v-if="!fileInput" class="drag-drop-box" @click="OpenFileExplorer" @drop="Drop" @dragover="DragOver" @change="FileChange">
             <input type="file" style="display: none;" />
             <img src="../assets/icon/drag-drop.svg" alt="Arrow" draggable="false" class="icon">
             <h2 class="drag-drop-text">
@@ -93,7 +93,7 @@
           </div>
           <div v-else class="filename-container">
             <!-- File name -->
-            <h2 class="filename-text" id="fileInput">
+            <h2 class="filename-text">
               {{ fileInput }}
             </h2>
             <!-- X icon -->
@@ -388,7 +388,7 @@ export default {
 
     /**
      * Change file name when user selects it in file explorer
-     * @param event
+     * @param event File change event
      * @constructor
      */
     FileChange(event) {
@@ -419,6 +419,16 @@ export default {
       else {
         this.showError = true;
       }
+    },
+
+    /**
+     * Open recent file
+     * @param fileIndex Index of the file they chose
+     * @constructor
+     */
+    OpenRecent(fileIndex) {
+      this.fileInput = JSON.parse(localStorage.getItem('recentList'))[fileIndex];
+      this.Create();
     }
   }
 }
