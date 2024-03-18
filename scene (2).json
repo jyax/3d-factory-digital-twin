@@ -1,0 +1,550 @@
+[
+   {
+      "id": "0",
+      "name": "",
+      "modelID": "",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      },
+      "scale": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "1",
+      "name": "",
+      "modelID": "floor",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": -2,
+         "z": 0
+      },
+      "scale": {
+         "x": 0.01,
+         "y": 0.01,
+         "z": 0.01
+      },
+      "rotation": {
+         "x": 0,
+         "y": 90,
+         "z": 0
+      }
+   },
+   {
+      "id": "2",
+      "name": "",
+      "modelID": "lathe",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 3,
+         "y": 3,
+         "z": 3
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "3",
+      "name": "",
+      "modelID": "lathe",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 3,
+         "y": 3,
+         "z": 3
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "4",
+      "name": "",
+      "modelID": "lathe",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 3,
+         "y": 3,
+         "z": 3
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "5",
+      "name": "",
+      "modelID": "ladder",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 1,
+         "y": 1,
+         "z": 1
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "6",
+      "name": "",
+      "modelID": "forklift",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 1.3,
+         "y": 1.3,
+         "z": 1.3
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "7",
+      "name": "",
+      "modelID": "forklift",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 1.3,
+         "y": 1.3,
+         "z": 1.3
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "8",
+      "name": "",
+      "modelID": "forklift",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 1.3,
+         "y": 1.3,
+         "z": 1.3
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "9",
+      "name": "",
+      "modelID": "picaMachine",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 0.2,
+         "y": 0.2,
+         "z": 0.2
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "10",
+      "name": "",
+      "modelID": "picaMachine",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 0.2,
+         "y": 0.2,
+         "z": 0.2
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "11",
+      "name": "",
+      "modelID": "robot",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 0.04,
+         "y": 0.04,
+         "z": 0.04
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "12",
+      "name": "",
+      "modelID": "robot",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 0.04,
+         "y": 0.04,
+         "z": 0.04
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "13",
+      "name": "",
+      "modelID": "robot",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 0.04,
+         "y": 0.04,
+         "z": 0.04
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "14",
+      "name": "",
+      "modelID": "bin",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 0.06,
+         "y": 0.06,
+         "z": 0.06
+      },
+      "rotation": {
+         "x": 90,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "15",
+      "name": "",
+      "modelID": "tank",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 0.025,
+         "y": 0.025,
+         "z": 0.025
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "16",
+      "name": "",
+      "modelID": "tank",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 0.025,
+         "y": 0.025,
+         "z": 0.025
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "17",
+      "name": "",
+      "modelID": "tank",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 0.025,
+         "y": 0.025,
+         "z": 0.025
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "18",
+      "name": "",
+      "modelID": "boiler",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 1,
+         "y": 1,
+         "z": 1
+      },
+      "rotation": {
+         "x": -90,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "19",
+      "name": "",
+      "modelID": "boiler",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 1,
+         "y": 1,
+         "z": 1
+      },
+      "rotation": {
+         "x": -90,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "20",
+      "name": "",
+      "modelID": "boiler",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 1,
+         "y": 1,
+         "z": 1
+      },
+      "rotation": {
+         "x": -90,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "21",
+      "name": "",
+      "modelID": "roboticArm",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {
+         "x": 2.5,
+         "y": 2.5,
+         "z": 2.5
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "22",
+      "name": "",
+      "modelID": "",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 12
+      },
+      "scale": {},
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   },
+   {
+      "id": "23",
+      "name": "",
+      "modelID": "dragon",
+      "liveData": {
+         "type": "position"
+      },
+      "pos": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      },
+      "scale": {
+         "x": 1,
+         "y": 1,
+         "z": 1
+      },
+      "rotation": {
+         "x": 0,
+         "y": 0,
+         "z": 0
+      }
+   }
+]

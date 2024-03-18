@@ -247,6 +247,7 @@ class SceneManager {
 
         this.createNewObject({
             pos: new Vector3(),
+            scale: new Vector3(),
             select: false
         });
         this.view.camera = this.cam;
@@ -259,7 +260,7 @@ class SceneManager {
             // do nothing
         }
         else {
-            let floor = this.createNewObject({model:"floor", pos: new Vector3(0, 1, 0), select: false});
+            let floor = this.createNewObject({model:"floor", pos: new Vector3(0, 1, 0), scale: new Vector3(1,1,1), select: false});
             floor.scaleX = 0.01;
             floor.scaleY = 0.01;
             floor.scaleZ = 0.01;
@@ -905,20 +906,25 @@ class SceneManager {
     /**
      * Create a new basic object and add it to the scene.
      * @param {Vector3} pos Initial position of object (optional)
+     * @param {Vector3} scale Initial scale of object (optional)
      * @param {boolean} select Whether to select object after adding
      * @param {string} model ID/name of mesh to use
      */
     createNewObject({
         pos = null,
+        scale = null,
         select = true,
         model = ""
     } = {}) {
         if (pos === null)
             pos = this.getCameraForward().mul(8).add(this.camera.transform.worldPosition);
+        if (scale === null)
+            scale = new Vector3(1,1,1);
 
         const object = new SceneObject.SceneObject({
             manager: this,
             pos: pos,
+            scale: scale,
             id: this.count.toString(),
             model: model
         });
@@ -981,20 +987,27 @@ class SceneManager {
      * Load scene information from JSON
      */
     LoadScene(sceneFile) {
-        this.clearObjects()
-        for (const objectInfo in sceneFile) {
+        this.clearSelection();
+        this.clearObjects();
+        for (const objectInfo of sceneFile) {
             const object = new SceneObject.SceneObject({
                 manager: this,
                 pos: new Vector3(objectInfo.pos.x,
                                 objectInfo.pos.y,
                                 objectInfo.pos.z),
+                scale: new Vector3(objectInfo.scale.x,
+                    objectInfo.scale.y,
+                    objectInfo.scale.z),
+                rotation: new Vector3(objectInfo.rotation.x,
+                    objectInfo.rotation.y,
+                    objectInfo.rotation.z),
                 id: objectInfo.id,
                 name: objectInfo.name,
                 model: objectInfo.modelID,
                 locked: objectInfo.locked
             })
 
-            this.addObject(object)
+            this.addObject(object);
         }
     }
 

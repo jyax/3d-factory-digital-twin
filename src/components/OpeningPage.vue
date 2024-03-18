@@ -1,147 +1,4 @@
 <script setup>
-import { ref } from 'vue';
-//import { defineEmits } from 'vue';
-import SceneManager from '../scene/scene_manager.js';
-
-// file name they choose
-const fileInput = ref('');
-// whether user is dragging over or not
-const isDraggingOver = ref(false);
-// whether user is editing or not
-const isEditing = ref(false);
-// name user chooses
-const editedName = ref('');
-// whether name field is empty of not
-const isEmpty = ref(true);
-// for allowing create button to show another page
-const emit = defineEmits(['create']);
-// whether they chose a file or not
-const emptyError = ref(false);
-
-// recent files
-const recentList = ref(JSON.parse(localStorage.getItem('recentList')) || [
-  'Factory 1',
-  'Factory 2',
-  'Factory 3',
-  'Factory 4',
-  'Factory 5',
-]);
-
-/**
- * Get file name when a file is dropped
- * @param event Drop event
- * @constructor
- */
-const Drop = (event) => {
-  event.preventDefault();
-  const file = event.dataTransfer.files[0];
-  fileInput.value = file.name;
-  isDraggingOver.value = false;
-};
-
-/**
- * Set isDraggingOver to true when user drags a file over drag-drop-box
- * @param event Drag over event
- * @constructor
- */
-const DragOver = (event) => {
-  event.preventDefault();
-  isDraggingOver.value = true;
-};
-
-/**
- * Clear file name when user chooses to cancel their file
- * @constructor
- */
-const ClearFile = () => {
-  fileInput.value = '';
-  isDraggingOver.value = false;
-};
-
-/**
- * Starting editing the file name
- * @constructor
- */
-const StartEditing = () => {
-  isEditing.value = true;
-};
-
-/**
- * Finish editing the file name
- * @constructor
- */
-const FinishEditing = () => {
-  isEditing.value = false;
-  isEmpty.value = editedName.value.trim() === '';
-}
-
-/**
- * Open file explorer when user clicks drag-drop-box
- * @constructor
- */
-const OpenFileExplorer = () => {
-  const input = document.querySelector('.drag-drop-box input[type="file"]');
-  input.click();
-}
-
-/**
- * Change file name when user selects it in file explorer
- * @param event
- * @constructor
- */
-const FileChange = (event) => {
-  const file = event.target.files[0];
-  fileInput.value = file.name;
-}
-
-/**
- * Add the file they create to recent list
- * @constructor
- */
-const Create = () => {
-  if (fileInput.value !== '') {
-    emptyError.value = false;
-    recentList.value.unshift(fileInput.value);
-    localStorage.setItem('recentList', JSON.stringify(recentList.value));
-    emit('create');
-  }
-  else {
-    emptyError.value = true;
-  }
-}
-
-/**
- * Load scene
- * @constructor
- */
-const Load = () => {
-  if (fileInput.value !== '') {
-    // const sceneManager = new SceneManager();
-    // console.log(document.getElementById('fileInput'));
-    // try {
-    //   document.getElementById('fileInput').addEventListener('drop', (event) => {
-    //     event.preventDefault()
-    //     let file = event.dataTransfer.files[0]
-    //
-    //     if (file.type.match('application/json')) {
-    //       let reader = new FileReader()
-    //       reader.onloadend = (event) => {
-    //         let jsonString = JSON.parse(String(event.target.result));
-    //         sceneManager.LoadScene(jsonString)
-    //       }
-    //       reader.readAsText()
-    //     }
-    //     else {
-    //       console.log("please use a valid JSON file")
-    //     }
-    //     //this.LoadScene()
-    //   })
-    // }
-    // catch {
-    //   console.log("error getting file input");
-    // }
-  }
-}
 
 </script>
 
@@ -228,15 +85,15 @@ const Load = () => {
         <!-- Drag and Drop -->
         <div class="drag-drop-container">
           <div v-if="!fileInput" class="drag-drop-box" @click="OpenFileExplorer" @drop="Drop" @dragover="DragOver" @change="FileChange" id="fileInput">
-            <input type="file" id="fileInput" style="display: none;" />
+            <input type="file" style="display: none;" />
             <img src="../assets/icon/drag-drop.svg" alt="Arrow" draggable="false" class="icon">
-            <h2 class="drag-drop-text" id="fileInput">
+            <h2 class="drag-drop-text">
               Click here or drag and drop a factory JSON file to upload.
             </h2>
           </div>
           <div v-else class="filename-container">
             <!-- File name -->
-            <h2 class="filename-text">
+            <h2 class="filename-text" id="fileInput">
               {{ fileInput }}
             </h2>
             <!-- X icon -->
@@ -251,8 +108,8 @@ const Load = () => {
           </h2>
         </div>
         <!-- Error -->
-        <h2 class="empty-error-text" v-if="emptyError">
-          Please select a file before creating.
+        <h2 class="empty-error-text" v-if="showError">
+          Please select a valid JSON file before creating.
         </h2>
       </div>
     </div>
@@ -444,3 +301,126 @@ const Load = () => {
 
 </style>
 
+<script>
+import SceneManager from '../scene/scene_manager.js';
+
+export default {
+  name: "OpeningPage",
+  props: {
+    mgr: {
+      type: SceneManager
+    }
+  },
+  data() {
+    return {
+      fileInput: '',
+      isDraggingOver: false,
+      isEditing: false,
+      editedName: '',
+      isEmpty: true,
+      showError: false,
+      recentList: JSON.parse(localStorage.getItem('recentList')) || [
+        'Factory 1',
+        'Factory 2',
+        'Factory 3',
+        'Factory 4',
+        'Factory 5',
+      ]
+    };
+  },
+  methods: {
+    /**
+     * Get file name when a file is dropped
+     * @param event Drop event
+     * @constructor
+     */
+    Drop(event) {
+      event.preventDefault();
+      const file = event.dataTransfer.files[0];
+      this.fileInput = file.name;
+      this.isDraggingOver = false;
+    },
+
+    /**
+     * Set isDraggingOver to true when user drags a file over drag-drop-box
+     * @param event Drag over event
+     * @constructor
+     */
+    DragOver(event) {
+      event.preventDefault();
+      this.isDraggingOver = true;
+    },
+
+    /**
+     * Clear file name when user chooses to cancel their file
+     * @constructor
+     */
+    ClearFile() {
+      this.fileInput = '';
+      this.isDraggingOver = false;
+    },
+
+    /**
+     * Starting editing the file name
+     * @constructor
+     */
+    StartEditing() {
+      this.isEditing = true;
+    },
+
+    /**
+     * Finish editing the file name
+     * @constructor
+     */
+    FinishEditing() {
+      this.isEditing = false;
+      this.isEmpty = this.editedName.trim() === '';
+    },
+
+    /**
+     * Open file explorer when user clicks drag-drop-box
+     * @constructor
+     */
+    OpenFileExplorer() {
+      const input = document.querySelector('.drag-drop-box input[type="file"]');
+      input.click();
+    },
+
+    /**
+     * Change file name when user selects it in file explorer
+     * @param event
+     * @constructor
+     */
+    FileChange(event) {
+      const file = event.target.files[0];
+      this.fileInput = file.name;
+    },
+
+    /**
+     * Add the file they create to recent list
+     * @constructor
+     */
+    Create () {
+      if (this.fileInput !== '' && this.fileInput.endsWith('.json')) {
+        this.showError = false;
+        fetch(this.fileInput)
+            .then(response => response.json())
+            .then(sceneFile => {
+              console.log(sceneFile);
+              this.mgr.LoadScene(sceneFile);
+              this.recentList.unshift(this.fileInput);
+              localStorage.setItem('recentList', JSON.stringify(this.recentList));
+              this.$emit('create');
+            })
+            .catch(error => {
+              console.error("error loading scene:", error);
+            });
+      }
+      else {
+        this.showError = true;
+      }
+    }
+  }
+}
+
+</script>

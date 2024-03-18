@@ -11,10 +11,11 @@
 
 <template>
 
-  <object-info v-show="!openingPage" :mgr="mgr"/>
+
   <div v-show="!openingPage" v-if="editOn">
     <toolbar :mgr="mgr"/>
   </div>
+  <object-info v-show="!openingPage" :mgr="mgr"/>
   <login :mgr="mgr"/>
   <outline v-show="!openingPage" :mgr="mgr"/>
   <alert v-show="!openingPage" :mgr="mgr"/>
@@ -23,7 +24,7 @@
 
   <BackToOpeningPage v-show="!openingPage" :mgr="mgr" @back="openingPage = true"/>
 
-  <OpeningPage v-show="openingPage" @create="openingPage = false"></OpeningPage>
+  <OpeningPage v-show="openingPage" :mgr="mgr" @create="openingPage = false"></OpeningPage>
 
 </template>
 
