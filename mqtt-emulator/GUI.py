@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog
 import json
 from asset import Asset
 from PIL import Image, ImageTk
@@ -14,10 +14,16 @@ SIDEBAR = '#282b30'
 BACKDROP = '#1e2124'
 
 SERVERLESS = True
+
 assetList = []
 
+SYNCED = None
+CLIENT = None
+
+
 def loadFromFile():
-	filepath = './mqtt-emulator/factory_jsons/sample.json'
+	filepath = filedialog.askopenfilename()
+	# filepath = './mqtt-emulator/factory_jsons/sample.json'
 	global assetList
 	with open(filepath, "r") as read: 
 		dictList = json.load(read)
@@ -27,10 +33,14 @@ def loadFromFile():
 			temp.UpdateSelf(*asset.values())
 			assetList.append(temp)
 
-	print(assetList[1].asDict())
-	print(assetList[2].asDict())
-	print(assetList[2].getDiffs(assetList[1]))
-	
+	# print(assetList[1].asDict())
+	# print(assetList[2].asDict())
+	# print(assetList[2].getDiffs(assetList[1]))
+
+def resetBtnPressed(client):
+	global assetList
+	for asset in assetList:
+		asset.liveUpdate(client)
 
 class toolbar(tk.Frame):
 	def __init__(self):
@@ -41,8 +51,6 @@ class toolbar(tk.Frame):
 		
 	def addToolbar(self):
 		self.config(bg=SIDEBAR)
-		
-		
 		
 		def toggle():
 			global SERVERLESS
@@ -67,7 +75,7 @@ class toolbar(tk.Frame):
 		AnimationMode = tk.Button(self,text='Animation',bg=PANE,fg='white',width=15)
 		AnimationMode.pack(padx=5,pady=5,side='right')
 
-		DemoMode = tk.Button(self,text='Demo Mode',bg=PANE,fg='white',width=10)
+		DemoMode = tk.Button(self,text='Demo Mode',bg=PANE,fg='white',width=10)#,command=page.set('demo'))
 		DemoMode.pack(padx=5,pady=5,side='right')
   
 		BaseMode = tk.Button(self,text='Live Data',bg=PANE,fg='white',width=10)
@@ -175,7 +183,7 @@ class footerBar(tk.Frame):
 		animateAll = tk.Button(self,text='Animate All',bg=PANE,fg='white',width =12)
 		animateAll.pack(padx=5,pady=5,side='left')
  
-		resetAll = tk.Button(self,text='Reset/Update All',bg=PANE,fg='white',width=15)
+		resetAll = tk.Button(self,text='Reset/Update All',bg=PANE,fg='white',width=15, command=lambda client=CLIENT :resetBtnPressed(client))
 		resetAll.pack(padx=5,pady=5,side='left')
 
 		# separator = ttk.Separator(self, orient='vertical')#,style={'color':TEXTBOX}
@@ -187,12 +195,24 @@ class footerBar(tk.Frame):
 		loadBtn = tk.Button(self,text='Load from file...',bg=PANE,fg='white',width=16,command=loadFromFile)
 		loadBtn.pack(padx=5,pady=5,side='right')
 
-		self.pack(side='bottom',before=browser,expand=True,pady=2,fill='x')
 		
-	 
-if __name__ == '__main__':
+class itemView(tk.Frame):
+	def __init__(self):
+		super().__init__()
+		self.config(bg=SIDEBAR,bd=1)
+		self.createViewer()
+  
+	def createViewer(self):
+		tk.Text(self)
 
+		self.pack(root)
+
+def main(client):
+	global CLIENT
+	CLIENT = client
+	global SYNCED
 	root = tk.Tk()
+	page = tk.StringVar(value='demo')
 	img = Image.open("./mqtt-emulator/UI/UNSYNCED.png").resize((10,10))
 	UNSYNCED = ImageTk.PhotoImage(img)
 	img2 = Image.open("./mqtt-emulator/UI/SYNCED.png").resize((10,10))
@@ -202,13 +222,17 @@ if __name__ == '__main__':
 	root.geometry(str(int(root.winfo_screenwidth()*scale))+'x'+str(int( root.winfo_screenheight()*scale*1.05)))
 	root.config(bg=BACKDROP)
 	toolbar()
-	
+ 
 	browser = collectionPane()
-
+	
+	
 	viewframe = itemPane(Asset())
 	footer = footerBar()
+	footer.pack(side='bottom',before=browser,expand=True,pady=2,fill='x')
 
-
+	if(page.get() != 'animate'):
+		browser.pack_forget()
+	
 	root.mainloop()
 
 

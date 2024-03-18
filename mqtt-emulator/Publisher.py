@@ -1,6 +1,6 @@
 
 import random
-import TEST_GUI as GUI
+import GUI
 # from asset import animate3cube
 from paho.mqtt import client as mqtt_client
 
