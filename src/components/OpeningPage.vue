@@ -419,7 +419,7 @@ export default {
               this.$emit('create');
             })
             .catch(error => {
-              console.error("error loading scene:", error);
+              this.showError = true;
             });
       }
       else {
