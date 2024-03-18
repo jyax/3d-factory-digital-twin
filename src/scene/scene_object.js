@@ -472,7 +472,7 @@ class SceneObject {
    * @param {Object} data Live data from MQTT
    */
   handleLiveData(data) {
-    keys = [
+    let keys = [
       "x",
       "y",
       "z",
@@ -485,7 +485,7 @@ class SceneObject {
       "qty_MAX"
     ];
 
-    for (key in keys) {
+    for (let key of keys) {
       if (key in data) {
         switch (key) {
           ///SENSOR VARIABLES

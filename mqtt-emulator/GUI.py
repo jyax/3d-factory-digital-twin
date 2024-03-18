@@ -28,13 +28,19 @@ def switchAnimation():
 
 	SWITCHABLES[1].grid(row=1, column=0, pady=5)
 
+def switchKeyframe():
+	global SWITCHABLES
+	for f in SWITCHABLES:
+		f.grid_forget()
+
+	SWITCHABLES[3].grid(row=1, column=0, pady=5)
 
 def switchDemo():
 	global SWITCHABLES
 	for f in SWITCHABLES:
 		f.grid_forget()
 
-	SWITCHABLES[0].grid(row=1, column=0, pady=5)
+	SWITCHABLES[2].grid(row=1, column=0, pady=5,sticky='nsew')
 
 
 def switchBase():
@@ -205,7 +211,7 @@ class itemPane(tk.Frame):
 		updateBtn.grid(row=row+1, column=0, columnspan=2,
 					   sticky='nsew', padx=2, pady=2)
 		editAnim = tk.Button(self, text='Edit Animation',
-							 bg=NOTIFICATION, fg='white')
+							 bg=NOTIFICATION, fg='white', command=switchKeyframe)
 		editAnim.grid(row=row+2, column=0, columnspan=2,
 					  sticky='nsew', padx=2, pady=1)
 
@@ -265,7 +271,27 @@ class demoMode(tk.Frame):
 	def __init__(self):
 		super().__init__()
 		self.config(bg=SIDEBAR, bd=1)
-		self.createViewer()
+		self.createButtons()
+
+	def createButtons(self):
+		button1= tk.Button(self,text='Temp Demo',bg=PANE,fg='white',height=5,width=20)#, command=lambda client=client: tempSpikeDemo(client))
+		button1.pack(side='left',padx=5)
+
+		button2= tk.Button(self,text='Factory Demo',bg=PANE,fg='white',height=5,width=20)#, command=lambda client=client: factoryDemo(client))
+		button2.pack(side='left',padx=5)
+
+		button3= tk.Button(self,text='012 Animate',bg=PANE,fg='white',height=5,width=20)#, command=lambda client=client: animate3cube(client))
+		button3.pack(side='left',padx=5)    
+	
+class editKeyframe(tk.Frame):
+	def __init__(self):
+		super().__init__()
+		self.config(bg=SIDEBAR, bd=1)
+		self.renderStates()
+
+	def renderStates(self):
+		itemPane(Asset())
+		itemPane(Asset())
 
 def main(client):
 	global CLIENT
@@ -285,10 +311,12 @@ def main(client):
 
 	browser = collectionPane()
 	viewer = itemView()
+	demo = demoMode()
+	keyframe = editKeyframe()
 
 	toolbar()
 
-	SWITCHABLES = [viewer, browser]
+	SWITCHABLES = [viewer, browser, demo,keyframe]
 
 	viewframe = itemPane(Asset())
 	footer = footerBar()
