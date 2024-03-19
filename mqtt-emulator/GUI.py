@@ -215,7 +215,7 @@ class itemPane(tk.Frame):
 		editAnim.grid(row=row+2, column=0, columnspan=2,
 					  sticky='nsew', padx=2, pady=1)
 
-		self.grid(row=1, column=1, sticky='e')
+		
 
 
 class footerBar(tk.Frame):
@@ -284,14 +284,54 @@ class demoMode(tk.Frame):
 		button3.pack(side='left',padx=5)    
 	
 class editKeyframe(tk.Frame):
-	def __init__(self):
+	def __init__(self,id):
 		super().__init__()
 		self.config(bg=SIDEBAR, bd=1)
+		self.id = id
+		self.asset = None
+	
 		self.renderStates()
+  
+  
+  
+	def createPane(self,state):
+		pane = tk.Frame(self)
+		row = 0
+		header = tk.Label(pane, text='NAME', bg=SIDEBAR, bd=1,
+						  justify='left', anchor='w', fg='white', padx=1, pady=1)
+		header.grid(row=0, columnspan=2)
+		for key, val in state.asDict().items():
+			row += 1
+			lbl = tk.Label(pane, text=key+':', bg=SIDEBAR, bd=1,
+						   justify='left', anchor='w', fg='white', padx=1, pady=1)
+			lbl.grid(column=0, row=row, sticky='w')
+			entry = tk.Entry(pane, bg=TEXTBOX, justify='left',
+							 width=10, fg='white')
+			entry.insert(0, str(val))
+			# entry.bind("<FocusOut>", lambda event, col=col, AssetID=obj,row= row:
+			#              handle_entry_change(event,AssetID,row,col))
+			entry.grid(column=1, row=row, sticky='w')
+		updateBtn = tk.Button(pane, text='Update', bg=NOTIFICATION, fg='white')
+		updateBtn.grid(row=row+1, column=0, columnspan=2,
+					   sticky='nsew', padx=2, pady=2)
+		editAnim = tk.Button(pane, text='Edit Animation',
+							 bg=NOTIFICATION, fg='white', command=switchKeyframe)
+		editAnim.grid(row=row+2, column=0, columnspan=2,
+					  sticky='nsew', padx=2, pady=1)
+		return pane
 
 	def renderStates(self):
-		itemPane(Asset())
-		itemPane(Asset())
+		global assetList
+		for asset in assetList:
+			if asset.getID() == self.id:
+				self.asset = asset
+    
+		col=0
+		for state in self.asset.getSchedule():
+			self.createPane(state).grid(row=1,column=col)
+			col+=2
+  
+
 
 def main(client):
 	global CLIENT
@@ -312,13 +352,13 @@ def main(client):
 	browser = collectionPane()
 	viewer = itemView()
 	demo = demoMode()
-	keyframe = editKeyframe()
+	keyframe = editKeyframe('0')
 
 	toolbar()
 
 	SWITCHABLES = [viewer, browser, demo,keyframe]
 
-	viewframe = itemPane(Asset())
+	viewframe = itemPane(Asset()).grid(row=1, column=1, sticky='e')
 	footer = footerBar()
 	footer.grid(row=2, column=0, columnspan=2, sticky='sew')
 

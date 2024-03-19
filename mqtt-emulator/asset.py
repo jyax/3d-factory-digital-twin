@@ -31,6 +31,8 @@ class Asset:
        
         self.name = 'Thing'
         self.last_updated = {}
+        self.schedule =[]
+        
         ## Unique Asset ID
         self.id = id
 
@@ -56,11 +58,15 @@ class Asset:
         #Capacity
         self.qty_MAX = qty_MAX
         
+        
     def setName(self,str):
         self.name = str
         
     def getName(self):
         return self.name
+    
+    def getSchedule(self):
+        return self.schedule
     
     def getID(self):
         return self.id
