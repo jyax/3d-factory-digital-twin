@@ -14,6 +14,7 @@ import ColorGradient from "../color/color_gradient.js";
 import subscriber from "./subscriber.js";
 import SubscriberPosition from "./subscriber_position.js";
 import SubscriberSingleValue from "./subscriber_single_value.js";
+import Util from "../util/util.js";
 
 /**
  * @module SceneObject
@@ -196,8 +197,8 @@ class SceneObject {
         });
 
         if (bb !== null) {
-            bb.min = bb.min.add(this._object.transform.worldPosition);
-            bb.max = bb.max.add(this._object.transform.worldPosition);
+            bb = Util.transformBoundingBox(bb, this._object.transform.worldMatrix);
+            bb.setFromMinMax(bb.min.add(this.pos), bb.max.add(this.pos));
         } else {
             bb = new BoundingBox();
         }
@@ -287,6 +288,20 @@ class SceneObject {
             return;
 
         this._object.z = z;
+
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
+    }
+
+    setRot(rot) {
+        this._object.localRotation = rot;
+
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
+    }
+
+    setScale(scale) {
+        this._object.transform.localScale = scale;
 
         if (this.isSelected())
             this.mgr.updateSelectBox();

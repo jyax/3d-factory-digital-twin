@@ -108,7 +108,7 @@ export default {
           parseFloat(this.zVal)
       );
 
-      this.object.getObject3D().localRotation = this.rot.clone();
+      this.object.setRot(this.rot.clone());
     },
 
     blurInput(e) {
