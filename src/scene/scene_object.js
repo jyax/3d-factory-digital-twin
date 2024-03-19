@@ -35,6 +35,9 @@ const store = createStore({
     actions: {},
     modules: {},
 });
+import subscriber from "./subscriber.js";
+import SubscriberPosition from "./subscriber_position.js";
+import SubscriberSingleValue from "./subscriber_single_value.js";
 
 /**
  * @module SceneObject
@@ -96,28 +99,27 @@ class SceneObject {
         this._hoverPreview = "";
 
         if (modelID === "") {
-            // mesh = this._object.addComponent(MeshRenderer);
-            // mesh.geometry = new BoxGeometry();
-            // mesh.material = new LitMaterial();
-            // mesh.material.baseColor = new Color(0.2, 0.5, 1);
-            // mesh.material.roughness = 1;
-            // mesh.material.metallic = 0;
-            
+            mesh = this._object.addComponent(MeshRenderer);
+            mesh.geometry = new BoxGeometry();
+            mesh.material = new LitMaterial();
+            mesh.material.baseColor = new Color(0.2, 0.5, 1);
+            mesh.material.roughness = 1;
+            mesh.material.metallic = 0;
+
+            this._object.addComponent(ColliderComponent);
         } else {
-            this._object.addChild(this.mgr.models.get(modelID).clone());
+            this._object = this.mgr.models.get(modelID).clone();
+            this._object.forChild(child => {
+                if (child.hasComponent(MeshRenderer))
+                    child.addComponent(ColliderComponent);
+            });
         }
 
         this._object.transform.localPosition = pos;
 
-        const col = this._object.addComponent(ColliderComponent);
-        col.shape = new BoxColliderShape()
-            .setFromCenterAndSize(new Vector3(0, 0, 0), new Vector3(1, 1, 1));
-
         this._events = new EventHandler();
 
-        this.liveData = {
-            type: "position"
-        };
+        this._subscribers = [];
     }
 
 
@@ -152,6 +154,14 @@ class SceneObject {
     }
 
     /**
+     * Get the position vector.
+     * @returns {Vector3} Position/translation vector
+     */
+    get pos() {
+        return this._object.localPosition;
+    }
+
+    /**
      * Get the event handler.
      * @returns {EventHandler} Event handler
      */
@@ -171,7 +181,7 @@ class SceneObject {
      * Toggle the locked status of the object.
      */
     toggleLock() {
-        this._locked = !this._locked;
+        this.locked = !this._locked;
 
         this.events.do("lock", this._locked);
     }
@@ -219,6 +229,10 @@ class SceneObject {
         return bb;
     }
 
+    getSubscribers() {
+        return [...this._subscribers];
+    }
+
 
     // Setters
 
@@ -244,6 +258,9 @@ class SceneObject {
         this._locked = val;
 
         this.events.do("lock", val);
+
+        if (this._locked && this.isSelected())
+            this.mgr.deselect(this);
     }
 
     /**
@@ -299,6 +316,14 @@ class SceneObject {
             this.mgr.updateSelectBox();
     }
 
+    setRot(rot) {
+      this._object.transform.localRotation = rot.clone();
+    }
+
+    setScale(scale) {
+      this._object.transform.localScale = scale.clone();
+    }
+
     /**
      * Set the model for the object.
      * @param {string} id ID of imported mesh
@@ -310,8 +335,10 @@ class SceneObject {
         const copy = this.mgr.models.get(id).clone();
         this._object.transform.cloneTo(copy);
         this.mgr.revObjects.delete(this._object);
-        this._object.destroy();
+        const old = this._object;
         this._object = copy;
+
+        this._object.transform.updateWorldMatrix(true);
         this.mgr.scene.addChild(this._object);
 
         this.mgr.revObjects.set(this._object, this);
@@ -322,6 +349,12 @@ class SceneObject {
         this.modelID = id;
 
         this._object.addComponent(keyboardScript);
+
+        this._object.forChild(child => {
+            child.addComponent(ColliderComponent);
+        });
+
+        this.mgr.scene.removeChild(old);
     }
 
     /**
@@ -373,6 +406,9 @@ class SceneObject {
      * Select this actor.
      */
     select() {
+        if (this.locked)
+            return;
+
         this.mgr.select(this);
     }
 
@@ -389,7 +425,7 @@ class SceneObject {
         });
 
         newObj.setModel(this.modelID);
-        newObj.localPosition = this._object.localPosition;
+        this._object.transform.cloneTo(newObj.getObject3D());
 
         return newObj;
     }
@@ -417,7 +453,7 @@ class SceneObject {
     mouseOver(e) {
         document.body.style.cursor = "pointer";
 
-        if (this.isSelected())
+        if (this.isSelected() || this.locked)
             return;
 
         if (this._hoverPreview !== "")
@@ -463,6 +499,10 @@ class SceneObject {
         this._hoverPreview = "";
     }
 
+    drag(elapsed) {
+
+    }
+
 
     // Live Data
 
@@ -471,33 +511,28 @@ class SceneObject {
      * @param {Object} data Live data from MQTT
      */
     handleLiveData(data) {
-        switch (this.liveData.type) {
-            case "single value": {
-                const min = this.liveData.min;
-                const max = this.liveData.max;
-                let val = data["temp"];
+        for (const subscriber of this._subscribers)
+            subscriber.handleData(data);
+    }
 
-                const d = (val - min) / (max - min);
+    addSubscriber(type) {
+        switch (type) {
+            case SubscriberPosition:
+                return this._subscribers.push(new SubscriberPosition(this));
 
-                const color = this.liveData.gradient.get(d);
-
-                this.setSolidColor(color);
-
-                if (val >= this.liveData.max) {
-                    this.mgr.alert("Temperature exceeded maximum threshold.", this.id);
-                }
-
-                break;
-            }
-
-            case "position": {
-                this.setPos(new Vector3(
-                    parseFloat(data["x"]),
-                    parseFloat(data["y"]),
-                    parseFloat(data["z"])
-                ));
-            }
+            case SubscriberSingleValue:
+                return this._subscribers.push(new SubscriberSingleValue(this));
         }
+
+        return null;
+    }
+
+    removeSubscriber(subscriber) {
+        this._subscribers.splice(this._subscribers.indexOf(subscriber), 1);
+    }
+
+    clearSubscribers() {
+        this._subscribers = [];
     }
 
 
