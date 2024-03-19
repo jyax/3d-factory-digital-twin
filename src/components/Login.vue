@@ -18,7 +18,7 @@
     <style scoped>
     .login-section {
       position: fixed;
-      top: 0;
+      top: 12px;
       left: 50%;
       transform: translateX(-50%);
       background-color: rgba(37, 37, 37, 0.67);

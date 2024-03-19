@@ -64,6 +64,8 @@ class SceneObject {
      * Create a new scene object.
      * @param {SceneManager} manager Parent scene manager
      * @param {Vector3} pos Initial position (optional)
+     * @param {Vector3} scale Initial scale (optional)
+     * @param {Vector3} rotation Initial rotation (optional)
      * @param {string} id Global ID (optional)
      * @param {string} name Name of object (optional)
      * @param {string} modelID ID of model/mesh to use (optional)
@@ -72,6 +74,8 @@ class SceneObject {
     constructor({
         manager,
         pos = new Vector3(),
+        scale = new Vector3(),
+        rotation = new Vector3(),
         id = "",
         name = "",
         model: modelID = "",
@@ -108,6 +112,12 @@ class SceneObject {
         }
 
         this._object.transform.localPosition = pos;
+        this._object.transform.scaleX = scale.x;
+        this._object.transform.scaleY = scale.y;
+        this._object.transform.scaleZ = scale.z;
+        this._object.transform.rotationX = rotation.x;
+        this._object.transform.rotationY = rotation.y;
+        this._object.transform.rotationZ = rotation.z;
 
         const col = this._object.addComponent(ColliderComponent);
         col.shape = new BoxColliderShape()
@@ -258,6 +268,28 @@ class SceneObject {
     }
 
     /**
+     * Set the local scale.
+     * @param {Vector3} scale New local scale
+     */
+    setScale(scale) {
+        this._object.localScale = scale;
+
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
+    }
+
+    /**
+     * Set the local rotation.
+     * @param {Vector3} rotation New local rotation
+     */
+    setRotation(rotation) {
+        this._object.localRotation = rotation;
+
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
+    }
+
+    /**
      * Set the x component of the local position.
      * @param {number} x New position along x-axis
      */
@@ -294,6 +326,90 @@ class SceneObject {
             return;
 
         this._object.z = z;
+
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
+    }
+
+    /**
+     * Set the x component of the local scale.
+     * @param {number} x New scale along the x-axis
+     */
+    setScaleX(x) {
+        if (isNaN(x))
+            return;
+
+        this._object.scaleX = x;
+
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
+    }
+
+    /**
+     * Set the y component of the local scale.
+     * @param {number} y New scale along the y-axis
+     */
+    setScaleY(y) {
+        if (isNaN(y))
+            return;
+
+        this._object.scaleY = y;
+
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
+    }
+
+    /**
+     * Set the z component of the local scale.
+     * @param {number} z New scale along the z-axis
+     */
+    setScaleZ(z) {
+        if (isNaN(z))
+            return;
+
+        this._object.scaleZ = z;
+
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
+    }
+
+    /**
+     * Set the x component of the local rotation.
+     * @param {number} x New rotation along the x-axis
+     */
+    setRotationX(x) {
+        if (isNaN(x))
+            return;
+
+        this._object.rotationX = x;
+
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
+    }
+
+    /**
+     * Set the y component of the local rotation.
+     * @param {number} y New rotation along the y-axis
+     */
+    setRotationY(y) {
+        if (isNaN(y))
+            return;
+
+        this._object.rotationY = y;
+
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
+    }
+
+    /**
+     * Set the z component of the local rotation.
+     * @param {number} z New rotation along the z-axis
+     */
+    setRotationZ(z) {
+        if (isNaN(z))
+            return;
+
+        this._object.rotationZ = z;
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
@@ -390,6 +506,8 @@ class SceneObject {
 
         newObj.setModel(this.modelID);
         newObj.localPosition = this._object.localPosition;
+        newObj.scale = this._object.localScale;
+        newObj.rotation = this._object.localRotation;
 
         return newObj;
     }
@@ -497,6 +615,22 @@ class SceneObject {
                     parseFloat(data["z"])
                 ));
             }
+
+            // case "scale": {
+            //     this.setScale(new Vector3(
+            //         parseFloat(data["x"]),
+            //         parseFloat(data["y"]),
+            //         parseFloat(data["z"])
+            //     ));
+            // }
+            //
+            // case "rotation": {
+            //     this.setRotation(new Vector3(
+            //         parseFloat(data["x"]),
+            //         parseFloat(data["y"]),
+            //         parseFloat(data["z"])
+            //     ));
+            // }
         }
     }
 
@@ -516,6 +650,16 @@ class SceneObject {
                 x: this._object.x,
                 y: this._object.y,
                 z: this._object.z
+            },
+            scale: {
+                x: this._object.scaleX,
+                y: this._object.scaleY,
+                z: this._object.scaleZ,
+            },
+            rotation: {
+                x: this._object.rotationX,
+                y: this._object.rotationY,
+                z: this._object.rotationZ,
             }
         }
     }

@@ -39,8 +39,6 @@ class GetModelsFromMongoDB {
                 const filePath = file.metadata && file.metadata.filePath;
                 if (filePath) {
                     this.models[modelName] = filePath;
-                } else {
-                    console.warn(`file path not found for model "${modelName}"`);
                 }
             }
 
