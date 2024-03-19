@@ -7,6 +7,10 @@
   import Login from "./Login.vue";
   import BackToOpeningPage from "./BackToOpeningPage.vue";
   import OpeningPage from "./OpeningPage.vue";
+  import Pancake from "./ViewButton.vue";
+
+  const canvas = ref("canvas");
+
 </script>
 
 <template>
