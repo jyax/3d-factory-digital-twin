@@ -112,7 +112,7 @@ export default {
       if (val !== "")
         scale = parseFloat(val);
 
-      this.object.setScale(new Vector3(scale, scale, scale));
+      this.object.getObject3D().transform.localScale = new Vector3(scale, scale, scale);
     }
   }
 };

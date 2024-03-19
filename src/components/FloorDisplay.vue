@@ -5,7 +5,6 @@
   import Toolbar from "./Toolbar.vue";
   import Alert from "./Alert.vue";
   import LoadBar from "./LoadBar.vue";
-  import ModelList from "./assets/ModelList.vue";
 
   let mgr = new SceneManager();
   window.manager = mgr;
@@ -18,13 +17,8 @@
 <template>
 
   <object-info :mgr="mgr"/>
-
-  <model-list :mgr="mgr"/>
-
   <toolbar :mgr="mgr"/>
-
   <outline :mgr="mgr"/>
-
   <alert :mgr="mgr"/>
 
   <load-bar :mgr="mgr"/>

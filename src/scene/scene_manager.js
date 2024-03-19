@@ -16,7 +16,7 @@ import {
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
-import Util from "../util/util.js";
+import Util from "../util/Util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
 import KeyboardScript from "./keyboard_component.js";
 import DragComponent from "./drag_component.js";
@@ -39,7 +39,12 @@ class SceneManager {
         "wall": "/glb_models/Slatwall_Bin_5.5in.glb",
         "floor": "/glb_models/factory_floor_sample_1.glb",
         "workstation1": "/glb_models/workstation.glb",
-        "workstation2": "/glb_models/Station 10x Layout v31.glb"
+        "workstation1_whole": "/glb_models/workstation_whole.glb",
+        "workstation2": "/glb_models/Station 10x Layout v31.glb",
+
+        // Hidden models for editor use only
+
+        ".translation-handle": "/glb_models/translation_handle.glb"
     };
 
     /**
@@ -159,7 +164,6 @@ class SceneManager {
                 if (total !== 0)
                     progress = i / total;
                 this.events.do("load_models", progress);
-                this.events.do("models", Array.from(this.models.keys()).sort());
             });
         }
 
@@ -170,8 +174,6 @@ class SceneManager {
             select: false
         });
         this.view.camera = this.cam;
-
-        /**
         //
         // HARDCODING THE SCENE
         //
@@ -526,23 +528,14 @@ class SceneManager {
         // END OF FACTORY
         //
 
-            */
-
         for (const id of Object.keys(SceneManager.MODELS)) {
             const model = await Engine3D.res.loadGltf(SceneManager.MODELS[id]);
             this.models.set(id, model);
         }
 
+        this.createNewObject(new Vector3(), false);
+
         document.addEventListener("keydown", (event) => {
-            const inputs = document.querySelectorAll("input, textarea");
-            for (const input of inputs) {
-                if (input.matches(":focus"))
-                    return false;
-            }
-
-            if (this._pressedKeys.has(event.key.toLowerCase()))
-                return;
-
             this._pressedKeys.add(event.key.toLowerCase());
 
             switch (event.key) {
@@ -561,11 +554,6 @@ class SceneManager {
 
                 case "e": {
                     if (this.selectedCount > 0) {
-                        if (event.ctrlKey) {
-                            event.preventDefault();
-                            this.duplicateSelected();
-                        }
-
                         this.events.do("drag", true);
                         this.dragging = true;
                     }
