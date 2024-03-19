@@ -3,7 +3,7 @@
   <div class="model-parent">
     <p class="label">Model</p>
 
-    <select class="dropdown" v-model="current" @change="doChange()">
+    <select class="dropdown" v-model="current" @change="doChange()" :disabled="!enableUpdate">
       <option value="">Default</option>
       <option v-for="id of options" :value="id">{{id}}</option>
     </select>
@@ -73,7 +73,9 @@ export default {
       options: Array.from(this.object.mgr.models.keys()).filter(id => id[0] !== '.'),
       current: this.object.modelID,
 
-      listener: null
+      listener: null,
+
+      enableUpdate: true
     }
   },
 

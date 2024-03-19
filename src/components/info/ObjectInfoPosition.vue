@@ -3,13 +3,13 @@
   <div class="input-vector">
 
     <input class="input-vector-comp c-x" v-model="xVal" type="text" placeholder="x"
-           @input="doX" v-on:keyup.enter="blurInput">
+           @input="doX" v-on:keyup.enter="blurInput" :disabled="!enableUpdate">
 
     <input class="input-vector-comp c-y" v-model="yVal" type="text" placeholder="y"
-           @input="doY" v-on:keyup.enter="blurInput">
+           @input="doY" v-on:keyup.enter="blurInput" :disabled="!enableUpdate">
 
     <input class="input-vector-comp c-z" v-model="zVal" type="text" placeholder="z"
-           @input="doZ" v-on:keyup.enter="blurInput" style="margin-right: 0;">
+           @input="doZ" v-on:keyup.enter="blurInput" style="margin-right: 0;" :disabled="!enableUpdate">
 
   </div>
 </template>
@@ -96,7 +96,9 @@ export default {
 
       xVal: 0,
       yVal: 0,
-      zVal: 0
+      zVal: 0,
+
+      enableUpdate: true
     }
   },
 
@@ -116,11 +118,9 @@ export default {
     blurInput(e) {
       e.target.blur();
     }
-  },
+  },  
 
   created() {
-    this.pos = this.object.getObject3D().localPosition;
-
     this.xVal = Math.floor(this.pos.x * 100) / 100;
     this.yVal = Math.floor(this.pos.y * 100) / 100;
     this.zVal = Math.floor(this.pos.z * 100) / 100;

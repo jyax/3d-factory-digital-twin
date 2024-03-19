@@ -274,6 +274,7 @@ export default {
 
   created() {
     this.listener = this.mgr.events.on("select", sel => this.update(sel));
+    this.mgr.events.on("switch view", this.switchView);
 
     this.update(this.mgr.getSelected());
   },

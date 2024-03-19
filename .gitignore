@@ -1,4 +1,8 @@
 .idea/
-mqtt-emulator/notes.md
-node_modules/*
 .vscode/
+./mqtt-emulator/notes.md
+./mqtt-emulator/__pycache__/
+./node_modules/
+./vite-project/node_modules/
+
+node_modules

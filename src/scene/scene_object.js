@@ -11,6 +11,30 @@ import {
 } from "@orillusion/core";
 import EventHandler from "../event/event_handler.js";
 import ColorGradient from "../color/color_gradient.js";
+import { createStore } from 'vuex';
+import keyboardScript from "./keyboardScript.js";
+
+//
+// Login/Logout Functionality
+// This is exported to be used in App.vue
+//
+const store = createStore({
+    state: {
+        user : null,
+    },
+    mutations: {
+        setUser(state, userData){
+            state.user = userData;
+        },
+    },
+    getters : {
+        authenticated(state){
+            return !!state.user;
+        },
+    },
+    actions: {},
+    modules: {},
+});
 import subscriber from "./subscriber.js";
 import SubscriberPosition from "./subscriber_position.js";
 import SubscriberSingleValue from "./subscriber_single_value.js";
@@ -316,6 +340,8 @@ class SceneObject {
 
         this.modelID = id;
 
+        this._object.addComponent(keyboardScript);
+
         this._object.forChild(child => {
             child.addComponent(ColliderComponent);
         });
@@ -401,6 +427,7 @@ class SceneObject {
      * @returns {SceneObject} Duplicate object
      */
     duplicate() {
+        cloned
         const copy = this.copy();
 
         this.mgr.addObject(copy);
@@ -499,6 +526,26 @@ class SceneObject {
     clearSubscribers() {
         this._subscribers = [];
     }
+
+
+    // Serialization / Save File
+    /**
+     * Serialize the object for saving
+     * @return {} Plain Object
+     */
+    serializeObject() {
+        return {
+            id: this._id,
+            name: this.name,
+            modelID: this.modelID,
+            liveData: this.liveData,
+            pos: {
+                x: this._object.x,
+                y: this._object.y,
+                z: this._object.z
+            }
+        }
+    }
 }
 
-export default SceneObject;
+export default {SceneObject, store};

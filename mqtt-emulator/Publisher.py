@@ -34,7 +34,11 @@ def connect_mqtt():
     client = mqtt_client.Client(client_id,protocol=mqtt_client.MQTTv5)
     client.username_pw_set(username, password)
     client.on_connect = on_connect
-    client.connect(broker, port)
+    try:
+        client.connect(broker, port)
+    except:
+        print('Target address: '+ broker,'is not running')
+    
     return client
 
 ## publish to client

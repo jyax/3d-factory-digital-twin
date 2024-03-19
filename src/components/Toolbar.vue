@@ -1,3 +1,8 @@
+<script setup>
+  import PointPosition from "./info/PointPosition.vue";
+</script>
+
+
 <template>
   <div class="section" id="tools">
     <div class="tools-icon" v-if="!dragMode">
@@ -51,7 +56,33 @@
         <span class="tooltip">Delete <span class="soft">[Del]</span></span>
       </div>
 
+      <div class="tool" @click="OpenLineWindow()">
+        <img src="../assets/icon/plus.svg" alt="Plus" draggable="false">
+        <span class="tooltip">New Line <span class="soft">[R]</span></span>
+      </div>
+
     </div>
+  </div>
+
+  <div class="section" id="line-menu" v-if="isLineMenuVisible">
+
+        <div class="row">
+          <p id="line-title">Create Line</p>
+          <button id="exit-button" @click="CloseLineMenu()">X</button>
+        </div>
+        <div id="point-list">
+          <div class="row" v-for="index in line.pointMap.keys()">
+            <PointPosition :mgr="mgr" :line="line" :index="index"/>
+          </div>
+        <button id="add-point" @click="AddPoint()">Add Point</button>
+        </div>
+        <!-- <div class="row">
+          <p>Width</p>
+          <input class="input-vector-comp c-z" v-model="width" type="text" placeholder="z"
+                @input="doZ" v-on:keyup.enter="blurInput" style="margin-right: 0;" :disabled="!enableUpdate">
+        </div> -->
+          <button id="draw-line-button" @click="line.drawLine(lineIndex); CloseLineMenu()">Draw Line</button>
+
   </div>
 </template>
 
@@ -227,10 +258,49 @@
   background-color: rgba(255, 255, 255, 0.5);
 }
 
+#line-menu {
+  position: absolute;
+  bottom: 75px;
+  height: auto;
+  width: 393px;
+  left: 50%;
+  transform: translate(-50%);
+  flex-direction: column;
+}
+
+#exit-button {
+  position: relative;
+  left: 80%;
+}
+
+#draw-line-button {
+  position: relative;
+  align-self: flex-end;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  padding: 1%;
+}
+
+p{
+  vertical-align: baseline;
+  font-size: 20px;
+}
+
+#line-title {
+  margin-top: 5px;
+  margin-bottom: 0px;
+  font-size: 20px;
+}
+
 </style>
 
 <script>
   import SceneManager from "../scene/scene_manager.js";
+  import Line from "../scene/line.js";
+  import { Vector3 } from "@orillusion/core";
 
   export default {
     props: {
@@ -243,7 +313,35 @@
     data() {
       return {
         selected: [],
-        dragMode: false
+        dragMode: false,
+
+        isLineMenuVisible: false,
+        pointIndex: 0,
+        lineIndex: 0,
+
+        line: undefined
+      }
+    },
+
+    methods : {
+      OpenLineWindow(){
+        this.isLineMenuVisible = true;
+        this.line = new Line(this.mgr.view);
+        this.lineIndex++;
+      }, 
+
+      CloseLineMenu(){
+        this.isLineMenuVisible = false;
+      },
+
+      // Makes this
+      // <div class="row">
+      //     <PointPosition :mgr="mgr" :index="pointIndex"/>
+      //  </div>
+      AddPoint(){
+        this.line.addPoint(new Vector3(0,0,0));
+        console.log(this.line.pointMap);
+        pointIndex++;
       }
     },
 

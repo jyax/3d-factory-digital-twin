@@ -41,7 +41,7 @@ class MQTTHandler {
         this.client = mqtt.connect(this.broker, options);
 
         this.client.on("connect", () => this._onConnect());
-        this.client.on("message", (topic, message) => this._onMessage(message.toString()));
+        this.client.on("message", (topic, message) => this._onMessage(message));
         this.client.on("error", error => console.log("Connection failed: " + error));
     }
 
@@ -67,8 +67,9 @@ class MQTTHandler {
      * @private
      */
     _onMessage(message){
-        console.log("Parsing: " + message);
+        console.log("Parsing: " + message.toString());
         const data = JSON.parse(message);
+        console.log(this.mgr.ids)
 
         let obj = this.mgr.getObjectById(data.id);
         if (obj === null) {

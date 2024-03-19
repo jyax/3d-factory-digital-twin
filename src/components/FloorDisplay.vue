@@ -5,19 +5,22 @@
   import Toolbar from "./Toolbar.vue";
   import Alert from "./Alert.vue";
   import LoadBar from "./LoadBar.vue";
+  import Login from "./Login.vue";
+  import Pancake from "./ViewButton.vue";
+  
+  const canvas = ref("canvas");
 
-  let mgr = new SceneManager();
-  window.manager = mgr;
-
-  onMounted(() => {
-    mgr.init();
-  });
 </script>
 
 <template>
 
+  <canvas id="canvas" ref="canvas" @mousedown="mgr.startDrag" @mouseleave="mgr.stopDrag" @mouseup="mgr.stopDrag"></canvas>
+  <pancake :mgr="mgr"/>
   <object-info :mgr="mgr"/>
-  <toolbar :mgr="mgr"/>
+  <div v-if="editOn">
+    <toolbar :mgr="mgr"/>
+  </div>
+  <login :mgr="mgr"/>
   <outline :mgr="mgr"/>
   <alert :mgr="mgr"/>
 
@@ -31,6 +34,26 @@
   export default {
     components: {
       Outline
+    },
+
+    data () {
+      return{
+        editOn: true,
+        mgr : new SceneManager()
+      }
+    },
+    
+    methods : {
+      switchView() {
+          this.editOn = !(this.editOn);
+          console.log("switch", this.editOn);
+      }
+    },
+
+    created() {
+      this.mgr.init();
+      this.mgr.events.on('switch view', this.switchView);
+      window.manager = this.mgr;
     }
   }
-</script>
+</script> 
