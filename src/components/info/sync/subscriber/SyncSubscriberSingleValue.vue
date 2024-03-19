@@ -1,8 +1,11 @@
 <script setup>
 
+import ObjectInfoInput from "../../ObjectInfoInput.vue";
 </script>
 
 <template>
+
+  <object-info-input :on-change="setID" label="Value Type" placeholder="Type..." style="margin-bottom: 16px;"/>
 
   <div class="single-input">
     <div class="single-input-left">
@@ -281,7 +284,6 @@ export default {
   },
 
   methods: {
-
     makeGradient() {
       const c1 = new Color();
       c1.setHex(this.color_1);
@@ -301,10 +303,10 @@ export default {
 
       return "background-image: linear-gradient(to bottom, " + this.color_1 + ", " + this.color_2 + ");"
     },
-  },
 
-  created() {
-
+    setID(val) {
+      this.subscriber.id = val;
+    }
   }
 };
 

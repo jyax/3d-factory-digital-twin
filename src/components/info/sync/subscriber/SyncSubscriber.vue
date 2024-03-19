@@ -11,6 +11,7 @@
     <div class="subscriber-inner" v-show="!collapsed">
 
       <sync-subscriber-position :subscriber="subscriber" v-if="subscriber instanceof SubscriberPosition"/>
+      <sync-subscriber-rotation :subscriber="subscriber" v-if="subscriber instanceof SubscriberRotation"/>
       <sync-subscriber-single-value :subscriber="subscriber" v-if="subscriber instanceof SubscriberSingleValue"/>
 
       <p class="hint">{{lastUpdate}}</p>
@@ -113,9 +114,11 @@ import SyncSubscriberPosition from "./SyncSubscriberPosition.vue";
 import SubscriberPosition from "../../../../scene/subscriber_position.js";
 import SyncSubscriberSingleValue from "./SyncSubscriberSingleValue.vue";
 import SubscriberSingleValue from "../../../../scene/subscriber_single_value.js";
+import SubscriberRotation from "../../../../scene/subscriber_rotation.js";
+import SyncSubscriberRotation from "./SyncSubscriberRotation.vue";
 
 export default {
-  components: {SyncSubscriberSingleValue, SyncSubscriberPosition},
+  components: {SyncSubscriberRotation, SyncSubscriberSingleValue, SyncSubscriberPosition},
   props: {
     label: {
       default: "Subscriber"
@@ -147,6 +150,9 @@ export default {
     },
     SubscriberPosition() {
       return SubscriberPosition
+    },
+    SubscriberRotation() {
+      return SubscriberRotation
     },
     dynamicClass() {
       if (this.collapsed)

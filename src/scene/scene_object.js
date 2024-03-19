@@ -38,6 +38,7 @@ const store = createStore({
 import subscriber from "./subscriber.js";
 import SubscriberPosition from "./subscriber_position.js";
 import SubscriberSingleValue from "./subscriber_single_value.js";
+import SubscriberRotation from "./subscriber_rotation.js";
 
 /**
  * @module SceneObject
@@ -119,7 +120,10 @@ class SceneObject {
 
         this._events = new EventHandler();
 
-        this._subscribers = [];
+        this._subscribers = [
+            new SubscriberPosition(this),
+            new SubscriberRotation(this),
+        ];
     }
 
 
@@ -516,15 +520,7 @@ class SceneObject {
     }
 
     addSubscriber(type) {
-        switch (type) {
-            case SubscriberPosition:
-                return this._subscribers.push(new SubscriberPosition(this));
-
-            case SubscriberSingleValue:
-                return this._subscribers.push(new SubscriberSingleValue(this));
-        }
-
-        return null;
+        return this._subscribers.push(new type(this));
     }
 
     removeSubscriber(subscriber) {

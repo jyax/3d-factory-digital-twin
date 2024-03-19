@@ -1,7 +1,7 @@
 import Subscriber from "./subscriber.js";
 import {Vector3} from "@orillusion/core";
 
-class SubscriberPosition extends Subscriber {
+class SubscriberRotation extends Subscriber {
     constructor(object) {
         super(object);
     }
@@ -12,21 +12,21 @@ class SubscriberPosition extends Subscriber {
         if (this.object === null)
             return;
 
-        if (!("x" in data) ||
-            !("y" in data) ||
-            !("z" in data))
+        if (!("rotationX" in data) ||
+            !("rotationY" in data) ||
+            !("rotationZ" in data))
             return;
 
         this.object.setPos(new Vector3(
-            parseFloat(data["x"]),
-            parseFloat(data["y"]),
-            parseFloat(data["z"])
+            parseFloat(data["rotationX"]),
+            parseFloat(data["rotationY"]),
+            parseFloat(data["rotationZ"])
         ));
     }
 
     getDisplayName() {
-        return "Position";
+        return "Rotation";
     }
 }
 
-export default SubscriberPosition;
+export default SubscriberRotation;
