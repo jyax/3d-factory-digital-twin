@@ -2,8 +2,8 @@ import {
     ComponentBase,
     BoundingBox,
     Camera3D,
-    Color, ComponentBase,
-    Engine3D, KeyEvent,
+    Color,
+    Engine3D,
     LitMaterial,
     MeshRenderer,
     Object3D,
@@ -21,7 +21,7 @@ import {
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
-import Util from "../util/Util.js";
+import Util from "../util/util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
 import Line from "./line.js";
 import keyboardScript from "./keyboardScript.js";
@@ -47,7 +47,6 @@ class SceneManager {
         "wall": "/glb_models/Slatwall_Bin_5.5in.glb",
         "floor": "./src/assets/glb_models/factory_floor_sample_1.glb",
         "workstation1": "/glb_models/workstation.glb",
-        "workstation1_whole": "/glb_models/workstation_whole.glb",
         "workstation2": "/glb_models/Station 10x Layout v31.glb",
         "lathe": "./src/assets/glb_models/downloadsGLB/desk_lathe.glb",
         "ladder": "./src/assets/glb_models/downloadsGLB/escada_movel_-_moving_ladder.glb",
@@ -58,10 +57,6 @@ class SceneManager {
         "tank": "./src/assets/glb_models/UN-COMPLIANT IBC TANK.glb",
         "boiler": "./src/assets/glb_models/downloadsGLB/boiler_from_the_puffer_vic_32 (1).glb",
         "roboticArm": "./src/assets/glb_models/downloadsGLB/black_honey_-_robotic_arm (1).glb",
-
-        // Hidden models for editor use only
-
-        ".translation-handle": "/glb_models/translation_handle.glb"
     };
 
     /**
@@ -181,7 +176,7 @@ class SceneManager {
         drag.mgr = this;
 
         this.camera = camObj;
-        this.cam = cam;
+
 
         this._cameraController = this.camera.addComponent(OrbitController);
         // this._cameraController.setCamera(new Vector3(0, 50, 50), new Vector3(0, 0, 0));
@@ -261,6 +256,9 @@ class SceneManager {
         // })
 
         document.addEventListener("keydown", (event) => {
+            if (Util.inputFocused())
+                return;
+
             this._pressedKeys.add(event.key.toLowerCase());
 
             switch (event.key) {

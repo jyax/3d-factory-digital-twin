@@ -16,6 +16,15 @@ class Util {
 
         return diff.length;
     }
+
+    static inputFocused() {
+        const inputs = document.querySelectorAll("input, textarea");
+        for (const input of inputs)
+            if (input.matches(":focus"))
+                return true;
+        
+        return false;
+    }
 }
 
 export default Util;

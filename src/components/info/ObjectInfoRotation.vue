@@ -3,13 +3,13 @@
   <div class="input-vector">
 
     <input class="input-vector-comp c-x" v-model="xVal" type="text" placeholder="x"
-           @input="doChange" v-on:keyup.enter="blurInput" :disabled="!enableUpdate">
+           @input="doChange" v-on:keyup.enter="blurInput">
 
     <input class="input-vector-comp c-y" v-model="yVal" type="text" placeholder="y"
-           @input="doChange" v-on:keyup.enter="blurInput" :disabled="!enableUpdate">
+           @input="doChange" v-on:keyup.enter="blurInput">
 
     <input class="input-vector-comp c-z" v-model="zVal" type="text" placeholder="z"
-           @input="doChange" v-on:keyup.enter="blurInput" style="margin-right: 0;" :disabled="!enableUpdate">
+           @input="doChange" v-on:keyup.enter="blurInput" style="margin-right: 0;">
 
   </div>
 </template>
@@ -110,7 +110,7 @@ export default {
           parseFloat(this.zVal)
       );
 
-      this.object.getObject3D().localRotation = this.rot.clone();
+      this.object.setRot(this.rot.clone());
     },
 
     blurInput(e) {

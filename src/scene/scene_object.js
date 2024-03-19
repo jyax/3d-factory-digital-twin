@@ -316,6 +316,14 @@ class SceneObject {
             this.mgr.updateSelectBox();
     }
 
+    setRot(rot) {
+      this._object.transform.localRotation = rot.clone();
+    }
+
+    setScale(scale) {
+      this._object.transform.localScale = scale.clone();
+    }
+
     /**
      * Set the model for the object.
      * @param {string} id ID of imported mesh

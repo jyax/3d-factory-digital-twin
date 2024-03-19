@@ -19,6 +19,9 @@ import {
     KeyEvent,
     KeyCode
 } from "@orillusion/core";
+
+import Util from "../util/util";
+
 class keyboardScript extends ComponentBase
 {
     right = false;
@@ -38,7 +41,6 @@ class keyboardScript extends ComponentBase
     }
     keyUp(e) {
         let trans = this.object3D.transform;
-        console.log(this.transform.rotationY);
 
         if(e.keyCode === KeyCode.Key_Right){
             this.right = false;
@@ -48,12 +50,13 @@ class keyboardScript extends ComponentBase
         }
         else {
             trans.rotationY = 0;
-            console.log(trans.rotationY);
         }
     }
 
     onUpdate() {
         if(!this.enable) return;
+        if (Util.inputFocused())
+                return;
 
         let trans = this.object3D.transform;
         if(this.left) trans.rotationY -= 5;
