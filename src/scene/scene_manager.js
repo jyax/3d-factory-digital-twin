@@ -673,7 +673,8 @@ class SceneManager {
 
         this.events.do("select", Array.from(this._selected.values()));
         // console.log(object);
-        object.getObject3D().addComponent(keyboardScript);
+        const ks = object.getObject3D().addComponent(keyboardScript);
+        ks.mgr = this;
 
         this.updateSelectBox();
     }

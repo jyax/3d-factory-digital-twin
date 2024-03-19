@@ -26,6 +26,7 @@ class keyboardScript extends ComponentBase
 {
     right = false;
     left = false;
+    mgr = null;
 
     start() {
         Engine3D.inputSystem.addEventListener(KeyEvent.KEY_UP, this.keyUp, this);
@@ -61,6 +62,9 @@ class keyboardScript extends ComponentBase
         let trans = this.object3D.transform;
         if(this.left) trans.rotationY -= 5;
         if(this.right) trans.rotationY += 5;
+
+        if (this.mgr !== null)
+            this.mgr.updateSelectBox();
     }
 }
 
