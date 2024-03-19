@@ -23,6 +23,7 @@ import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
 import Util from "../util/Util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
+import Line from "./line.js";
 import keyboardScript from "./keyboardScript.js";
 
 // DEVELOPMENT PURPOSES ONLY
@@ -206,6 +207,7 @@ class SceneManager {
         if (loadModelsFromMongoDB) {
             const total = Object.keys(this.modelsMap).length;
 
+        let i = 0;
 
             for (const id of Object.keys(this.modelsMap)) {
                 const model = Engine3D.res.loadGltf(this.modelsMap[id]);
