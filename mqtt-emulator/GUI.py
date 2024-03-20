@@ -294,10 +294,10 @@ class editKeyframe(tk.Frame):
   
   
   
-	def createPane(self,state):
-		pane = tk.Frame(self)
+	def createPane(self,state,num):
+		pane = tk.Frame(self,bg=SIDEBAR)
 		row = 0
-		header = tk.Label(pane, text='NAME', bg=SIDEBAR, bd=1,
+		header = tk.Label(pane, text=state.getName(), bg=SIDEBAR, bd=1,
 						  justify='left', anchor='w', fg='white', padx=1, pady=1)
 		header.grid(row=0, columnspan=2)
 		for key, val in state.asDict().items():
@@ -311,13 +311,10 @@ class editKeyframe(tk.Frame):
 			# entry.bind("<FocusOut>", lambda event, col=col, AssetID=obj,row= row:
 			#              handle_entry_change(event,AssetID,row,col))
 			entry.grid(column=1, row=row, sticky='w')
-		updateBtn = tk.Button(pane, text='Update', bg=NOTIFICATION, fg='white')
-		updateBtn.grid(row=row+1, column=0, columnspan=2,
-					   sticky='nsew', padx=2, pady=2)
-		editAnim = tk.Button(pane, text='Edit Animation',
-							 bg=NOTIFICATION, fg='white', command=switchKeyframe)
-		editAnim.grid(row=row+2, column=0, columnspan=2,
-					  sticky='nsew', padx=2, pady=1)
+		stateNum = tk.Label(pane, text='State: '+str(num), bg=SIDEBAR, bd=1,
+						  justify='left', anchor='w', fg='white', padx=1, pady=1)
+		stateNum.grid(row=row+1, columnspan=2)
+		
 		return pane
 
 	def renderStates(self):
@@ -327,9 +324,12 @@ class editKeyframe(tk.Frame):
 				self.asset = asset
     
 		col=0
-		for state in self.asset.getSchedule():
-			self.createPane(state).grid(row=1,column=col)
+		schedule = [Asset(),Asset()]
+		for num,state in enumerate(schedule):
+			self.createPane(state,num).grid(row=1,column=col)
 			col+=2
+	
+
   
 
 
