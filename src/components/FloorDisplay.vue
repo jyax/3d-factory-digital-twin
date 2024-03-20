@@ -6,6 +6,7 @@
   import Alert from "./Alert.vue";
   import LoadBar from "./LoadBar.vue";
   import Login from "./Login.vue";
+  import Pancake from "./ViewButton.vue";
   
   const canvas = ref("canvas");
 
@@ -14,7 +15,6 @@
 <template>
 
   <canvas id="canvas" ref="canvas" @mousedown="mgr.startDrag" @mouseleave="mgr.stopDrag" @mouseup="mgr.stopDrag"></canvas>
-  <pancake :mgr="mgr"/>
   <object-info :mgr="mgr"/>
   <div v-if="editOn">
     <toolbar :mgr="mgr"/>
@@ -27,22 +27,24 @@
 
 </template>
 
-<style scoped>
-
-</style>
-
 <script>
-  import Outline from "./Outline.vue";
+  import Outline from "./outline/Outline.vue";
   
   export default {
     components: {
       Outline
     },
 
+    props: {
+      mgr: {
+        type: SceneManager,
+        required: true
+      }
+    },
+
     data () {
       return{
-        editOn: true,
-        mgr : new SceneManager()
+        editOn: true
       }
     },
     
@@ -54,9 +56,7 @@
     },
 
     created() {
-      this.mgr.init();
       this.mgr.events.on('switch view', this.switchView);
-      window.manager = this.mgr;
     }
   }
-</script>
+</script> 

@@ -11,7 +11,8 @@ import {
 } from "@orillusion/core";
 import EventHandler from "../event/event_handler.js";
 import ColorGradient from "../color/color_gradient.js";
-import { createStore } from "vuex";
+import { createStore } from 'vuex';
+import keyboardScript from "./keyboardScript.js";
 
 //
 // Login/Logout Functionality
@@ -34,6 +35,9 @@ const store = createStore({
   actions: {},
   modules: {},
 });
+import SubscriberPosition from "./subscriber_position.js";
+import SubscriberRotation from "./subscriber_rotation.js";
+import Util from "../util/util.js";
 
 /**
  * @module SceneObject
@@ -93,31 +97,33 @@ class SceneObject {
 
     this._hoverPreview = "";
 
-    if (modelID === "") {
-      // mesh = this._object.addComponent(MeshRenderer);
-      // mesh.geometry = new BoxGeometry();
-      // mesh.material = new LitMaterial();
-      // mesh.material.baseColor = new Color(0.2, 0.5, 1);
-      // mesh.material.roughness = 1;
-      // mesh.material.metallic = 0;
-    } else {
-      this._object.addChild(this.mgr.models.get(modelID).clone());
-    }
+        if (modelID === "") {
+            mesh = this._object.addComponent(MeshRenderer);
+            mesh.geometry = new BoxGeometry();
+            mesh.material = new LitMaterial();
+            mesh.material.baseColor = new Color(0.2, 0.5, 1);
+            mesh.material.roughness = 1;
+            mesh.material.metallic = 0;
+
+            this._object.addComponent(ColliderComponent);
+        } else {
+            this._object = this.mgr.models.get(modelID).clone();
+            this._object.forChild(child => {
+                if (child.hasComponent(MeshRenderer))
+                    child.addComponent(ColliderComponent);
+            });
+        }
 
     this._object.transform.localPosition = pos;
 
-    const col = this._object.addComponent(ColliderComponent);
-    col.shape = new BoxColliderShape().setFromCenterAndSize(
-      new Vector3(0, 0, 0),
-      new Vector3(1, 1, 1)
-    );
+        this._events = new EventHandler();
 
-    this._events = new EventHandler();
+        this._subscribers = [
+            new SubscriberPosition(this),
+            new SubscriberRotation(this),
+        ];
+    }
 
-    this.liveData = {
-      type: "position",
-    };
-  }
 
   // Deletion
 
@@ -140,13 +146,21 @@ class SceneObject {
     return this._manager;
   }
 
-  /**
-   * Get the global ID.
-   * @returns {string} Global ID
-   */
-  get id() {
-    return this._id;
-  }
+    /**
+     * Get the global ID.
+     * @returns {string} Global ID
+     */
+    get id() {
+        return this._id;
+    }
+
+    /**
+     * Get the position vector.
+     * @returns {Vector3} Position/translation vector
+     */
+    get pos() {
+        return this._object.localPosition;
+    }
 
   /**
    * Get the event handler.
@@ -164,11 +178,11 @@ class SceneObject {
     return this._locked;
   }
 
-  /**
-   * Toggle the locked status of the object.
-   */
-  toggleLock() {
-    this._locked = !this._locked;
+    /**
+     * Toggle the locked status of the object.
+     */
+    toggleLock() {
+        this.locked = !this._locked;
 
     this.events.do("lock", this._locked);
   }
@@ -204,22 +218,25 @@ class SceneObject {
       }
     });
 
-    if (bb !== null) {
-      bb.min = bb.min.add(this._object.transform.worldPosition);
-      bb.max = bb.max.add(this._object.transform.worldPosition);
-    } else {
-      bb = new BoundingBox();
-    }
+        if (bb !== null) {
+            const matrix = this._object.transform.worldMatrix.clone();
+            matrix.position = new Vector3();
+            bb = Util.transformBoundingBox(bb, matrix);
+            bb.setFromMinMax(
+                bb.min.add(this.pos),
+                bb.max.add(this.pos)
+            );
+        } else {
+            bb = new BoundingBox();
+        }
 
     return bb;
   }
 
-  /**
-   * Getter for pos
-   */
-  getPos() {
-    return this.pos;
-  }
+    getSubscribers() {
+        return [...this._subscribers];
+    }
+
 
   // Setters
 
@@ -242,8 +259,11 @@ class SceneObject {
   set locked(val) {
     this._locked = val;
 
-    this.events.do("lock", val);
-  }
+        this.events.do("lock", val);
+
+        if (this._locked && this.isSelected())
+            this.mgr.deselect(this);
+    }
 
   /**
    * Set the local position.
@@ -288,8 +308,23 @@ class SceneObject {
 
     this._object.z = z;
 
-    if (this.isSelected()) this.mgr.updateSelectBox();
-  }
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
+    }
+
+    setRot(rot) {
+        this._object.transform.localRotation = rot.clone();
+
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
+    }
+
+    setScale(scale) {
+        this._object.transform.localScale = scale.clone();
+
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
+    }
 
   /**
    * Set the model for the object.
@@ -298,19 +333,30 @@ class SceneObject {
   setModel(id) {
     if (id === "" || !this.mgr.models.has(id)) return;
 
-    const copy = this.mgr.models.get(id).clone();
-    this._object.transform.cloneTo(copy);
-    this.mgr.revObjects.delete(this._object);
-    this._object.destroy();
-    this._object = copy;
-    this.mgr.scene.addChild(this._object);
+        const copy = this.mgr.models.get(id).clone();
+        this._object.transform.cloneTo(copy);
+        this.mgr.revObjects.delete(this._object);
+        const old = this._object;
+        this._object = copy;
+
+        this._object.transform.updateWorldMatrix(true);
+        this.mgr.scene.addChild(this._object);
 
     this.mgr.revObjects.set(this._object, this);
 
     if (this.isSelected()) this.mgr.updateSelectBox();
 
-    this.modelID = id;
-  }
+        this.modelID = id;
+
+        const ks = this._object.addComponent(keyboardScript);
+        ks.mgr = this.mgr;
+
+        this._object.forChild(child => {
+            child.addComponent(ColliderComponent);
+        });
+
+        this.mgr.scene.removeChild(old);
+    }
 
   /**
    * Set the color for every part of the object.
@@ -355,12 +401,16 @@ class SceneObject {
 
   // Selection
 
-  /**
-   * Select this actor.
-   */
-  select() {
-    this.mgr.select(this);
-  }
+    /**
+     * Select this actor.
+     */
+    select() {
+        if (this.locked)
+            return;
+
+        this.mgr.select(this);
+    }
+
 
   // Duplication
 
@@ -373,8 +423,8 @@ class SceneObject {
       manager: this.mgr,
     });
 
-    newObj.setModel(this.modelID);
-    newObj.localPosition = this._object.localPosition;
+        newObj.setModel(this.modelID);
+        this._object.transform.cloneTo(newObj.getObject3D());
 
     return newObj;
   }
@@ -401,7 +451,8 @@ class SceneObject {
   mouseOver(e) {
     document.body.style.cursor = "pointer";
 
-    if (this.isSelected()) return;
+        if (this.isSelected() || this.locked)
+            return;
 
     if (this._hoverPreview !== "")
       this.mgr.view.graphic3D.Clear(this._hoverPreview);
@@ -450,111 +501,53 @@ class SceneObject {
     this._hoverPreview = "";
   }
 
-  temp_check(temp) {
-    const min = this.liveData.min;
-    const max = this.liveData.max;
+    drag(elapsed) {
 
-    const d = (val - min) / (max - min);
-
-    const color = this.liveData.gradient.get(d);
-
-    this.setSolidColor(color);
-
-    if (val >= this.liveData.max) {
-      this.mgr.alert("Temperature exceeded maximum threshold.", this.id);
     }
-  }
 
-  // Live Data
 
-  /**
-   * Handle live data from MQTT.
-   * @param {Object} data Live data from MQTT
-   */
-  handleLiveData(data) {
-    let keys = [
-      "x",
-      "y",
-      "z",
-      "rotationX",
-      "rotationY",
-      "rotationZ",
-      "temp",
-      "voltage",
-      "qty",
-      "qty_MAX"
-    ];
+    // Live Data
 
-    for (let key of keys) {
-      if (key in data) {
-        switch (key) {
-          ///SENSOR VARIABLES
-          case "temp": {
-            if (this.liveData.type === "single value")
-              this.temp_check(data[key]);
-            break;
-          }
-          case "qty": {
-            if (this.liveData.type === "single value")
-              this.temp_check(data[key]);
-            break;
-          }
-          case "voltage": {
-            if (this.liveData.type === "single value")
-              this.temp_check(data[key]);
-            break;
-          }
-          case "qty_MAX": {
-            if (this.liveData.type === "single value")
-              this.temp_check(data[key]);
-            break;
-          }
+    /**
+     * Handle live data from MQTT.
+     * @param {Object} data Live data from MQTT
+     */
+    handleLiveData(data) {
+        for (const subscriber of this._subscribers)
+            subscriber.handleData(data);
+    }
 
-          ///POSTIONS
-          case "x": {
-            this.setPos(data[key]);
-            break;
-          }
-          case "y": {
-            this.setPos(data[key]);
-            break;
-          }
-          case "z": {
-            this.setPos(data[key]);
-            break;
-          }
+    addSubscriber(type) {
+        return this._subscribers.push(new type(this));
+    }
 
-          ///ROTATIONS
-          case "rotationX": {
-            this.getObject3D.transform.rotationX(data[key]);
-            break;
-          }
-          case "rotationY": {
-            this.getObject3D.transform.rotationY(data[key]);
-            break;
-          }
-          case "rotationZ": {
-            this.getObject3D.transform.rotationZ(data[key]);
-            break;
-          }
+    removeSubscriber(subscriber) {
+        this._subscribers.splice(this._subscribers.indexOf(subscriber), 1);
+    }
+
+    clearSubscribers() {
+        this._subscribers = [];
+    }
+
+
+    // Serialization / Save File
+    /**
+     * Serialize the object for saving
+     * @return {} Plain Object
+     */
+    serializeObject() {
+        return {
+            id: this._id,
+            name: this.name,
+            modelID: this.modelID,
+            liveData: this.liveData,
+            pos: {
+                x: this._object.x,
+                y: this._object.y,
+                z: this._object.z
+            }
         }
-      }
     }
-  }
-
-  serializeObject() {
-    return {
-      id: this._id,
-      name: this.name,
-      modelID: this.modelID,
-      liveData: this.liveData,
-      pos: {
-        x: this._object.x,
-        y: this._object.y,
-        z: this._object.z,
-      },
-    };
-  }
 }
 
 export default { SceneObject, store };

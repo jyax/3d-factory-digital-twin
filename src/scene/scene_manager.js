@@ -21,51 +21,12 @@ import {
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
-import Util from "../util/Util.js";
+import Util from "../util/util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
-
-class keyboardScript extends ComponentBase
-{
-    right = false;
-    left = false;
-
-    start() {
-        Engine3D.inputSystem.addEventListener(KeyEvent.KEY_UP, this.keyUp, this);
-        Engine3D.inputSystem.addEventListener(KeyEvent.KEY_DOWN, this.keyDown, this);
-    }
-    keyDown(e) {
-        if (e.keyCode == KeyCode.Key_Right){
-            this.right = true;
-            console.log("right", this.transform.rotationY);
-        }
-        else if(e.keyCode == KeyCode.Key_Left){
-            this.left = true;
-            console.log("left", this.transform.rotationY);
-        }
-    }
-    keyUp(e) {
-        let trans = this.object3D.transform;
-
-        if(e.keyCode == KeyCode.Key_Right){
-            this.right = false;
-        }
-        else if(e.keyCode == KeyCode.Key_Left){
-            this.left = false;
-        }
-        else {
-            trans.rotationY = 0;
-            console.log(trans.rotationY);
-        }
-    }
-
-    onUpdate() {
-        if(!this.enable) return;
-
-        let trans = this.object3D.transform;
-        if(this.left) trans.rotationY -= 5;
-        if(this.right) trans.rotationY += 5;
-    }
-}
+import Line from "./line.js";
+import keyboardScript from "./keyboardScript.js";
+import KeyboardScript from "./keyboard_component.js";
+import DragComponent from "./drag_component.js";
 
 /**
  * @module SceneManager
@@ -86,7 +47,6 @@ class SceneManager {
         "wall": "/glb_models/Slatwall_Bin_5.5in.glb",
         "floor": "./src/assets/glb_models/factory_floor_sample_1.glb",
         "workstation1": "/glb_models/workstation.glb",
-        "workstation1_whole": "/glb_models/workstation_whole.glb",
         "workstation2": "/glb_models/Station 10x Layout v31.glb",
         "lathe": "./src/assets/glb_models/downloadsGLB/desk_lathe.glb",
         "ladder": "./src/assets/glb_models/downloadsGLB/escada_movel_-_moving_ladder.glb",
@@ -97,11 +57,6 @@ class SceneManager {
         "tank": "./src/assets/glb_models/UN-COMPLIANT IBC TANK.glb",
         "boiler": "./src/assets/glb_models/downloadsGLB/boiler_from_the_puffer_vic_32 (1).glb",
         "roboticArm": "./src/assets/glb_models/downloadsGLB/black_honey_-_robotic_arm (1).glb",
-        "pallet cell": "./src/assets/glb_models/pallet cell.glb",
-        "fl":"./src/assets/glb_models/factory_layout.glb",
-        // Hidden models for editor use only
-
-        ".translation-handle": "/glb_models/translation_handle.glb"
     };
 
     /**
@@ -109,8 +64,8 @@ class SceneManager {
      * @param {Color} skyColor Color of sky (optional)
      */
     constructor({
-        skyColor = new Color(200, 200, 200)
-    } = {}) {
+                    skyColor = new Color(200, 200, 200)
+                } = {}) {
         this._skyColor = skyColor;
 
         this.sky = null;
@@ -122,6 +77,9 @@ class SceneManager {
         this.objects = new Set();
         this.revObjects = new Map();
         this._selected = new Set();
+
+        this._pressedKeys = new Set();
+        this.dragging = false;
 
         this.models = new Map();
 
@@ -157,40 +115,36 @@ class SceneManager {
         this.editMode = true;
 
         // mongodb stuff
-        let receivedModels = []; // Variable to store the received models
-        fetch('http://localhost:3000/api/loadModels', {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                thing: "yes"
-            })
-        })
-            .then(response => {
-                // Log the raw response for inspection
-                console.log(response);
+        this.modelsMap = {};
+        this.LoadModels();
+    }
 
-                // Check the response status
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                // Parse JSON data from response
-                return response.json();
-            })
-            .then(data => {
-                // Log parsed JSON data
-                console.log(data);
-                receivedModels = data.models;
-            })
-            .catch(error => {
-                // Handle errors
-                console.error('Error:', error);
-            })
-            .finally(() => {
-                console.log("Models:")
-                console.log(receivedModels);
-            });
+    /**
+     * Load models from MongoDB
+     * @constructor
+     */
+    LoadModels() {
+        // fetch('http://localhost:3000/api/loadModels', {
+        //     method: "POST",
+        //     headers: {
+        //         "Content-Type": "application/json"
+        //     },
+        //     body: JSON.stringify({
+        //         thing: "yes"
+        //     })
+        // })
+        //     .then(response => {
+        //         if (!response.ok) {
+        //             throw new Error('network response was not ok');
+        //         }
+        //         return response.json();
+        //     })
+        //     .then(data => {
+        //         this.modelsMap = data.models;
+        //     })
+        //     .catch(error => {
+        //         console.error('error:', error);
+        //     });
     }
 
     /**
@@ -217,9 +171,12 @@ class SceneManager {
         this.scene.envMap = new SolidColorSky(this._skyColor);
 
         let camObj = new Object3D();
-        let cam = camObj.addComponent(Camera3D);
+        this.cam = camObj.addComponent(Camera3D);
+        const drag = camObj.addComponent(DragComponent);
+        drag.mgr = this;
+
         this.camera = camObj;
-        this.cam = cam;
+
 
         this._cameraController = this.camera.addComponent(OrbitController);
         // this._cameraController.setCamera(new Vector3(0, 50, 50), new Vector3(0, 0, 0));
@@ -268,52 +225,11 @@ class SceneManager {
             select: false
         });
         this.view.camera = this.cam;
-        //
-        // HARDCODING THE SCENE
-        //
-
-        // Creating a Plane/floor
-        let floor = this.createNewObject({model:"floor", pos: new Vector3(0, 1, 0), select: false});
-        floor.scaleX = 0.01;
-        floor.scaleY = 0.01;
-        floor.scaleZ = 0.01;
-        floor.transform.localPosition = new Vector3(0, -2, 0);
-       
- 
-         let fl = this.createNewObject({model:"fl", select: false});
-         fl.scaleX = 0.01;
-         fl.scaleY = 0.01;
-         fl.scaleZ = 0.01;
-         fl.transform.localPosition = new Vector3(-9, -2.337, -14);
- 
-         let pallet = this.createNewObject({model:"pallet cell", select: false});
-         pallet.scaleX = pallet.scaleY = pallet.scaleZ = 0.01;
-         pallet.rotationY = -90;
-         pallet.transform.localPosition = new Vector3(10, -3.5, -20);
-
-        // let conveyor = this.createNewObject({model:"conveyor", select: false});
-        // conveyor.scaleX = pallet.scaleY = pallet.scaleZ = 0.01;
-        // conveyor.transform.localPosition = new Vector3(-10, -1.75, 10);
-         
-        //  let AMC = this.createNewObject({model:"AMC", select: false});
-        //  AMC.scaleX = AMC.scaleZ = AMC.scaleY= 0.08;
-        //  AMC.rotationX = AMC.rotationY =-90;
-        //  AMC.transform.localPosition = new Vector3(-10, -1.75, 10);
 
 
 
-
-
-      
-
-        //
-        // END OF FACTORY
-        //
-
-
-
-        for (const id of Object.keys(SceneManager.MODELS)) {
-            const model = await Engine3D.res.loadGltf(SceneManager.MODELS[id]);
+        for (const id of Object.keys(this.modelsMap)) {
+            const model = await Engine3D.res.loadGltf(this.modelsMap[id]);
             this.models.set(id, model);
         }
 
@@ -340,6 +256,11 @@ class SceneManager {
         // })
 
         document.addEventListener("keydown", (event) => {
+            if (Util.inputFocused())
+                return;
+
+            this._pressedKeys.add(event.key.toLowerCase());
+
             switch (event.key) {
                 case "a": {
                     if (!event.ctrlKey)
@@ -351,6 +272,14 @@ class SceneManager {
                     event.preventDefault();
                     this.selectAll();
 
+                    break;
+                }
+
+                case "e": {
+                    if (this.selectedCount > 0) {
+                        this.events.do("drag", true);
+                        this.dragging = true;
+                    }
                     break;
                 }
 
@@ -426,47 +355,44 @@ class SceneManager {
         });
 
         document.addEventListener("keyup", (event) => {
-            if (event.key === "Control")
-                this._ctrlPressed = false;
+            this._pressedKeys.delete(event.key.toLowerCase());
+
+            switch (event.key) {
+                case "e": {
+                    this.events.do("drag", false);
+                    this.dragging = false;
+                    break;
+                }
+
+                case "Control": {
+                    this._ctrlPressed = false;
+                    break;
+                }
+            }
         });
 
         Engine3D.startRenderView(this.view);
 
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_CLICK, e => {
+            if (this.isKeyDown('e'))
+                return;
+
             const object = this.revObjects.get(e.target);
             object.click();
         }, this);
-
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, e => {
             const object = this.revObjects.get(e.target);
             object.mouseOver();
         }, this);
-
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_OUT, e => {
             const object = this.revObjects.get(e.target);
             object.mouseOff();
         }, this);
 
-        this.view.pickFire.addEventListener(PointerEvent3D.PICK_DOWN, e => {
-            const object = this.revObjects.get(e.target);
-            object.mouseDown();
-        }, this);
-
-        this.createNewObject({model: 'dragon',pos:new Vector3(0,0,0)})
-
-        this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, this._onOver, this);
-
-        Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_DOWN, this._onMouseDown, this, null, 999);
-        Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_MOVE, this._onMouseMove, this);
-        Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_UP, this._onMouseUp, this);
-
-        // mongodb init
-        //await this.modelLoader.loadModelsFromMongoDB();
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_DOWN, e => this._onMouseDown(e), this);
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_UP, e => this._onMouseUp(e), this);
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_MOVE, e => this._onMouseMove(e), this);
     }
-
-
-
-
 
     // --------
     // Getters
@@ -511,11 +437,16 @@ class SceneManager {
         return this.camera.transform.forward;
     }
 
+    /**
+     * Get the forward vector of the camera at the mouse position.
+     * @returns {Vector3} Forward vector at mouse position
+     */
+    getMouseForward() {
+        const input = Engine3D.inputSystem;
+        return this.cam.screenPointToRay(input.mouseX, input.mouseY).direction;
+    }
 
 
-
-
-    // --------
     // Setters
     // --------
 
@@ -528,10 +459,6 @@ class SceneManager {
         this.sky = this.scene.addComponent(SkyRenderer);
         this.sky.map = colorSky;
     }
-
-
-
-
 
     // ------
     // Input
@@ -566,10 +493,6 @@ class SceneManager {
         this.camera.localPosition = pos.add(dir.mul(mag));
     }
 
-
-
-
-
     // ----------------
     // User Interfaces
     // ----------------
@@ -583,10 +506,6 @@ class SceneManager {
     alert(description = "", id = "") {
         this.events.do("alert", description, id);
     }
-
-
-
-
 
     // -----------------
     // Objects - Access
@@ -612,10 +531,6 @@ class SceneManager {
         return Array.from(this.objects.values());
     }
 
-
-
-
-
     // -------------------
     // Objects - Creation
     // -------------------
@@ -632,26 +547,20 @@ class SceneManager {
         model = ""
     } = {}) {
         if (pos === null)
-            pos = this.getCameraForward().mul(8).add(this.camera.transform.worldPosition);
+            pos = this.getMouseForward().mul(8).add(this.camera.transform.worldPosition);
 
         const object = new SceneObject.SceneObject({
             manager: this,
             pos: pos,
-            id: this.count.toString(),
             model: model
         });
 
-        object.getObject3D().name = this.count.toString();
-        this.count += 1;
-        // console.log("Object "+object.getObject3D().name, object)
-
         this.addObject(object);
 
-        if (select) {
+        if (select)
             object.select();
-            this.focusOnSelected();
-        }
-        return object.getObject3D();
+
+        return object;
     }
 
     /**
@@ -666,10 +575,6 @@ class SceneManager {
 
         this.events.do("add", object);
     }
-
-
-
-
 
     // -----------------------
     // Scene Saving & Loading
@@ -720,9 +625,6 @@ class SceneManager {
         }
     }
 
-
-
-
     // -------------------
     // Objects - Deletion
     // -------------------
@@ -749,10 +651,6 @@ class SceneManager {
             object.delete();
     }
 
-
-
-
-
     // --------------------
     // Objects - Selection
     // --------------------
@@ -775,7 +673,8 @@ class SceneManager {
 
         this.events.do("select", Array.from(this._selected.values()));
         // console.log(object);
-        object.getObject3D().addComponent(keyboardScript);
+        const ks = object.getObject3D().addComponent(keyboardScript);
+        ks.mgr = this;
 
         this.updateSelectBox();
     }
@@ -1066,7 +965,5 @@ class SceneManager {
         this.canMove = false;
     }
 }
-
-
 
 export default SceneManager;

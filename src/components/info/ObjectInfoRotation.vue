@@ -3,13 +3,13 @@
   <div class="input-vector">
 
     <input class="input-vector-comp c-x" v-model="xVal" type="text" placeholder="x"
-           @input="doChange" v-on:keyup.enter="blurInput" :disabled="!enableUpdate">
+           @input="doChange" v-on:keyup.enter="blurInput">
 
     <input class="input-vector-comp c-y" v-model="yVal" type="text" placeholder="y"
-           @input="doChange" v-on:keyup.enter="blurInput" :disabled="!enableUpdate">
+           @input="doChange" v-on:keyup.enter="blurInput">
 
     <input class="input-vector-comp c-z" v-model="zVal" type="text" placeholder="z"
-           @input="doChange" v-on:keyup.enter="blurInput" style="margin-right: 0;" :disabled="!enableUpdate">
+           @input="doChange" v-on:keyup.enter="blurInput" style="margin-right: 0;">
 
   </div>
 </template>
@@ -77,15 +77,15 @@
 </style>
 
 <script>
-import SceneManager from "../../scene/scene_manager.js";
 import {Vector3} from "@orillusion/core";
+import SceneObject from "../../scene/scene_object.js";
 
 export default {
   name: "ObjectInfoRotation",
 
   props: {
-    mgr: {
-      type: SceneManager,
+    object: {
+      type: SceneObject,
       required: true
     }
   },
@@ -110,35 +110,20 @@ export default {
           parseFloat(this.zVal)
       );
 
-      this.mgr.getFirstSelected().getObject3D().localRotation = this.rot.clone();
+      this.object.setRot(this.rot.clone());
     },
 
     blurInput(e) {
       e.target.blur();
-    },
-
-    update(selected) {
-      if (selected.length !== 1)
-        this.rot = new Vector3();
-      else
-        this.rot = selected[0].getObject3D().localRotation;
-
-      this.xVal = Math.floor(this.rot.x * 100) / 100;
-      this.yVal = Math.floor(this.rot.y * 100) / 100;
-      this.zVal = Math.floor(this.rot.z * 100) / 100;
-    },
-
-    switchView() {
-        this.enableUpdate = !(this.enableUpdate);
-        console.log("switch", this.enableUpdate);
     }
   },
 
   created() {
-    this.mgr.events.on("select", selected => this.update(selected));
-    this.mgr.events.on('switch view', this.switchView);
+    this.rot = this.object.getObject3D().localRotation;
 
-    this.update(this.mgr.getSelected());
+    this.xVal = Math.floor(this.rot.x * 100) / 100;
+    this.yVal = Math.floor(this.rot.y * 100) / 100;
+    this.zVal = Math.floor(this.rot.z * 100) / 100;
   }
 }
 </script>
