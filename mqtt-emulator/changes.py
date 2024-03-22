@@ -1,36 +1,15 @@
 from asset import Asset
-import Publisher
+import time
 import json
 
-# class state:
-#     def __init__(self,start_state,end_state,start_time,duration):
-#         self.start_state= start_state
-#         self.end_state = end_state
-#         self.start_time = start_time
-#         self.duration = duration
-        
-#     def get_start_state(self):
-#         return self.start_state
-    
-#     def get_end_state(self):
-#         return self.end_state    
-    
-#     def get_start_time(self):
-#         return self.start_time
-    
-#     def get_duration(self):
-#         return self.duration
-    
-#     def animate(self,client):
-#         start = Asset(self.start_state.asDict().values())
-#         self.start_state.animateSelf(self.end_state,self.start_time,self.duration)
-        
-#         Publisher.publish(client, json.dumps(start.getDiffs(self.start_state)))
+
+
         
     
-class sequence:
+class Sequence:
     def __init__(self,states):
         self.states = []
+        self.durations = []
         
     def add_state(self,state):
         self.states.append(state)
@@ -40,3 +19,42 @@ class sequence:
     
     def get_states(self):
         return self.states
+    
+    def add_duration(self,duration):
+        self.durations.append(duration)
+        
+    def delete_duration(self, index):
+        self.durations.pop(index)
+    
+    def get_durations(self):
+        return self.durations
+
+    def updateState(self,index,new_state):
+        self.states[index] = new_state
+
+    def updateDuration(self,index,new_dur):
+        self.durations[index] = new_dur
+
+    def run(self):
+        LIMIT = 30
+
+        #constants
+        CYCLE_TIME = 0.10 # in seconds
+        START_TIME = time.perf_counter()
+
+
+        # GETTER for current time
+        def getTime():
+            return time.perf_counter() - START_TIME
+
+        start_times = []
+        total = 0
+        for t in self.durations:
+            total +=t
+            start_times.append(total)
+
+        while getTime() < LIMIT:
+            for idx in range(0,len(start_times)):
+                while getTime() < start_times[idx]:
+                    time.sleep(CYCLE_TIME)
+                    print('Animate OBJ',idx,'&',idx+1,'| Time:',getTime())
