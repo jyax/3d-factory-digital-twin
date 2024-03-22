@@ -28,12 +28,14 @@ def switchAnimation():
 
 	SWITCHABLES[1].grid(row=1, column=0, pady=5)
 
+
 def switchKeyframe():
 	global SWITCHABLES
 	for f in SWITCHABLES:
 		f.grid_forget()
 
 	SWITCHABLES[3].grid(row=1, column=0, pady=5)
+
 
 def switchDemo():
 	global SWITCHABLES
@@ -215,8 +217,6 @@ class itemPane(tk.Frame):
 		editAnim.grid(row=row+2, column=0, columnspan=2,
 					  sticky='nsew', padx=2, pady=1)
 
-		
-
 
 class footerBar(tk.Frame):
 	def __init__(self):
@@ -267,6 +267,7 @@ class itemView(tk.Frame):
 
 		view.pack(side='left')
 
+
 class demoMode(tk.Frame):
 	def __init__(self):
 		super().__init__()
@@ -282,11 +283,12 @@ class demoMode(tk.Frame):
 
 		button3= tk.Button(self,text='012 Animate',bg=PANE,fg='white',height=5,width=20)#, command=lambda client=client: animate3cube(client))
 		button3.pack(side='left',padx=5)    
-	
+
+
 class editKeyframe(tk.Frame):
 	def __init__(self,id):
 		super().__init__()
-		self.config(bg=SIDEBAR, bd=1)
+		self.config(bg=BACKDROP, bd=1)
 		self.id = id
 		self.asset = None
 	
@@ -317,6 +319,16 @@ class editKeyframe(tk.Frame):
 		
 		return pane
 
+	def createDurCtrl(self):
+		frm = tk.Frame(self,bg=BACKDROP)
+		arrow = tk.Canvas(frm,bg=BACKDROP,width=20,height=20)
+		duration = tk.Entry(frm,bg=TEXTBOX,fg='white',width=6)
+		arrow.grid(row=0,column=0)
+		duration.grid(row=1,column=0)
+		return frm
+
+
+
 	def renderStates(self):
 		global assetList
 		for asset in assetList:
@@ -327,6 +339,8 @@ class editKeyframe(tk.Frame):
 		schedule = [Asset(),Asset()]
 		for num,state in enumerate(schedule):
 			self.createPane(state,num).grid(row=1,column=col)
+			if num < len(schedule)-1:
+				self.createDurCtrl().grid(row=1,column=col+1,padx=2)
 			col+=2
 	
 
