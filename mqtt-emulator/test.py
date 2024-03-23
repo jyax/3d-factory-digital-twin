@@ -11,13 +11,13 @@ def testMain(client):
     # for i in range(4):
     #     s.add_state('2')
 
-    s.add_state(a.Asset(x=0))
-    s.add_state(a.Asset(x=5))
-    s.add_state(a.Asset(x=0))
-    s.add_state(a.Asset(x=5))
+    s.add_state(a.Asset(rot_x=0))
+    s.add_state(a.Asset(rot_x=180))
+    s.add_state(a.Asset(rot_x=0))
+    s.add_state(a.Asset(rot_x=-180))
 
-    s.add_duration(2)
-    s.add_duration(3)
-    s.add_duration(2)
+    s.add_duration(5)
+    s.add_duration(5)
+    s.add_duration(5)
 
     s.runSolo(client)

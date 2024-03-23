@@ -12,15 +12,15 @@ class SubscriberRotation extends Subscriber {
         if (this.object === null)
             return;
 
-        if (!("rotationX" in data) ||
-            !("rotationY" in data) ||
-            !("rotationZ" in data))
+        if (!("rot_x" in data) ||
+            !("rot_y" in data) ||
+            !("rot_x" in data))
             return;
 
-        this.object.setPos(new Vector3(
-            parseFloat(data["rotationX"]),
-            parseFloat(data["rotationY"]),
-            parseFloat(data["rotationZ"])
+        this.object.setRot(new Vector3(
+            parseFloat(data["rot_x"]),
+            parseFloat(data["rot_y"]),
+            parseFloat(data["rot_z"])
         ));
     }
 

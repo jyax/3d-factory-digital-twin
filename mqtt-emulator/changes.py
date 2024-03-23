@@ -1,10 +1,5 @@
 import time
 
-
-
-
-		
-	
 class Sequence:
 	def __init__(self,states):
 		self.states = []
@@ -36,9 +31,8 @@ class Sequence:
 
 	def runSolo(self,client):
 		
-
 		#constants
-		CYCLE_TIME = .5 # in seconds
+		CYCLE_TIME = .05 # in seconds
 		START_TIME = time.perf_counter()
 		LIMIT = sum(self.durations)
 

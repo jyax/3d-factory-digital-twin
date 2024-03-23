@@ -6,7 +6,7 @@ import json
 def calcVal(start_val, end_val, start_time, duration, curr_time):
     delta =  end_val-start_val
     fraction = (curr_time-start_time)/duration
-    return start_val + (delta*fraction)
+    return round(start_val + (delta*fraction),3)
 
 class Asset:
 
