@@ -1,29 +1,34 @@
 
-import time
+
 import Publisher as pub
 import json
 
 
-#constants
-CYCLE_TIME = 0.05 # in seconds
-START_TIME = time.perf_counter()
+# #constants
+# CYCLE_TIME = 0.05 # in seconds
+# START_TIME = time.perf_counter()
 
-# GETTER for current time
-def getTime():
-    return time.perf_counter() - START_TIME
+# # GETTER for current time
+# def getTime():
+#     return time.perf_counter() - START_TIME
 
 
 # Calculates what a value should be between 2 values and times
-def calc_val(start_val, end_val, start_time, duration):
-    #print(getTime())
-    if(start_time <= getTime() and start_time+duration >= getTime()):
-        frac = getTime()-start_time
-        delta = ((end_val-start_val)*frac)/duration
-        return round(start_val+delta,2)
-    elif(start_time > getTime()):
-        return start_val
-    else:
-        return end_val
+# def calc_val(start_val, end_val, start_time, duration):
+#     #print(getTime())
+#     if(start_time <= getTime() and start_time+duration >= getTime()):
+#         frac = getTime()-start_time
+#         delta = ((end_val-start_val)*frac)/duration
+#         return round(start_val+delta,2)
+#     elif(start_time > getTime()):
+#         return start_val
+#     else:
+#         return end_val
+    
+def calcVal2(start_val, end_val, start_time, duration, curr_time):
+    delta =  end_val-start_val
+    fraction = (curr_time-start_time)/duration
+    return start_val + (delta*fraction)
 
 class Asset:
 
@@ -109,17 +114,20 @@ class Asset:
         #TODO get diff here before publish
             
 
-    def animateSelf(self, goalstate, start_time, duration):
+    def animateSelf(self, goalstate, start_time, duration,curr_time):
         
         curr = self.asDict()
         vals = list(curr.values())
         keys =list(curr.keys())
         end = goalstate.asDict()
 
+        # print(curr.values())
+
         for i in range(1,len(keys)):
-            curr.update({keys[i]:calc_val(vals[i],end[keys[i]],start_time,duration/CYCLE_TIME)})
+            curr.update({keys[i]:calcVal2(vals[i],end[keys[i]],start_time,duration,curr_time)})
             # print(calc_val(vals[i],end[keys[i]],start_time,duration))
-        self.UpdateSelf((curr.values()))
+        # print(curr.values())
+        self.UpdateSelf(*(curr.values()))
         
     def getDiffs(self, other):
         if self.id != other.getID():
@@ -137,43 +145,43 @@ class Asset:
     def isSynced(self):
         return self.last_updated.getDiffs(self) == {'id':self.id} 
         
-def animate3cube(client):
+# def animate3cube(client):
 
-    TestItem = Asset("1",0,0,0,25.0)
-    TestItemFinal = Asset("1",0,3,0,25.0)
-    TestItem2 = Asset("2",0,0,0,25.0)
-    TestItemFinal2 = Asset("2",3,0,0,25.0)
-    TestItem3 = Asset("0",0,0,0,25.0)
-    TestItemFinal3 = Asset("0",0,0,3,25.0)
+#     TestItem = Asset("1",0,0,0,25.0)
+#     TestItemFinal = Asset("1",0,3,0,25.0)
+#     TestItem2 = Asset("2",0,0,0,25.0)
+#     TestItemFinal2 = Asset("2",3,0,0,25.0)
+#     TestItem3 = Asset("0",0,0,0,25.0)
+#     TestItemFinal3 = Asset("0",0,0,3,25.0)
 
-    while (getTime()<10):
-        time.sleep(CYCLE_TIME)
-        # print(TestItem.asDict())
-        TestItem.animateSelf(TestItemFinal,0,10)
-        pub.publish(client,json.dumps(TestItem.asDict()))
+#     while (getTime()<10):
+#         time.sleep(CYCLE_TIME)
+#         # print(TestItem.asDict())
+#         TestItem.animateSelf(TestItemFinal,0,10)
+#         pub.publish(client,json.dumps(TestItem.asDict()))
         
-        TestItem2.animateSelf(TestItemFinal2,0,10)
-        pub.publish(client,json.dumps(TestItem2.asDict()))
+#         TestItem2.animateSelf(TestItemFinal2,0,10)
+#         pub.publish(client,json.dumps(TestItem2.asDict()))
 
-        TestItem3.animateSelf(TestItemFinal3,0,10)
-        pub.publish(client,json.dumps(TestItem3.asDict()))
+#         TestItem3.animateSelf(TestItemFinal3,0,10)
+#         pub.publish(client,json.dumps(TestItem3.asDict()))
 
-def tempSpikeDemo(client):
-    TestItem = Asset("0",0,0,0,0)
-    TestItemFinal = Asset("0",0,3,0,105.0)
+# def tempSpikeDemo(client):
+#     TestItem = Asset("0",0,0,0,0)
+#     TestItemFinal = Asset("0",0,3,0,105.0)
 
-    while (getTime()<6):
-        time.sleep(CYCLE_TIME)
+#     while (getTime()<6):
+#         time.sleep(CYCLE_TIME)
        
-        TestItem.animateSelf(TestItemFinal,0,2)
-        TestItem.liveUpdate(client)
+#         TestItem.animateSelf(TestItemFinal,0,2)
+#         TestItem.liveUpdate(client)
 
-def animateLoop(client,animated_objects):
-    threshold = 30
-    while(getTime() < threshold):
-        for change_obj in animated_objects:
-            for change in change_obj.get_states():
-                change.animate(client)
+# def animateLoop(client,animated_objects):
+#     threshold = 30
+#     while(getTime() < threshold):
+#         for change_obj in animated_objects:
+#             for change in change_obj.get_states():
+#                 change.animate(client)
                 
                 
                 

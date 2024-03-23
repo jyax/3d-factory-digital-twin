@@ -1,6 +1,5 @@
-from asset import Asset
 import time
-import json
+
 
 
 
@@ -35,8 +34,8 @@ class Sequence:
     def updateDuration(self,index,new_dur):
         self.durations[index] = new_dur
 
-    def run(self):
-        LIMIT = 30
+    def runSolo(self,client):
+        LIMIT = sum(self.durations)
 
         #constants
         CYCLE_TIME = 0.10 # in seconds
@@ -54,7 +53,9 @@ class Sequence:
             start_times.append(total)
 
         while getTime() < LIMIT:
-            for idx in range(0,len(start_times)):
-                while getTime() < start_times[idx]:
+            for idx in range(0,len(self.states)-2):
+                while start_times[idx] <= getTime() and getTime() < start_times[idx + 1]:
+                    # print('Animate OBJ',idx,'&',idx+1,'| Time:',getTime())
+                    self.states[idx].animateSelf(self.states[idx+1],start_times[idx],self.durations[idx],getTime())
+                    self.states[idx].liveUpdate(client)
                     time.sleep(CYCLE_TIME)
-                    print('Animate OBJ',idx,'&',idx+1,'| Time:',getTime())

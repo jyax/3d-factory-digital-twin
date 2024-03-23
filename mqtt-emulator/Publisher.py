@@ -4,6 +4,8 @@ import GUI
 # from asset import animate3cube
 from paho.mqtt import client as mqtt_client
 
+import test
+
 ###TOGGLE TEST MODES###
 #######################
 SERVERLESS  =   True###
@@ -55,10 +57,13 @@ def publish(client, msg):
 def run():
     client = connect_mqtt()
     client.loop_start()
-    if not ANIMATE: 
-        GUI.main(client)
-    else:
-        pass
+
+
+    test.testMain(client)
+
+
+    GUI.main(client)
+  
     client.loop_stop()
 
 
