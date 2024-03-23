@@ -6,14 +6,14 @@
   import Alert from "./Alert.vue";
   import LoadBar from "./LoadBar.vue";
   import Login from "./Login.vue";
-  import Pancake from "./ViewButton.vue";
-  
+  import FileSelect from "./FileSelect.vue";
+
   const canvas = ref("canvas");
 
 </script>
 
 <template>
-
+  <FileSelect :mgr="mgr"/>
   <canvas id="canvas" ref="canvas" @mousedown="mgr.startDrag" @mouseleave="mgr.stopDrag" @mouseup="mgr.stopDrag"></canvas>
   <object-info :mgr="mgr"/>
   <div v-if="editOn">
