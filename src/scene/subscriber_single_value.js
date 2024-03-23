@@ -2,22 +2,30 @@ import Subscriber from "./subscriber.js";
 import ColorGradient from "../color/color_gradient.js";
 
 class SubscriberSingleValue extends Subscriber {
-    constructor(object) {
+    constructor(object, id = "") {
         super(object);
 
         this.gradient = new ColorGradient();
 
         this.min = 0;
         this.max = 0;
+
+        this.id = id;
     }
 
     handleData(data) {
         super.handleData(data);
 
+        if (this.id === "")
+            return;
+
         if (this.object === null)
             return;
 
-        let val = parseFloat(data["temp"]);
+        if (!(this.id in data))
+            return;
+
+        let val = parseFloat(data[this.id]);
 
         const d = (val - this.min) / (this.max - this.min);
 

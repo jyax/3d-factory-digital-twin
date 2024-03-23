@@ -21,6 +21,8 @@ import SyncSubscriber from "./subscriber/SyncSubscriber.vue";
 
     <sync-subscriber-add label="Position" v-if="availableTypes.includes(SubscriberPosition)"
                          @click="addSubscriber(SubscriberPosition)"/>
+    <sync-subscriber-add label="Rotation" v-if="availableTypes.includes(SubscriberRotation)"
+                         @click="addSubscriber(SubscriberRotation)"/>
     <sync-subscriber-add label="Single value" v-if="availableTypes.includes(SubscriberSingleValue)"
                          @click="addSubscriber(SubscriberSingleValue)"/>
 
@@ -259,6 +261,7 @@ input[type="color"]::-webkit-color-swatch:hover {
 import SceneObject from "../../../scene/scene_object.js";
 import SubscriberPosition from "../../../scene/subscriber_position.js";
 import SubscriberSingleValue from "../../../scene/subscriber_single_value.js";
+import SubscriberRotation from "../../../scene/subscriber_rotation.js";
 
 export default {
   name: "ObjectInfoSync",
@@ -272,7 +275,7 @@ export default {
 
   data() {
     return {
-      allTypes: [SubscriberPosition, SubscriberSingleValue],
+      allTypes: [SubscriberPosition, SubscriberSingleValue, SubscriberRotation],
       availableTypes: [],
       subscribers: []
     }

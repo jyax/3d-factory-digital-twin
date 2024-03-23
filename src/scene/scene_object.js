@@ -35,9 +35,9 @@ const store = createStore({
     actions: {},
     modules: {},
 });
-import subscriber from "./subscriber.js";
 import SubscriberPosition from "./subscriber_position.js";
-import SubscriberSingleValue from "./subscriber_single_value.js";
+import SubscriberRotation from "./subscriber_rotation.js";
+import Util from "../util/util.js";
 
 /**
  * @module SceneObject
@@ -119,7 +119,10 @@ class SceneObject {
 
         this._events = new EventHandler();
 
-        this._subscribers = [];
+        this._subscribers = [
+            new SubscriberPosition(this),
+            new SubscriberRotation(this),
+        ];
     }
 
 
@@ -220,8 +223,13 @@ class SceneObject {
         });
 
         if (bb !== null) {
-            bb.min = bb.min.add(this._object.transform.worldPosition);
-            bb.max = bb.max.add(this._object.transform.worldPosition);
+            const matrix = this._object.transform.worldMatrix.clone();
+            matrix.position = new Vector3();
+            bb = Util.transformBoundingBox(bb, matrix);
+            bb.setFromMinMax(
+                bb.min.add(this.pos),
+                bb.max.add(this.pos)
+            );
         } else {
             bb = new BoundingBox();
         }
@@ -317,11 +325,17 @@ class SceneObject {
     }
 
     setRot(rot) {
-      this._object.transform.localRotation = rot.clone();
+        this._object.transform.localRotation = rot.clone();
+
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
     }
 
     setScale(scale) {
-      this._object.transform.localScale = scale.clone();
+        this._object.transform.localScale = scale.clone();
+
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
     }
 
     /**
@@ -348,7 +362,8 @@ class SceneObject {
 
         this.modelID = id;
 
-        this._object.addComponent(keyboardScript);
+        const ks = this._object.addComponent(keyboardScript);
+        ks.mgr = this.mgr;
 
         this._object.forChild(child => {
             child.addComponent(ColliderComponent);
@@ -516,15 +531,7 @@ class SceneObject {
     }
 
     addSubscriber(type) {
-        switch (type) {
-            case SubscriberPosition:
-                return this._subscribers.push(new SubscriberPosition(this));
-
-            case SubscriberSingleValue:
-                return this._subscribers.push(new SubscriberSingleValue(this));
-        }
-
-        return null;
+        return this._subscribers.push(new type(this));
     }
 
     removeSubscriber(subscriber) {
