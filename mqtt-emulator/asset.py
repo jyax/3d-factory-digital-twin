@@ -2,30 +2,8 @@
 
 import Publisher as pub
 import json
-
-
-# #constants
-# CYCLE_TIME = 0.05 # in seconds
-# START_TIME = time.perf_counter()
-
-# # GETTER for current time
-# def getTime():
-#     return time.perf_counter() - START_TIME
-
-
-# Calculates what a value should be between 2 values and times
-# def calc_val(start_val, end_val, start_time, duration):
-#     #print(getTime())
-#     if(start_time <= getTime() and start_time+duration >= getTime()):
-#         frac = getTime()-start_time
-#         delta = ((end_val-start_val)*frac)/duration
-#         return round(start_val+delta,2)
-#     elif(start_time > getTime()):
-#         return start_val
-#     else:
-#         return end_val
-    
-def calcVal2(start_val, end_val, start_time, duration, curr_time):
+   
+def calcVal(start_val, end_val, start_time, duration, curr_time):
     delta =  end_val-start_val
     fraction = (curr_time-start_time)/duration
     return start_val + (delta*fraction)
@@ -124,7 +102,7 @@ class Asset:
         # print(curr.values())
 
         for i in range(1,len(keys)):
-            curr.update({keys[i]:calcVal2(vals[i],end[keys[i]],start_time,duration,curr_time)})
+            curr.update({keys[i]:calcVal(vals[i],end[keys[i]],start_time,duration,curr_time)})
             # print(calc_val(vals[i],end[keys[i]],start_time,duration))
         # print(curr.values())
         self.UpdateSelf(*(curr.values()))
