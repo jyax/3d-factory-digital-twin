@@ -21,10 +21,12 @@ import {
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
-import Util from "../util/Util.js";
+import Util from "../util/util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
 import Line from "./line.js";
 import keyboardScript from "./keyboardScript.js";
+import KeyboardScript from "./keyboard_component.js";
+import DragComponent from "./drag_component.js";
 
 /**
  * @module SceneManager
@@ -67,8 +69,8 @@ class SceneManager {
      * @param {Color} skyColor Color of sky (optional)
      */
     constructor({
-                    skyColor = new Color(200, 200, 200)
-                } = {}) {
+        skyColor = new Color(200, 200, 200)
+    } = {}) {
         this._skyColor = skyColor;
 
         this.sky = null;
@@ -80,6 +82,9 @@ class SceneManager {
         this.objects = new Set();
         this.revObjects = new Map();
         this._selected = new Set();
+
+        this._pressedKeys = new Set();
+        this.dragging = false;
 
         this.models = new Map();
 
@@ -171,9 +176,12 @@ class SceneManager {
         this.scene.envMap = new SolidColorSky(this._skyColor);
 
         let camObj = new Object3D();
-        let cam = camObj.addComponent(Camera3D);
+        this.cam = camObj.addComponent(Camera3D);
+        const drag = camObj.addComponent(DragComponent);
+        drag.mgr = this;
+
         this.camera = camObj;
-        this.cam = cam;
+
 
         this._cameraController = this.camera.addComponent(OrbitController);
         // this._cameraController.setCamera(new Vector3(0, 50, 50), new Vector3(0, 0, 0));
@@ -194,11 +202,6 @@ class SceneManager {
         this.view = new View3D();
         this.view.scene = this.scene;
         this.view.camera = this.cam;
-
-        console.log("database models:");
-        console.log(this.modelsMap);
-        console.log("scene manager models:");
-        console.log(SceneManager.MODELS);
 
         const promises = [];
         const total = Object.keys(SceneManager.MODELS).length;
@@ -258,6 +261,11 @@ class SceneManager {
         // })
 
         document.addEventListener("keydown", (event) => {
+            if (Util.inputFocused())
+                return;
+
+            this._pressedKeys.add(event.key.toLowerCase());
+
             switch (event.key) {
                 case "a": {
                     if (!event.ctrlKey)
@@ -269,6 +277,14 @@ class SceneManager {
                     event.preventDefault();
                     this.selectAll();
 
+                    break;
+                }
+
+                case "e": {
+                    if (this.selectedCount > 0) {
+                        this.events.do("drag", true);
+                        this.dragging = true;
+                    }
                     break;
                 }
 
@@ -344,13 +360,28 @@ class SceneManager {
         });
 
         document.addEventListener("keyup", (event) => {
-            if (event.key === "Control")
-                this._ctrlPressed = false;
+            this._pressedKeys.delete(event.key.toLowerCase());
+
+            switch (event.key) {
+                case "e": {
+                    this.events.do("drag", false);
+                    this.dragging = false;
+                    break;
+                }
+
+                case "Control": {
+                    this._ctrlPressed = false;
+                    break;
+                }
+            }
         });
 
         Engine3D.startRenderView(this.view);
 
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_CLICK, e => {
+            if (this.isKeyDown('e'))
+                return;
+
             const object = this.revObjects.get(e.target);
             object.click();
         }, this);
@@ -365,18 +396,9 @@ class SceneManager {
             object.mouseOff();
         }, this);
 
-        this.view.pickFire.addEventListener(PointerEvent3D.PICK_DOWN, e => {
-            const object = this.revObjects.get(e.target);
-            object.mouseDown();
-        }, this);
-
-
-        this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, this._onOver, this);
-
-        Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_DOWN, this._onMouseDown, this, null, 999);
-        Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_MOVE, this._onMouseMove, this);
-        Engine3D.inputSystem.addEventListener(PointerEvent3D.POINTER_UP, this._onMouseUp, this);
-
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_DOWN, e => this._onMouseDown(e), this);
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_UP, e => this._onMouseUp(e), this);
+        this.view.pickFire.addEventListener(PointerEvent3D.PICK_MOVE, e => this._onMouseMove(e), this);
     }
 
     // --------
@@ -422,7 +444,16 @@ class SceneManager {
         return this.camera.transform.forward;
     }
 
-    // --------
+    /**
+     * Get the forward vector of the camera at the mouse position.
+     * @returns {Vector3} Forward vector at mouse position
+     */
+    getMouseForward() {
+        const input = Engine3D.inputSystem;
+        return this.cam.screenPointToRay(input.mouseX, input.mouseY).direction;
+    }
+
+
     // Setters
     // --------
 
@@ -523,26 +554,20 @@ class SceneManager {
         model = ""
     } = {}) {
         if (pos === null)
-            pos = this.getCameraForward().mul(8).add(this.camera.transform.worldPosition);
+            pos = this.getMouseForward().mul(8).add(this.camera.transform.worldPosition);
 
         const object = new SceneObject.SceneObject({
             manager: this,
             pos: pos,
-            id: this.count.toString(),
             model: model
         });
 
-        object.getObject3D().name = this.count.toString();
-        this.count += 1;
-        // console.log("Object "+object.getObject3D().name, object)
-
         this.addObject(object);
 
-        if (select) {
+        if (select)
             object.select();
-            this.focusOnSelected();
-        }
-        return object.getObject3D();
+
+        return object;
     }
 
     /**
@@ -675,7 +700,8 @@ class SceneManager {
 
         this.events.do("select", Array.from(this._selected.values()));
         // console.log(object);
-        object.getObject3D().addComponent(keyboardScript);
+        const ks = object.getObject3D().addComponent(keyboardScript);
+        ks.mgr = this;
 
         this.updateSelectBox();
     }

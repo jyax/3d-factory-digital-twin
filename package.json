@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node vite.config.js",
-    "dev": "concurrently \"node database/Server.js\" vite",
+    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },

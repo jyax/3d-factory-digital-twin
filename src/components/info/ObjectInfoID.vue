@@ -1,41 +1,28 @@
 <script>
 
 import ObjectInfoInput from "./ObjectInfoInput.vue";
+import SceneObject from "../../scene/scene_object.js";
 
 export default {
   extends: ObjectInfoInput,
 
-  data() {
-    return {
-      listener: null
+  props: {
+    object: {
+      type: SceneObject,
+      required: true
     }
   },
 
   methods: {
     doChange() {
-      this.mgr.getFirstSelected().id = this.val;
+      this.object.id = this.val;
 
-      this.mgr.events.do("rename");
+      this.object.events.do("rename");
     },
-
-    update() {
-      if (this.mgr.selectedCount !== 1) {
-        this.val = "";
-        return;
-      }
-
-      this.val = this.mgr.getFirstSelected().id;
-    }
   },
 
   created() {
-    this.listener = this.mgr.events.on("select", sel => this.update());
-
-    this.update();
-  },
-
-  destroyed() {
-    this.mgr.events.remove(this.listener);
+    this.val = this.object.id;
   }
 }
 
