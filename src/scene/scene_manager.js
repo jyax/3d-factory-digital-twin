@@ -57,6 +57,7 @@ class SceneManager {
         "tank": "./src/assets/glb_models/UN-COMPLIANT IBC TANK.glb",
         "boiler": "./src/assets/glb_models/downloadsGLB/boiler_from_the_puffer_vic_32 (1).glb",
         "roboticArm": "./src/assets/glb_models/downloadsGLB/black_honey_-_robotic_arm (1).glb",
+        "testfactory": "./src/assets/glb_models/downloadsGLB/testfactory1.glb"
     };
 
     /**
@@ -233,7 +234,8 @@ class SceneManager {
             this.models.set(id, model);
         }
 
-        this.createNewObject(new Vector3(), false);
+        this.createNewObject(new Vector3(), false,"testfactory");
+        
 
         /**
          * Event listener for File Input

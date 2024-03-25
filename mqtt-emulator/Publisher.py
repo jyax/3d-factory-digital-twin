@@ -56,13 +56,14 @@ def publish(client, msg):
 ## Code to run on launch
 def run():
     client = connect_mqtt()
+
     client.loop_start()
 
-
+    # GUI.main(client)
     test.testMain(client)
 
 
-    GUI.main(client)
+   
   
     client.loop_stop()
 
