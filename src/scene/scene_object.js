@@ -37,6 +37,7 @@ const store = createStore({
 });
 import SubscriberPosition from "./subscriber_position.js";
 import SubscriberRotation from "./subscriber_rotation.js";
+import SubscriberSingleValue from "./subscriber_single_value.js";
 import Util from "../util/util.js";
 import subscriber from "./subscriber.js";
 
@@ -550,6 +551,14 @@ class SceneObject {
      * @return {} Plain Object
      */
     serializeObject() {
+        let singleValSubs = {}
+        this._subscribers.forEach(sub => {
+            if (sub instanceof SubscriberSingleValue)
+            {
+                let type = sub.type || 'default'
+                singleValSubs[type] = sub.serialize()
+            }
+        })
         return {
             objInfo: {
                 id: this._id,
@@ -572,12 +581,11 @@ class SceneObject {
                 }
             },
             subscribers: {
-                singleValue: {
-                    type: {
-                    }
-                },
+                singleValue: singleValSubs,
                 transformers: !!this._subscribers.find(
-                    subscriber => subscriber instanceof SubscriberPosition || subscriber instanceof SubscriberRotation),
+                    subscriber =>
+                        subscriber instanceof SubscriberPosition ||
+                        subscriber instanceof SubscriberRotation),
             }
         }
     }
