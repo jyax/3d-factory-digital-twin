@@ -584,7 +584,27 @@ class SceneManager {
 
         // Remove the URL from usage
         URL.revokeObjectURL(blobUrl)
+
+        try {
+            const response = fetch('http://localhost:9000/Factory_Floors', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ sceneData: jsonString })
+            });
+            console.log(jsonString);
+    
+            if (response.ok) {
+                console.log('Scene saved successfully to server.');
+            } else {
+                console.error('Failed to save scene to server.');
+            }
+        } catch (error) {
+            console.error('Error saving scene to server:', error);
+        }
     }
+    
 
     /**
      * Load scene information from JSON
