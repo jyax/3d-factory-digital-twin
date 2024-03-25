@@ -64,17 +64,10 @@
 
 <script>
 
-import SceneManager from "../../scene/scene_manager.js";
-
 export default {
   name: "ObjectInfoInput",
 
   props: {
-    mgr: {
-      type: SceneManager,
-      required: true
-    },
-
     default: {
       default: ""
     },
@@ -117,7 +110,7 @@ export default {
 
   created() {
     this.val = this.default;
-    this.mgr.events.on("switch view", this.switchView);
+    // this.mgr.events.on("switch view", this.switchView);
   }
 }
 

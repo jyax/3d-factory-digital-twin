@@ -56,7 +56,7 @@ class AddToDirectory {
             const filesCursor = bucket.find();
             const fileList = await filesCursor.toArray();
 
-            const promises = [];
+            const downloadAndTransferPromises = [];
             for (const file of fileList) {
                 let fileName = file.filename;
                 if (!fileName.endsWith('.glb')) {
@@ -64,22 +64,22 @@ class AddToDirectory {
                 }
                 const outputFilePath = path.join(this.localDirectory, fileName);
 
-                promises.push(new Promise((resolve, reject) => {
-                    const readStream = bucket.openDownloadStream(file._id);
-                    const writeStream = fs.createWriteStream(outputFilePath);
-                    readStream.pipe(writeStream);
-                    writeStream.on('finish', () => {
+                downloadAndTransferPromises.push(new Promise((resolve, reject) => {
+                    const downloadStream = bucket.openDownloadStream(file._id);
+                    const fileStream = fs.createWriteStream(outputFilePath);
+                    downloadStream.pipe(fileStream);
+                    fileStream.on('finish', () => {
                         console.log(`file "${fileName}" downloaded and saved to "${outputFilePath}"`);
                         resolve();
                     });
-                    writeStream.on('error', (err) => {
+                    fileStream.on('error', (err) => {
                         console.error(`error saving file "${fileName}" to "${outputFilePath}":`, err);
                         reject(err);
                     });
                 }));
             }
 
-            await Promise.all(promises);
+            await Promise.all(downloadAndTransferPromises);
             console.log('all files downloaded and saved to local directory');
         } catch (err) {
             console.error('error downloading and transferring files', err);

@@ -1,10 +1,11 @@
+// Server.js
 
 // const socket = require('socket.io');
 // const express = require('express');
 // const cors = require('cors');
 // const bodyParser = require('body-parser');
 // const { AddToMongoDBServer } = require('./AddToMongoDBServer.js');
-// const { AddToDirectory } = require('./AddToDirectory.js');
+//const { AddToDirectory } = require('./AddToDirectory.js');
 
 import express from 'express';
 import cors from 'cors';
@@ -24,6 +25,8 @@ const PORT = 3000;
  */
 const StartServer = async () => {
     try {
+        //const { GetModelsFromMongoDB } = await import('./GetModelsFromMongoDB.js');
+
         app.post('/api/loadModels', async (req, res) => {
             console.log('received request at /api/loadModels');
             console.log(req.body);
@@ -33,6 +36,7 @@ const StartServer = async () => {
                 const getModelsFromMongoDB = new GetModelsFromMongoDB(databaseUrl, databaseName);
                 await getModelsFromMongoDB.GetModels();
 
+                // Send the loaded models as JSON in the response
                 res.json({ message: 'models loaded successfully', models: getModelsFromMongoDB.models });
             } catch (error) {
                 console.error('error loading models:', error);

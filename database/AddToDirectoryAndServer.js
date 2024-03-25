@@ -76,7 +76,7 @@ class AddToDirectoryAndServer {
                 const transferPromise = new Promise((resolve, reject) => {
                     exec(command)
                         .then(() => {
-                            console.log(`file "${fileName}" transferred`);
+                            console.log(`file "${fileName}" transferred successfully`);
                             resolve();
                         })
                         .catch((err) => {

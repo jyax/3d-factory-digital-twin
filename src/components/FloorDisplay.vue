@@ -1,71 +1,62 @@
 <script setup>
-  import {onMounted} from "vue";
+  import {onMounted, ref} from "vue";
+  import SceneManager from "../scene/scene_manager.js";
   import ObjectInfo from "./ObjectInfo.vue";
   import Toolbar from "./Toolbar.vue";
   import Alert from "./Alert.vue";
   import LoadBar from "./LoadBar.vue";
   import Login from "./Login.vue";
-  import BackToOpeningPage from "./BackToOpeningPage.vue";
-  import OpeningPage from "./OpeningPage.vue";
+  import Pancake from "./ViewButton.vue";
+  
+  const canvas = ref("canvas");
+
 </script>
 
 <template>
 
-  <object-info v-show="!openingPage" :mgr="mgr"/>
-  <div v-show="!openingPage" v-if="editOn">
+  <canvas id="canvas" ref="canvas" @mousedown="mgr.startDrag" @mouseleave="mgr.stopDrag" @mouseup="mgr.stopDrag"></canvas>
+  <object-info :mgr="mgr"/>
+  <div v-if="editOn">
     <toolbar :mgr="mgr"/>
   </div>
   <login :mgr="mgr"/>
-  <outline v-show="!openingPage" :mgr="mgr"/>
-  <alert v-show="!openingPage" :mgr="mgr"/>
+  <outline :mgr="mgr"/>
+  <alert :mgr="mgr"/>
 
-  <load-bar v-show="!openingPage" :mgr="mgr"/>
-
-  <BackToOpeningPage v-show="!openingPage" :mgr="mgr" @back="openingPage = true"/>
-
-  <OpeningPage v-show="openingPage" @create="openingPage = false"></OpeningPage>
+  <load-bar :mgr="mgr"/>
 
 </template>
 
-<style scoped>
-
-</style>
-
 <script>
-  import Outline from "./Outline.vue";
-  import {onMounted } from "vue";
-  import SceneManager from "../scene/scene_manager.js";
-
+  import Outline from "./outline/Outline.vue";
+  
   export default {
     components: {
       Outline
     },
 
-    data () {
-      return {
-        openingPage: true,
-        editOn: true,
-        mgr : new SceneManager()
+    props: {
+      mgr: {
+        type: SceneManager,
+        required: true
       }
     },
 
-    methods: {
+    data () {
+      return{
+        editOn: true
+      }
+    },
+    
+    methods : {
       switchView() {
           this.editOn = !(this.editOn);
           console.log("switch", this.editOn);
       }
     },
 
-    watch: {
-      openingPage(n, o) {
-        this.mgr.setCanvasVisibility(!n);
-      }
-    },
-
-    mounted() {
-      this.mgr.init();
+    created() {
       this.mgr.events.on('switch view', this.switchView);
-      window.manager = this.mgr;
     }
   }
-</script>
+</script> 
