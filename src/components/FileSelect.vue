@@ -110,17 +110,19 @@ export default{
       // prevent default actions
       ev.preventDefault();
 
-      if(ev.dataTransfer.items) {
+      if(ev.dataTransfer.files) {
+        const fr = new FileReader();
+        console.log(typeof(ev.dataTransfer.files[0]));
+        fr.readAsText(ev.dataTransfer.files[0]);
 
-        [...ev.dataTransfer.items].forEach((item, i) => {
-
-          console.log(item.kind);
-          if(item.kind == 'file') {  
-            let file = item.getAsFile();
-            console.log(file);
-          }
-
+        fr.addEventListener('load', () => {
+          const data = fr.result;
+          console.log("file contents: ", fr.result);
+          // this.mgr.LoadScene(data);
         });
+      }
+      else {
+        console.error("File Reading");
       }
     },
 

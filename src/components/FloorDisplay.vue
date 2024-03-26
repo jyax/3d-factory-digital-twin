@@ -45,7 +45,7 @@
     data () {
       return{
         editOn: true,
-        startMenuOn: false
+        startMenuOn: true
       }
     },
     
