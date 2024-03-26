@@ -50,6 +50,7 @@ class SceneManager {
         "wall": "/glb_models/Slatwall_Bin_5.5in.glb",
         "floor": "./src/assets/glb_models/factory_floor_sample_1.glb",
         "workstation1": "/glb_models/workstation.glb",
+        "workstation1_whole": "/glb_models/workstation_whole.glb",
         "workstation2": "/glb_models/Station 10x Layout v31.glb",
         "lathe": "./src/assets/glb_models/downloadsGLB/desk_lathe.glb",
         "ladder": "./src/assets/glb_models/downloadsGLB/escada_movel_-_moving_ladder.glb",
@@ -60,6 +61,10 @@ class SceneManager {
         "tank": "./src/assets/glb_models/UN-COMPLIANT IBC TANK.glb",
         "boiler": "./src/assets/glb_models/downloadsGLB/boiler_from_the_puffer_vic_32 (1).glb",
         "roboticArm": "./src/assets/glb_models/downloadsGLB/black_honey_-_robotic_arm (1).glb",
+
+        // Hidden models for editor use only
+
+        ".translation-handle": "/glb_models/translation_handle.glb"
     };
 
     /**
@@ -67,8 +72,8 @@ class SceneManager {
      * @param {Color} skyColor Color of sky (optional)
      */
     constructor({
-                    skyColor = new Color(200, 200, 200)
-                } = {}) {
+        skyColor = new Color(200, 200, 200)
+    } = {}) {
         this._skyColor = skyColor;
 
         this.sky = null;
@@ -418,10 +423,12 @@ class SceneManager {
             const object = this.revObjects.get(e.target);
             object.click();
         }, this);
+
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, e => {
             const object = this.revObjects.get(e.target);
             object.mouseOver();
         }, this);
+
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_OUT, e => {
             const object = this.revObjects.get(e.target);
             object.mouseOff();
@@ -647,7 +654,27 @@ class SceneManager {
 
         // Remove the URL from usage
         URL.revokeObjectURL(blobUrl)
+
+        try {
+            const response = fetch('http://localhost:9000/Factory_Floors', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ sceneData: jsonString })
+            });
+            console.log(jsonString);
+    
+            if (response.ok) {
+                console.log('Scene saved successfully to server.');
+            } else {
+                console.error('Failed to save scene to server.');
+            }
+        } catch (error) {
+            console.error('Error saving scene to server:', error);
+        }
     }
+    
 
     /**
      * Load scene information from JSON
