@@ -13,7 +13,7 @@
 </script>
 
 <template>
-  <FileSelect :mgr="mgr"/>
+  <FileSelect :mgr="mgr" v-if="startMenuOn"/>
   <canvas id="canvas" ref="canvas" @mousedown="mgr.startDrag" @mouseleave="mgr.stopDrag" @mouseup="mgr.stopDrag"></canvas>
   <object-info :mgr="mgr"/>
   <div v-if="editOn">
@@ -44,7 +44,8 @@
 
     data () {
       return{
-        editOn: true
+        editOn: true,
+        startMenuOn: false
       }
     },
     
@@ -52,11 +53,16 @@
       switchView() {
           this.editOn = !(this.editOn);
           console.log("switch", this.editOn);
+      },
+
+      showStartMenu() {
+        this.startMenuOn = false;
       }
     },
 
     created() {
       this.mgr.events.on('switch view', this.switchView);
+      this.mgr.events.on('open project', this.showStartMenu);
     }
   }
 </script> 

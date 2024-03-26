@@ -7,12 +7,11 @@
       </div>
       <div class="panel" id="right-panel">
         <h2>New</h2>
-        <input class="file-name-input" type="text" placeholder="Name..."
-          onDrop="dropHandler(event)"/>
-        <div id="file-drop">
+        <input class="file-name-input" type="text" placeholder="Name..."/>
+        <div id="file-drop" @dragover.prevent @drop.prevent @drop="dropHandler" @dragover="dragOverHandler">
           <p class="center">Click here or drag an drop a factory JSON file to upload</p>
         </div>
-        <button id="create-button">Create</button>
+        <button id="create-button" @click="displayProject">Create</button>
       </div>
     </div>
 </template>
@@ -115,24 +114,27 @@ export default{
 
         [...ev.dataTransfer.items].forEach((item, i) => {
 
-          if(item.kind === file) {  
+          console.log(item.kind);
+          if(item.kind == 'file') {  
             let file = item.getAsFile();
+            console.log(file);
           }
 
         });
       }
+    },
+
+    dragOverHandler(ev) {
+        console.log("over");
+    },
+
+    displayProject() {
+      this.mgr.events.do('open project');
     }
   },
 
   created() {
-    this.mgr.events.on("alert", (desc, id) => {
-      this.description = desc;
-      this.objectID = id;
 
-      this.visible = true;
-    });
-
-    this.description = this.desc;
   }
 }
 </script>

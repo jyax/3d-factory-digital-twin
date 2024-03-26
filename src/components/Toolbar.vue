@@ -76,12 +76,14 @@
           </div>
         <button id="add-point" @click="AddPoint()">Add Point</button>
         </div>
-        <!-- <div class="row">
-          <p>Width</p>
-          <input class="input-vector-comp c-z" v-model="width" type="text" placeholder="z"
-                @input="doZ" v-on:keyup.enter="blurInput" style="margin-right: 0;" :disabled="!enableUpdate">
-        </div> -->
-          <button id="draw-line-button" @click="line.drawLine(lineIndex); CloseLineMenu()">Draw Line</button>
+        <div class="row">
+          <div class="col">
+            <p id="width-p">Width</p>
+            <input class="width-input" v-model="width" type="text" placeholder=1
+                  @input="doZ" v-on:keyup.enter="blurInput" style="margin-right: 0;">
+          </div>
+          <button id="draw-line-button" @click="line.drawLine(mgr, width); CloseLineMenu()">Draw Line</button>
+        </div>
 
   </div>
 </template>
@@ -284,6 +286,12 @@
   padding: 1%;
 }
 
+.col {
+  display: flex;
+  flex-direction: column;
+  /* padding: 1%; */
+}
+
 p{
   vertical-align: baseline;
   font-size: 20px;
@@ -292,7 +300,19 @@ p{
 #line-title {
   margin-top: 5px;
   margin-bottom: 0px;
-  font-size: 20px;
+  font-size: 2
+  0px;
+}
+
+#width-p {
+  margin-left:0px;
+  margin-right: 0px;
+  width: 40%;
+}
+
+.width-input {
+  width: 40%;
+  text-align: center;
 }
 
 </style>
@@ -318,6 +338,7 @@ p{
         isLineMenuVisible: false,
         pointIndex: 0,
         lineIndex: 0,
+        width: 1,
 
         line: undefined
       }
@@ -326,7 +347,7 @@ p{
     methods : {
       OpenLineWindow(){
         this.isLineMenuVisible = true;
-        this.line = new Line(this.mgr.view);
+        this.line = this.mgr.createLine();
         this.lineIndex++;
       }, 
 
@@ -341,7 +362,7 @@ p{
       AddPoint(){
         this.line.addPoint(new Vector3(0,0,0));
         console.log(this.line.pointMap);
-        pointIndex++;
+        this.pointIndex++;
       }
     },
 

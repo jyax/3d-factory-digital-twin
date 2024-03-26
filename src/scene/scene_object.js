@@ -202,6 +202,7 @@ class SceneObject {
      * @returns {boolean} Whether object is selected
      */
     isSelected() {
+        console.log(this._manager);
         return this._manager.isSelected(this);
     }
 

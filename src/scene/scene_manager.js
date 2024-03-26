@@ -14,10 +14,13 @@ import {
     SolidColorSky,
     Vector3,
     View3D,
+    BoxGeometry,
     FlyCameraController,
     AtmosphericComponent,
     KeyEvent,
-    KeyCode
+    KeyCode,
+    Ray,
+    Graphic3D
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
@@ -220,10 +223,10 @@ class SceneManager {
 
         await Promise.all(promises);
 
-        this.createNewObject({
-            pos: new Vector3(),
-            select: false
-        });
+        // this.createNewObject({
+        //     pos: new Vector3(),
+        //     select: false
+        // });
         this.view.camera = this.cam;
 
 
@@ -233,8 +236,43 @@ class SceneManager {
             this.models.set(id, model);
         }
 
-        this.createNewObject(new Vector3(), false);
+        // this.createNewObject(new Vector3(), false);
 
+        // let obj = this.createNewObject(new Vector3(0,0,0));
+
+        // // obj.setPos(new Vector3(0,0,0));
+        
+        let obj2 = this.createNewObject(new Vector3(11,0,0));
+        obj2.setPos(new Vector3(11,0,0));
+        
+        let obj3 = this.createNewObject(new Vector3(11,0,0));
+        obj3.setPos(new Vector3(11,0,-11));
+        
+        // let startPoint = new Vector3(10,0,0);
+        // let endPoint = new Vector3(10,0,-10);
+        // console.log(endPoint);
+        // console.log(startPoint);
+        // console.log((endPoint.z - startPoint.z));
+        // console.log((endPoint.x - startPoint.x));
+        // obj._object.rotationY = -(Math.atan( (endPoint.z - startPoint.z) / (endPoint.x - startPoint.x)) * (180/Math.PI));
+        // obj._object.scaleX = Vector3.distance(startPoint, endPoint);
+        // obj._object.scaleY = 0;
+        // obj._object.scaleZ = 2;
+        // let originPoint = new Vector3(0,0,0);
+        // originPoint.x += (startPoint.x + endPoint.x) / 2;
+        // originPoint.y += (startPoint.y + endPoint.y) / 2;
+        // originPoint.z += (startPoint.z + endPoint.z) / 2
+        // obj.setPos(originPoint);
+        // console.log(endPoint);
+        // console.log(startPoint);
+        // console.log((endPoint.z - startPoint.z));
+        // console.log((endPoint.x - startPoint.x));
+        // console.log(-10 / 0);
+
+        // console.log(obj);
+        // console.log("position: ", obj._object.localPosition);
+        // console.log("rotation: ", obj._object.localRotation);
+        // console.log("scale: ", obj._object.scaleX, obj._object.scaleY, obj._object.scaleZ);
         /**
          * Event listener for File Input
          */
@@ -545,22 +583,29 @@ class SceneManager {
         pos = null,
         select = true,
         model = ""
-    } = {}) {
+        } = {}) {
         if (pos === null)
             pos = this.getMouseForward().mul(8).add(this.camera.transform.worldPosition);
-
         const object = new SceneObject.SceneObject({
             manager: this,
             pos: pos,
             model: model
         });
-
         this.addObject(object);
 
         if (select)
             object.select();
 
         return object;
+    }
+
+    /** 
+     * Creates new Line object
+     * @param {SceneManager} manager Parent scene manager
+     * @param {[Vector3]} points List of points in the line
+    */
+    createLine(points=[]) {
+        return new Line({manager: this, points: points});
     }
 
     /**
