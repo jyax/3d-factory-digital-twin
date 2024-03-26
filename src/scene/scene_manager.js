@@ -57,7 +57,7 @@ class SceneManager {
         "tank": "./src/assets/glb_models/UN-COMPLIANT IBC TANK.glb",
         "boiler": "./src/assets/glb_models/downloadsGLB/boiler_from_the_puffer_vic_32 (1).glb",
         "roboticArm": "./src/assets/glb_models/downloadsGLB/black_honey_-_robotic_arm (1).glb",
-        "testfactory": "./src/assets/glb_models/downloadsGLB/testfactory1.glb"
+        "testfactory": "./src/assets/glb_models/testfactory1.glb"
     };
 
     /**
@@ -185,12 +185,12 @@ class SceneManager {
         // this._cameraController.moveSpeed = 30;
 
         this._cameraController.smooth = 0;
-        this._cameraController.panFactor = 0.01;
+        this._cameraController.panFactor = 1;
         this._cameraController.wheelStep = 0.01;
 
         camObj.localPosition = new Vector3(0, 0, 4);
 
-        this.cam.perspective(60, c.width / c.height, 0.1, 5000);
+        this.cam.perspective(60, c.width / c.height, 10, 50000);
 
         this.scene.addChild(camObj);
 
@@ -234,7 +234,10 @@ class SceneManager {
             this.models.set(id, model);
         }
 
-        this.createNewObject(new Vector3(), false,"testfactory");
+        // this.createNewObject(new Vector3(), false);
+        this.createNewObject({select:false,model:"testfactory",pos: new Vector3()})
+        
+
         
 
         /**
