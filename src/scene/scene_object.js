@@ -1,6 +1,5 @@
 import {
     BoundingBox,
-    BoxColliderShape,
     BoxGeometry,
     ColliderComponent,
     Color,
@@ -10,9 +9,8 @@ import {
     Vector3
 } from "@orillusion/core";
 import EventHandler from "../event/event_handler.js";
-import ColorGradient from "../color/color_gradient.js";
 import { createStore } from 'vuex';
-import keyboardScript from "./keyboardScript.js";
+import KeyboardScript from "./keyboard_script.js";
 
 //
 // Login/Logout Functionality
@@ -162,7 +160,23 @@ class SceneObject {
      * @returns {Vector3} Position/translation vector
      */
     get pos() {
-        return this._object.localPosition;
+        return this._object.localPosition.clone();
+    }
+
+    /**
+     * Get the rotation of the object.
+     * @returns {Vector3} Rotation vector
+     */
+    get rot() {
+        return this._object.transform.localRotation.clone();
+    }
+
+    /**
+     * Get the scale of the object.
+     * @returns {Vector3} Scale vector
+     */
+    get scale() {
+        return this._object.transform.localScale.clone();
     }
 
     /**
@@ -283,7 +297,7 @@ class SceneObject {
         if (this.isSelected())
             this.mgr.updateSelectBox();
 
-        this.events.do("pos", this.pos);
+        this.events.do("pos", this.pos.clone());
     }
 
     /**
@@ -340,7 +354,7 @@ class SceneObject {
         if (this.isSelected())
             this.mgr.updateSelectBox();
 
-        this.events.do("rot", rot.clone());
+        this.events.do("rot", newRot.clone());
     }
 
     set scale(newScale) {
@@ -349,7 +363,7 @@ class SceneObject {
         if (this.isSelected())
             this.mgr.updateSelectBox();
 
-        this.events.do("scale", scale);
+        this.events.do("scale", newScale);
     }
 
     /**
@@ -376,8 +390,9 @@ class SceneObject {
 
         this.modelID = id;
 
-        const ks = this._object.addComponent(keyboardScript);
+        const ks = this._object.addComponent(KeyboardScript);
         ks.mgr = this.mgr;
+        ks.object = this;
 
         this._object.forChild(child => {
             child.addComponent(ColliderComponent);

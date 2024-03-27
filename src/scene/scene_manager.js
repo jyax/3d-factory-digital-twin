@@ -27,8 +27,7 @@ import EventHandler from "../event/event_handler.js";
 import Util from "../util/util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
 import Line from "./line.js";
-import keyboardScript from "./keyboardScript.js";
-import KeyboardScript from "./keyboard_component.js";
+import KeyboardScript from "./keyboard_script.js";
 import DragComponent from "./drag_component.js";
 import SubscriberSingleValue from "./subscriber_single_value.js";
 
@@ -751,9 +750,12 @@ class SceneManager {
         }
 
         this.events.do("select", Array.from(this._selected.values()));
-        // console.log(object);
-        const ks = object.getObject3D().addComponent(keyboardScript);
-        ks.mgr = this;
+
+        if (!object.getObject3D().hasComponent(KeyboardScript)) {
+            const ks = object.getObject3D().addComponent(KeyboardScript);
+            ks.mgr = this;
+            ks.object = object;
+        }
 
         this.updateSelectBox();
     }

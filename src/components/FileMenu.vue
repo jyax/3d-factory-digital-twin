@@ -117,6 +117,9 @@ import AssetListing from "./AssetListing.vue";
 
   font-size: 16px;
   text-align: left;
+
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .input:hover, .input:focus {
