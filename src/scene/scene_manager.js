@@ -30,6 +30,7 @@ import Line from "./line.js";
 import keyboardScript from "./keyboardScript.js";
 import KeyboardScript from "./keyboard_component.js";
 import DragComponent from "./drag_component.js";
+import SubscriberSingleValue from "./subscriber_single_value.js";
 
 /**
  * @module SceneManager
@@ -275,8 +276,9 @@ class SceneManager {
         // })
 
         document.addEventListener("keydown", (event) => {
-            if (Util.inputFocused())
+            if (Util.inputFocused()) {
                 return;
+            }
 
             this._pressedKeys.add(event.key.toLowerCase());
 
@@ -334,10 +336,12 @@ class SceneManager {
                     break;
                 }
                 case "s": {
-                    if (event.ctrlKey) {
-                        event.preventDefault()
-                        this.saveScene()
+                    if (!event.ctrlKey) {
+                        break;
                     }
+                    event.preventDefault()
+                    this.saveScene()
+
                     break
                 }
 
@@ -385,6 +389,7 @@ class SceneManager {
 
                 case "Control": {
                     this._ctrlPressed = false;
+                    console.log("ctrl let go")
                     break;
                 }
             }
@@ -655,21 +660,36 @@ class SceneManager {
     /**
      * Load scene information from JSON
      */
-    LoadScene(sceneFile) {
+    loadScene(sceneData) {
+        console.log("Data imported to scene: ", sceneData)
         this.clearObjects()
-        for (const objectInfo in sceneFile) {
-            const object = new SceneObject.SceneObject({
+        for (let object of sceneData) {
+            const sceneObj = new SceneObject.SceneObject({
                 manager: this,
-                pos: new Vector3(objectInfo.pos.x,
-                                objectInfo.pos.y,
-                                objectInfo.pos.z),
-                id: objectInfo.id,
-                name: objectInfo.name,
-                model: objectInfo.modelID,
-                locked: objectInfo.locked
-            })
+                id: object.objInfo.id,
+                model: object.objInfo.model,
+                locked: object.objInfo.locked,
+                //transformers: object.subscribers.transformers
+            });
 
-            this.addObject(object)
+            sceneObj.pos = new Vector3(object.objInfo.pos.x, object.objInfo.pos.y, object.objInfo.pos.z);
+            sceneObj.rot = new Vector3(object.objInfo.rot.x, object.objInfo.rot.y, object.objInfo.rot.z);
+            sceneObj.scale = new Vector3(object.objInfo.scale.x, object.objInfo.scale.y, object.objInfo.scale.z);
+
+            for (let subType in object.subscribers.singleValue) {
+                const subInfo = object.subscribers.singleValue[subType];
+                const subscriber = new SubscriberSingleValue(
+                    sceneObj,
+                    subType,
+                    subInfo.min,
+                    subInfo.max,
+                    subInfo.gradient
+                );
+
+                sceneObj.addSubscriber(subscriber);
+            }
+
+            this.addObject(sceneObj);
         }
     }
 

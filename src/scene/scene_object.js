@@ -78,7 +78,6 @@ class SceneObject {
         manager,
         pos = new Vector3(),
         id = "",
-        name = "",
         model: modelID = "",
         locked = false
     } = {}) {
@@ -88,7 +87,7 @@ class SceneObject {
         if (this._id !== "")
             this.mgr.ids.set(this._id, this);
 
-        this.name = name;
+        this._pos = pos;
 
         this._locked = locked;
 
@@ -230,8 +229,8 @@ class SceneObject {
             matrix.position = new Vector3();
             bb = Util.transformBoundingBox(bb, matrix);
             bb.setFromMinMax(
-                bb.min.add(this.pos),
-                bb.max.add(this.pos)
+                bb.min.add(this._pos),
+                bb.max.add(this._pos)
             );
         } else {
             bb = new BoundingBox();
@@ -276,10 +275,11 @@ class SceneObject {
 
     /**
      * Set the local position.
-     * @param {Vector3} pos New local position
+     * @param {Vector3} newPos New local position
      */
-    setPos(pos) {
-        this._object.localPosition = pos;
+    set pos(newPos) {
+        this._object.localPosition = newPos;
+        this._pos = newPos;
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
@@ -289,7 +289,7 @@ class SceneObject {
      * Set the x component of the local position.
      * @param {number} x New position along x-axis
      */
-    setX(x) {
+    set X(x) {
         if (isNaN(x))
             return;
 
@@ -303,7 +303,7 @@ class SceneObject {
      * Set the y component of the local position.
      * @param {number} y New position along y-axis
      */
-    setY(y) {
+    set Y(y) {
         if (isNaN(y))
             return;
 
@@ -317,7 +317,7 @@ class SceneObject {
      * Set the z component of the local position.
      * @param {number} z New position along z-axis
      */
-    setZ(z) {
+    set Z(z) {
         if (isNaN(z))
             return;
 
@@ -327,15 +327,15 @@ class SceneObject {
             this.mgr.updateSelectBox();
     }
 
-    setRot(rot) {
-        this._object.transform.localRotation = rot.clone();
+    set rot(newRot) {
+        this._object.transform.localRotation = newRot.clone();
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
     }
 
-    setScale(scale) {
-        this._object.transform.localScale = scale.clone();
+    set scale(newScale) {
+        this._object.transform.localScale = newScale.clone();
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
@@ -533,8 +533,8 @@ class SceneObject {
             subscriber.handleData(data);
     }
 
-    addSubscriber(type) {
-        return this._subscribers.push(new type(this));
+    addSubscriber(sub) {
+        this._subscribers.push(sub);
     }
 
     removeSubscriber(subscriber) {
@@ -556,7 +556,7 @@ class SceneObject {
         this._subscribers.forEach(sub => {
             if (sub instanceof SubscriberSingleValue)
             {
-                let type = sub.type || 'default'
+                let type = sub.id || 'default'
                 singleValSubs[type] = sub.serialize()
             }
         })
@@ -571,9 +571,9 @@ class SceneObject {
                     z: this._object.z
                 },
                 rot: {
-                    xDeg: this._object.transform.localRotation.x,
-                    yDeg: this._object.transform.localRotation.y,
-                    zDeg: this._object.transform.localRotation.z
+                    x: this._object.transform.localRotation.x,
+                    y: this._object.transform.localRotation.y,
+                    z: this._object.transform.localRotation.z
                 },
                 scale: {
                     x: this._object.transform.localScale.x,
