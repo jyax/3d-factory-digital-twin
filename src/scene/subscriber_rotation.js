@@ -3,7 +3,7 @@ import {Vector3} from "@orillusion/core";
 
 class SubscriberRotation extends Subscriber {
     constructor(object) {
-        super(object);
+        super(object, "rotation");
     }
 
     handleData(data) {
@@ -17,11 +17,11 @@ class SubscriberRotation extends Subscriber {
             !("rotationZ" in data))
             return;
 
-        this.object.setPos(new Vector3(
+        this.object.pos = new Vector3(
             parseFloat(data["rotationX"]),
             parseFloat(data["rotationY"]),
             parseFloat(data["rotationZ"])
-        ));
+        );
     }
 
     getDisplayName() {

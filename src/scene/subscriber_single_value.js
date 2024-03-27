@@ -3,13 +3,11 @@ import ColorGradient from "../color/color_gradient.js";
 
 class SubscriberSingleValue extends Subscriber {
     constructor(object, id = "", min = 0, max = 0, gradient = new ColorGradient()) {
-        super(object);
+        super(object, id);
 
         this.gradient = new ColorGradient();
         this.min = 0;
         this.max = 0;
-
-        this.id = id;
     }
 
     handleData(data) {

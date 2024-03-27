@@ -276,9 +276,8 @@ class SceneManager {
         // })
 
         document.addEventListener("keydown", (event) => {
-            if (Util.inputFocused()) {
+            if (Util.inputFocused())
                 return;
-            }
 
             this._pressedKeys.add(event.key.toLowerCase());
 
@@ -342,7 +341,7 @@ class SceneManager {
                     event.preventDefault()
                     this.saveScene()
 
-                    break
+                    break;
                 }
 
                 case "Tab": {
@@ -389,7 +388,6 @@ class SceneManager {
 
                 case "Control": {
                     this._ctrlPressed = false;
-                    console.log("ctrl let go")
                     break;
                 }
             }
@@ -470,6 +468,10 @@ class SceneManager {
     getMouseForward() {
         const input = Engine3D.inputSystem;
         return this.cam.screenPointToRay(input.mouseX, input.mouseY).direction;
+    }
+
+    getModelIDs() {
+        return Array.from(this.models.keys());
     }
 
 
@@ -571,14 +573,16 @@ class SceneManager {
         pos = null,
         select = true,
         model = ""
-        } = {}) {
+    } = {}) {
         if (pos === null)
             pos = this.getMouseForward().mul(8).add(this.camera.transform.worldPosition);
+
         const object = new SceneObject.SceneObject({
             manager: this,
             pos: pos,
             model: model
         });
+
         this.addObject(object);
 
         if (select)
@@ -691,6 +695,13 @@ class SceneManager {
 
             this.addObject(sceneObj);
         }
+    }
+
+    async loadModel(id, file) {
+        const model = await Engine3D.res.loadGltf(file);
+        this.models.set(id, model);
+
+        this.events.do("load_model", 1);
     }
 
     // -------------------
@@ -929,6 +940,7 @@ class SceneManager {
 
         return bb;
     }
+
     _onOver(e) {
         console.log('onOver: Name-', this.revObjects);
         // console.log('onOver: Parent-', e.target.parent.object3D.name, e.data.pickInfo);

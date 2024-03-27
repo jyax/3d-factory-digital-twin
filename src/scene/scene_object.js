@@ -203,7 +203,6 @@ class SceneObject {
      * @returns {boolean} Whether object is selected
      */
     isSelected() {
-        console.log(this._manager);
         return this._manager.isSelected(this);
     }
 
@@ -283,6 +282,8 @@ class SceneObject {
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
+
+        this.events.do("pos", this.pos);
     }
 
     /**
@@ -297,6 +298,8 @@ class SceneObject {
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
+
+        this.events.do("pos", this.pos);
     }
 
     /**
@@ -311,6 +314,8 @@ class SceneObject {
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
+
+        this.events.do("pos", this.pos);
     }
 
     /**
@@ -325,6 +330,8 @@ class SceneObject {
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
+
+        this.events.do("pos", this.pos);
     }
 
     set rot(newRot) {
@@ -332,6 +339,8 @@ class SceneObject {
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
+
+        this.events.do("rot", rot.clone());
     }
 
     set scale(newScale) {
@@ -339,6 +348,8 @@ class SceneObject {
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
+
+        this.events.do("scale", scale);
     }
 
     /**
