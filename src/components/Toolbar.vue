@@ -303,8 +303,7 @@ p{
 #line-title {
   margin-top: 5px;
   margin-bottom: 0px;
-  font-size: 2
-  0px;
+  font-size: 20px;
 }
 
 #width-p {
