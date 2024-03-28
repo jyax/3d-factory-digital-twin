@@ -15,7 +15,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 .listing {
   display: flex;
   flex-direction: row;

@@ -79,7 +79,7 @@ class DragComponent extends ComponentBase {
     _moveSelected(center, pos) {
         for (const object of this.mgr.getSelected()) {
             const diff = object.pos.subtract(center);
-            object.setPos(pos.add(diff));
+            object.pos = pos.add(diff);
         }
 
         this.mgr.updateSelectBox();

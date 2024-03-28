@@ -21,7 +21,7 @@ import ObjectInfoPosition from "../ObjectInfoPosition.vue";
     <object-info-position :object="object"/>
     <object-info-rotation :object="object"/>
 
-    <object-info-input label="Scale" placeholder="1" :on-change="val => setScale(val)"
+    <object-info-input label="Scale" placeholder="1" :default="scale" :key="scale" :on-change="val => setScale(val)"
                        style="margin-top: 16px;"/>
 
   </div>
@@ -106,6 +106,12 @@ export default {
     }
   },
 
+  data() {
+    return {
+      scale: 1
+    }
+  },
+
   methods: {
     setScale(val) {
       let scale = 1;
@@ -114,6 +120,10 @@ export default {
 
       this.object.getObject3D().transform.localScale = new Vector3(scale, scale, scale);
     }
+  },
+
+  created() {
+    this.scale = this.object.scale.x;
   }
 };
 

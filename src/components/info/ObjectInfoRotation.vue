@@ -115,15 +115,24 @@ export default {
 
     blurInput(e) {
       e.target.blur();
+    },
+
+    update() {
+      this.xVal = Math.floor(this.rot.x * 100) / 100;
+      this.yVal = Math.floor(this.rot.y * 100) / 100;
+      this.zVal = Math.floor(this.rot.z * 100) / 100;
     }
   },
 
   created() {
     this.rot = this.object.getObject3D().localRotation;
 
-    this.xVal = Math.floor(this.rot.x * 100) / 100;
-    this.yVal = Math.floor(this.rot.y * 100) / 100;
-    this.zVal = Math.floor(this.rot.z * 100) / 100;
+    this.update();
+
+    this.object.events.on("rot", rot => {
+      this.rot = rot.clone();
+      this.update();
+    });
   }
 }
 </script>

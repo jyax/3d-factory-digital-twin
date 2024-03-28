@@ -14,19 +14,22 @@ import {
     SolidColorSky,
     Vector3,
     View3D,
+    BoxGeometry,
     FlyCameraController,
     AtmosphericComponent,
     KeyEvent,
-    KeyCode
+    KeyCode,
+    Ray,
+    Graphic3D
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
 import Util from "../util/util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
 import Line from "./line.js";
-import keyboardScript from "./keyboardScript.js";
-import KeyboardScript from "./keyboard_component.js";
+import KeyboardScript from "./keyboard_script.js";
 import DragComponent from "./drag_component.js";
+import SubscriberSingleValue from "./subscriber_single_value.js";
 
 /**
  * @module SceneManager
@@ -47,6 +50,7 @@ class SceneManager {
         "wall": "/glb_models/Slatwall_Bin_5.5in.glb",
         "floor": "./src/assets/glb_models/factory_floor_sample_1.glb",
         "workstation1": "/glb_models/workstation.glb",
+        "workstation1_whole": "/glb_models/workstation_whole.glb",
         "workstation2": "/glb_models/Station 10x Layout v31.glb",
         "lathe": "./src/assets/glb_models/downloadsGLB/desk_lathe.glb",
         "ladder": "./src/assets/glb_models/downloadsGLB/escada_movel_-_moving_ladder.glb",
@@ -58,6 +62,10 @@ class SceneManager {
         "boiler": "./src/assets/glb_models/downloadsGLB/boiler_from_the_puffer_vic_32 (1).glb",
         "roboticArm": "./src/assets/glb_models/downloadsGLB/black_honey_-_robotic_arm (1).glb",
         "testfactory": "./src/assets/glb_models/testfactory1.glb"
+
+        // Hidden models for editor use only
+
+        ".translation-handle": "/glb_models/translation_handle.glb"
     };
 
     /**
@@ -65,8 +73,8 @@ class SceneManager {
      * @param {Color} skyColor Color of sky (optional)
      */
     constructor({
-                    skyColor = new Color(200, 200, 200)
-                } = {}) {
+        skyColor = new Color(200, 200, 200)
+    } = {}) {
         this._skyColor = skyColor;
 
         this.sky = null;
@@ -221,10 +229,10 @@ class SceneManager {
 
         await Promise.all(promises);
 
-        this.createNewObject({
-            pos: new Vector3(),
-            select: false
-        });
+        // this.createNewObject({
+        //     pos: new Vector3(),
+        //     select: false
+        // });
         this.view.camera = this.cam;
 
 
@@ -320,11 +328,13 @@ class SceneManager {
                     break;
                 }
                 case "s": {
-                    if (event.ctrlKey) {
-                        event.preventDefault()
-                        this.saveScene()
+                    if (!event.ctrlKey) {
+                        break;
                     }
-                    break
+                    event.preventDefault()
+                    this.saveScene()
+
+                    break;
                 }
 
                 case "Tab": {
@@ -385,10 +395,12 @@ class SceneManager {
             const object = this.revObjects.get(e.target);
             object.click();
         }, this);
+
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, e => {
             const object = this.revObjects.get(e.target);
             object.mouseOver();
         }, this);
+
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_OUT, e => {
             const object = this.revObjects.get(e.target);
             object.mouseOff();
@@ -449,6 +461,10 @@ class SceneManager {
     getMouseForward() {
         const input = Engine3D.inputSystem;
         return this.cam.screenPointToRay(input.mouseX, input.mouseY).direction;
+    }
+
+    getModelIDs() {
+        return Array.from(this.models.keys());
     }
 
 
@@ -568,6 +584,15 @@ class SceneManager {
         return object;
     }
 
+    /** 
+     * Creates new Line object
+     * @param {SceneManager} manager Parent scene manager
+     * @param {[Vector3]} points List of points in the line
+    */
+    createLine(points=[]) {
+        return new Line({manager: this, points: points});
+    }
+
     /**
      * Add an object to the scene.
      * @param {SceneObject} object Object to add
@@ -607,27 +632,69 @@ class SceneManager {
 
         // Remove the URL from usage
         URL.revokeObjectURL(blobUrl)
+
+        try {
+            const response = fetch('http://localhost:9000/Factory_Floors', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ sceneData: jsonString })
+            });
+            console.log(jsonString);
+    
+            if (response.ok) {
+                console.log('Scene saved successfully to server.');
+            } else {
+                console.error('Failed to save scene to server.');
+            }
+        } catch (error) {
+            console.error('Error saving scene to server:', error);
+        }
     }
+    
 
     /**
      * Load scene information from JSON
      */
-    LoadScene(sceneFile) {
+    loadScene(sceneData) {
+        console.log("Data imported to scene: ", sceneData)
         this.clearObjects()
-        for (const objectInfo in sceneFile) {
-            const object = new SceneObject.SceneObject({
+        for (let object of sceneData) {
+            const sceneObj = new SceneObject.SceneObject({
                 manager: this,
-                pos: new Vector3(objectInfo.pos.x,
-                                objectInfo.pos.y,
-                                objectInfo.pos.z),
-                id: objectInfo.id,
-                name: objectInfo.name,
-                model: objectInfo.modelID,
-                locked: objectInfo.locked
-            })
+                id: object.objInfo.id,
+                model: object.objInfo.model,
+                locked: object.objInfo.locked,
+                //transformers: object.subscribers.transformers
+            });
 
-            this.addObject(object)
+            sceneObj.pos = new Vector3(object.objInfo.pos.x, object.objInfo.pos.y, object.objInfo.pos.z);
+            sceneObj.rot = new Vector3(object.objInfo.rot.x, object.objInfo.rot.y, object.objInfo.rot.z);
+            sceneObj.scale = new Vector3(object.objInfo.scale.x, object.objInfo.scale.y, object.objInfo.scale.z);
+
+            for (let subType in object.subscribers.singleValue) {
+                const subInfo = object.subscribers.singleValue[subType];
+                const subscriber = new SubscriberSingleValue(
+                    sceneObj,
+                    subType,
+                    subInfo.min,
+                    subInfo.max,
+                    subInfo.gradient
+                );
+
+                sceneObj.addSubscriber(subscriber);
+            }
+
+            this.addObject(sceneObj);
         }
+    }
+
+    async loadModel(id, file) {
+        const model = await Engine3D.res.loadGltf(file);
+        this.models.set(id, model);
+
+        this.events.do("load_model", 1);
     }
 
     // -------------------
@@ -677,9 +744,12 @@ class SceneManager {
         }
 
         this.events.do("select", Array.from(this._selected.values()));
-        // console.log(object);
-        const ks = object.getObject3D().addComponent(keyboardScript);
-        ks.mgr = this;
+
+        if (!object.getObject3D().hasComponent(KeyboardScript)) {
+            const ks = object.getObject3D().addComponent(KeyboardScript);
+            ks.mgr = this;
+            ks.object = object;
+        }
 
         this.updateSelectBox();
     }
@@ -866,6 +936,7 @@ class SceneManager {
 
         return bb;
     }
+
     _onOver(e) {
         console.log('onOver: Name-', this.revObjects);
         // console.log('onOver: Parent-', e.target.parent.object3D.name, e.data.pickInfo);

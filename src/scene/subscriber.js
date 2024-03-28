@@ -1,8 +1,10 @@
 import EventHandler from "../event/event_handler.js";
 
 class Subscriber {
-    constructor(object) {
+    constructor(object, type = "") {
         this.object = object;
+
+        this.type = type;
 
         this._lastReceived = null;
 

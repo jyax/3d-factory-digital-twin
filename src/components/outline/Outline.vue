@@ -148,7 +148,8 @@
 
 .empty {
   color: rgba(255, 255, 255, 0.6);
-  margin-top: 4px;
+  margin-top: 8px;
+  margin-bottom: 20px;
 }
 
 </style>

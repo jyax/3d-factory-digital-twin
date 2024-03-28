@@ -2,15 +2,12 @@ import Subscriber from "./subscriber.js";
 import ColorGradient from "../color/color_gradient.js";
 
 class SubscriberSingleValue extends Subscriber {
-    constructor(object, id = "") {
-        super(object);
+    constructor(object, id = "", min = 0, max = 0, gradient = new ColorGradient()) {
+        super(object, id);
 
         this.gradient = new ColorGradient();
-
         this.min = 0;
         this.max = 0;
-
-        this.id = id;
     }
 
     handleData(data) {
@@ -39,6 +36,14 @@ class SubscriberSingleValue extends Subscriber {
 
     getDisplayName() {
         return "Single value";
+    }
+
+    serialize() {
+        return {
+            min: this.min,
+            max: this.max,
+            gradient: this.gradient
+        }
     }
 }
 

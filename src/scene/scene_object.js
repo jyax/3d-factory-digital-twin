@@ -1,18 +1,16 @@
 import {
-  BoundingBox,
-  BoxColliderShape,
-  BoxGeometry,
-  ColliderComponent,
-  Color,
-  LitMaterial,
-  MeshRenderer,
-  Object3D,
-  Vector3,
+    BoundingBox,
+    BoxGeometry,
+    ColliderComponent,
+    Color,
+    LitMaterial,
+    MeshRenderer,
+    Object3D,
+    Vector3
 } from "@orillusion/core";
 import EventHandler from "../event/event_handler.js";
-import ColorGradient from "../color/color_gradient.js";
 import { createStore } from 'vuex';
-import keyboardScript from "./keyboardScript.js";
+import KeyboardScript from "./keyboard_script.js";
 
 //
 // Login/Logout Functionality
@@ -37,7 +35,9 @@ const store = createStore({
 });
 import SubscriberPosition from "./subscriber_position.js";
 import SubscriberRotation from "./subscriber_rotation.js";
+import SubscriberSingleValue from "./subscriber_single_value.js";
 import Util from "../util/util.js";
+import subscriber from "./subscriber.js";
 
 /**
  * @module SceneObject
@@ -63,29 +63,28 @@ class SceneObject {
     return object;
   }
 
-  /**
-   * Create a new scene object.
-   * @param {SceneManager} manager Parent scene manager
-   * @param {Vector3} pos Initial position (optional)
-   * @param {string} id Global ID (optional)
-   * @param {string} name Name of object (optional)
-   * @param {string} modelID ID of model/mesh to use (optional)
-   * @param {boolean} locked Whether user edits of the objects should be prevented
-   */
-  constructor({
-    manager,
-    pos = new Vector3(),
-    id = "",
-    name = "",
-    model: modelID = "",
-    locked = false,
-  } = {}) {
-    this._manager = manager;
+    /**
+     * Create a new scene object.
+     * @param {SceneManager} manager Parent scene manager
+     * @param {Vector3} pos Initial position (optional)
+     * @param {string} id Global ID (optional)
+     * @param {string} name Name of object (optional)
+     * @param {string} modelID ID of model/mesh to use (optional)
+     * @param {boolean} locked Whether user edits of the objects should be prevented
+     */
+    constructor({
+        manager,
+        pos = new Vector3(),
+        id = "",
+        model: modelID = "",
+        locked = false
+    } = {}) {
+        this._manager = manager;
 
     this._id = id;
     if (this._id !== "") this.mgr.ids.set(this._id, this);
 
-    this.name = name;
+        this._pos = pos;
 
     this._locked = locked;
 
@@ -159,7 +158,23 @@ class SceneObject {
      * @returns {Vector3} Position/translation vector
      */
     get pos() {
-        return this._object.localPosition;
+        return this._object.localPosition.clone();
+    }
+
+    /**
+     * Get the rotation of the object.
+     * @returns {Vector3} Rotation vector
+     */
+    get rot() {
+        return this._object.transform.localRotation.clone();
+    }
+
+    /**
+     * Get the scale of the object.
+     * @returns {Vector3} Scale vector
+     */
+    get scale() {
+        return this._object.transform.localScale.clone();
     }
 
   /**
@@ -223,8 +238,8 @@ class SceneObject {
             matrix.position = new Vector3();
             bb = Util.transformBoundingBox(bb, matrix);
             bb.setFromMinMax(
-                bb.min.add(this.pos),
-                bb.max.add(this.pos)
+                bb.min.add(this._pos),
+                bb.max.add(this._pos)
             );
         } else {
             bb = new BoundingBox();
@@ -265,65 +280,84 @@ class SceneObject {
             this.mgr.deselect(this);
     }
 
-  /**
-   * Set the local position.
-   * @param {Vector3} pos New local position
-   */
-  setPos(pos) {
-    this._object.localPosition = pos;
+    /**
+     * Set the local position.
+     * @param {Vector3} newPos New local position
+     */
+    set pos(newPos) {
+        this._object.localPosition = newPos;
+        this._pos = newPos;
 
-    if (this.isSelected()) this.mgr.updateSelectBox();
-  }
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
 
-  /**
-   * Set the x component of the local position.
-   * @param {number} x New position along x-axis
-   */
-  setX(x) {
-    if (isNaN(x)) return;
+        this.events.do("pos", this.pos.clone());
+    }
+
+    /**
+     * Set the x component of the local position.
+     * @param {number} x New position along x-axis
+     */
+    set X(x) {
+        if (isNaN(x))
+            return;
 
     this._object.x = x;
 
-    if (this.isSelected()) this.mgr.updateSelectBox();
-  }
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
 
-  /**
-   * Set the y component of the local position.
-   * @param {number} y New position along y-axis
-   */
-  setY(y) {
-    if (isNaN(y)) return;
+        this.events.do("pos", this.pos);
+    }
+
+    /**
+     * Set the y component of the local position.
+     * @param {number} y New position along y-axis
+     */
+    set Y(y) {
+        if (isNaN(y))
+            return;
 
     this._object.y = y;
 
-    if (this.isSelected()) this.mgr.updateSelectBox();
-  }
+        if (this.isSelected())
+            this.mgr.updateSelectBox();
 
-  /**
-   * Set the z component of the local position.
-   * @param {number} z New position along z-axis
-   */
-  setZ(z) {
-    if (isNaN(z)) return;
+        this.events.do("pos", this.pos);
+    }
+
+    /**
+     * Set the z component of the local position.
+     * @param {number} z New position along z-axis
+     */
+    set Z(z) {
+        if (isNaN(z))
+            return;
 
     this._object.z = z;
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
+
+        this.events.do("pos", this.pos);
     }
 
-    setRot(rot) {
-        this._object.transform.localRotation = rot.clone();
+    set rot(newRot) {
+        this._object.transform.localRotation = newRot.clone();
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
+
+        this.events.do("rot", newRot.clone());
     }
 
-    setScale(scale) {
-        this._object.transform.localScale = scale.clone();
+    set scale(newScale) {
+        this._object.transform.localScale = newScale.clone();
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
+
+        this.events.do("scale", newScale);
     }
 
   /**
@@ -348,8 +382,9 @@ class SceneObject {
 
         this.modelID = id;
 
-        const ks = this._object.addComponent(keyboardScript);
+        const ks = this._object.addComponent(KeyboardScript);
         ks.mgr = this.mgr;
+        ks.object = this;
 
         this._object.forChild(child => {
             child.addComponent(ColliderComponent);
@@ -517,8 +552,8 @@ class SceneObject {
             subscriber.handleData(data);
     }
 
-    addSubscriber(type) {
-        return this._subscribers.push(new type(this));
+    addSubscriber(sub) {
+        this._subscribers.push(sub);
     }
 
     removeSubscriber(subscriber) {
@@ -536,18 +571,44 @@ class SceneObject {
      * @return {} Plain Object
      */
     serializeObject() {
+        let singleValSubs = {}
+        this._subscribers.forEach(sub => {
+            if (sub instanceof SubscriberSingleValue)
+            {
+                let type = sub.id || 'default'
+                singleValSubs[type] = sub.serialize()
+            }
+        })
         return {
-            id: this._id,
-            name: this.name,
-            modelID: this.modelID,
-            liveData: this.liveData,
-            pos: {
-                x: this._object.x,
-                y: this._object.y,
-                z: this._object.z
+            objInfo: {
+                id: this._id,
+                model: this.modelID,
+                locked: this._locked,
+                pos: {
+                    x: this._object.x,
+                    y: this._object.y,
+                    z: this._object.z
+                },
+                rot: {
+                    x: this._object.transform.localRotation.x,
+                    y: this._object.transform.localRotation.y,
+                    z: this._object.transform.localRotation.z
+                },
+                scale: {
+                    x: this._object.transform.localScale.x,
+                    y: this._object.transform.localScale.y,
+                    z: this._object.transform.localScale.z
+                }
+            },
+            subscribers: {
+                singleValue: singleValSubs,
+                transformers: !!this._subscribers.find(
+                    subscriber =>
+                        subscriber instanceof SubscriberPosition ||
+                        subscriber instanceof SubscriberRotation),
             }
         }
     }
 }
 
-export default { SceneObject, store };
+export default {SceneObject, store};
