@@ -30,6 +30,7 @@ import Line from "./line.js";
 import KeyboardScript from "./keyboard_script.js";
 import DragComponent from "./drag_component.js";
 import SubscriberSingleValue from "./subscriber_single_value.js";
+import CameraControl from "./camera_control.js";
 
 /**
  * @module SceneManager
@@ -183,6 +184,7 @@ class SceneManager {
         this.cam = camObj.addComponent(Camera3D);
         const drag = camObj.addComponent(DragComponent);
         drag.mgr = this;
+        camObj.addComponent(CameraControl);
 
         this.camera = camObj;
 
@@ -568,7 +570,7 @@ class SceneManager {
         model = ""
     } = {}) {
         if (pos === null)
-            pos = this.getMouseForward().mul(8).add(this.camera.transform.worldPosition);
+            pos = this.getMouseForward().mul(256).add(this.camera.transform.worldPosition);
 
         const object = new SceneObject.SceneObject({
             manager: this,
