@@ -283,7 +283,7 @@ export default {
 
   methods: {
     addSubscriber(type) {
-      this.object.addSubscriber(type);
+      this.object.addSubscriber(new type());
 
       this.load();
     },
