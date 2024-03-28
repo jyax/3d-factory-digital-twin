@@ -104,15 +104,15 @@ export default {
 
   methods: {
     doX() {
-      this.object.X(parseFloat(this.xVal));
+      this.object.X = parseFloat(this.xVal);
     },
 
     doY() {
-      this.object.Y(parseFloat(this.yVal));
+      this.object.Y = parseFloat(this.yVal);
     },
 
     doZ() {
-      this.object.Z(parseFloat(this.zVal));
+      this.object.Z = parseFloat(this.zVal);
     },
 
     blurInput(e) {

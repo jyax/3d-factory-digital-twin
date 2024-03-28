@@ -110,7 +110,7 @@ export default {
           parseFloat(this.zVal)
       );
 
-      this.object.rot(this.rot.clone());
+      this.object.rot = this.rot.clone();
     },
 
     blurInput(e) {

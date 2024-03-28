@@ -99,7 +99,7 @@ class SceneObject {
 
         if (modelID === "") {
             mesh = this._object.addComponent(MeshRenderer);
-            mesh.geometry = new BoxGeometry();
+            mesh.geometry = new BoxGeometry(100, 100, 100);
             mesh.material = new LitMaterial();
             mesh.material.baseColor = new Color(0.2, 0.5, 1);
             mesh.material.roughness = 1;

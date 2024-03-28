@@ -43,7 +43,7 @@ class SubscriberSingleValue extends Subscriber {
             min: this.min,
             max: this.max,
             gradient: this.gradient
-        }
+        };
     }
 }
 
