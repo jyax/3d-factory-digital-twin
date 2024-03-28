@@ -116,9 +116,10 @@ export default{
           const fr = new FileReader();
 
           fr.onloadend = (event) => {
-            const data = JSON.parse(String(fr.result))
-            console.log("Data from FileSelect: ", data)
-            this.mgr.loadScene(data)
+            const data = JSON.parse(String(fr.result));
+            console.log("Data from FileSelect: ", data);
+            this.mgr.loadScene(data);
+            this.mgr.events.do('open project');
           }
           fr.readAsText(ev.dataTransfer.files[0]);
         } else { this.mgr.alert("File is either corrupted or is not JSON") }
