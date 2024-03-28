@@ -17,11 +17,11 @@ class SubscriberRotation extends Subscriber {
             !("rot_x" in data))
             return;
 
-        this.object.setRot(new Vector3(
+        this.object.rot = new Vector3(
             parseFloat(data["rot_x"]),
             parseFloat(data["rot_y"]),
             parseFloat(data["rot_z"])
-        ));
+        );
     }
 
     getDisplayName() {
