@@ -362,6 +362,7 @@ class SceneManager {
                     this.editMode = !this.editMode;
                     console.log(this.editMode);
                     this.events.do('switch view');
+                    break;
                 }
 
                 case "Control": {
