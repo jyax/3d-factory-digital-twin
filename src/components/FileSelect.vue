@@ -2,16 +2,17 @@
     <div class="overlay">
       <div class="panel" id="left-panel">
         <h2>Past Files</h2>
-        <FileListing class="item" fileName="Test" />
-        <FileListing class="item" fileName="Test" />
+        <div id="files" v-for="file in savedFiles">
+        <FileListing class="item" :fileName=file @click="loadFile(file)"/>
+        </div>
       </div>
       <div class="panel" id="right-panel">
         <h2>New</h2>
-        <input class="file-name-input" type="text" placeholder="Name..."/>
+        <input class="file-name-input" type="text" placeholder="Name..." v-model="newFileName"/>
         <div id="file-drop" @dragover.prevent @drop.prevent @drop="dropHandler" @dragover="dragOverHandler">
           <p class="center">Click here or drag an drop a factory JSON file to upload</p>
         </div>
-        <button id="create-button" @click="displayProject">Create</button>
+        <button id="create-button" @click="mgr.LoadScene({}); displayProject();">Create</button>
       </div>
     </div>
 </template>
@@ -105,6 +106,13 @@ export default{
     }
   },
 
+  data () {
+    return {
+      newFileName: "",
+      savedFiles: []
+    }
+  },
+
   methods: {
     dropHandler(ev) {
       // prevent default actions
@@ -118,7 +126,9 @@ export default{
         fr.addEventListener('load', () => {
           const data = fr.result;
           console.log("file contents: ", fr.result);
-          // this.mgr.LoadScene(data);
+          this.newFileName = file.name;
+          // this.mgr.LoadScene(file.name, data);
+          this.displayProject();
         });
       }
       else {
@@ -132,11 +142,18 @@ export default{
 
     displayProject() {
       this.mgr.events.do('open project');
+      console.log(this.newFileName);
+    },
+
+    loadFile(fileName){
+
+      let json = JSON.parse(localStorage.getItem(fileName));
+      this.mgr.LoadScene(fileName, json);
     }
   },
 
   created() {
-
+    this.savedFiles = ['test_scene_1', 'test_scene_2'];
   }
 }
 </script>

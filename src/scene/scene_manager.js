@@ -122,6 +122,8 @@ class SceneManager {
 
         this.editMode = true;
 
+        this.name = '';
+
         // mongodb stuff
         this.modelsMap = {};
         this.LoadModels();
@@ -616,6 +618,8 @@ class SceneManager {
         let currentScene = this.getAllObjects().map(obj => obj.serializeObject())
         let jsonString = JSON.stringify(currentScene, null, 3)
 
+        localStorage.setItem(this.name, jsonString);
+
         let sceneBlob = new Blob([jsonString], {type: "application/json"})
         const blobUrl = URL.createObjectURL(sceneBlob);
 
@@ -655,7 +659,8 @@ class SceneManager {
     /**
      * Load scene information from JSON
      */
-    LoadScene(sceneFile) {
+    LoadScene(fileName, sceneFile) {
+        this.name = fileName;
         this.clearObjects()
         for (const objectInfo in sceneFile) {
             const object = new SceneObject.SceneObject({

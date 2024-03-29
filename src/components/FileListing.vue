@@ -1,7 +1,5 @@
 <template>
-    <div class="listing" @click="this.object.select(); this.object.mouseOff()" :class="dynamicStyle" @mouseover="this.object.mouseOver()"
-         @mouseout="this.object.mouseOff()">
-      <p class="listing-name anonymous" v-if="fileName === ''">Object</p>
+    <div class="listing">
       <p class="listing-name" v-if="fileName !== ''">{{fileName}}</p>
     </div>
 </template>
