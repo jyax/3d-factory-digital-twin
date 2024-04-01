@@ -61,7 +61,7 @@ class SceneManager {
         "bin": "./src/assets/glb_models/Slatwall_Bin_5.5in.glb",
         "tank": "./src/assets/glb_models/UN-COMPLIANT IBC TANK.glb",
         "boiler": "./src/assets/glb_models/downloadsGLB/boiler_from_the_puffer_vic_32 (1).glb",
-        "roboticArm": "./src/assets/glb_models/downloadsGLB/black_honey_-_robotic_arm (1).glb",
+        "roboticArm": "./src/assets/glb_models/boxarm.glb",
         "testfactory": "./src/assets/glb_models/testfactory1.glb",
 
         // Hidden models for editor use only

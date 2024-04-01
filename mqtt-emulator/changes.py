@@ -70,7 +70,7 @@ class Sequence:
 def runAsGroup(sequences,client):
 
 	#constants
-		CYCLE_TIME = .05 # in seconds
+		CYCLE_TIME = .07 # in seconds
 		START_TIME = time.perf_counter()
 		LIMIT = 30 # seconds
 
@@ -93,7 +93,6 @@ def runAsGroup(sequences,client):
 				for idx in range(0,len(seq.states)-1):
 					if(idx < len(seq.durations)-1):
 						if seq.start_times[idx] <= getTime() and getTime() < seq.start_times[idx + 1]:
-		
 							seq.states[idx].animateSelf(seq.states[idx+1],seq.start_times[idx],seq.durations[idx],getTime())
 							seq.states[idx].liveUpdate(client)
 							
@@ -102,6 +101,6 @@ def runAsGroup(sequences,client):
 							seq.states[idx].animateSelf(seq.states[len(seq.states)-1],seq.start_times[idx],seq.durations[idx],getTime())
 							seq.states[idx].liveUpdate(client)
 
-				time.sleep(CYCLE_TIME)		
+			time.sleep(CYCLE_TIME)		
 					
 		
