@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 version: '3.1'
 services:
   mongodb:
@@ -16,23 +15,3 @@ services:
       - "8083:8083"
       - "8084:8084"
       - "8883:8883"
-=======
-version: '3.1'
-services:
-  mongodb:
-    image: mongo:latest
-    environment:
-        - MONGO_INITDB_ROOT_USERNAME=root
-        - MONGO_INITDB_ROOT_PASSWORD=password
-    ports:
-      - "27017:27017"
-    command: mongod
-  emqx:
-    image: emqx:5.0
-    ports:
-      - "1883:1883"
-      - "8083:8083"
-      - "8084:8084"
-      - "8883:8883"
->>>>>>> c8b0355b17775cf58251fd3485db0c1a844acd90
-      - "18083:18083"

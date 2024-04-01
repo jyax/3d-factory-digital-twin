@@ -5,7 +5,12 @@ import ObjectInfoInput from "../../ObjectInfoInput.vue";
 
 <template>
 
-  <object-info-input :on-change="setID" label="Value Type" placeholder="Type..." style="margin-bottom: 16px;"/>
+  <object-info-input :on-change="setID" @focus="this.getTypes(); showSuggestions = true;" @blur="showSuggestions = false"
+                     label="Value Type" placeholder="Type..." ref="typeInput"/>
+
+  <div class="type-suggestions" v-if="id.length === 0">
+    <p class="type-suggestion" v-for="type of suggestions" @click="useSuggestion(type)">{{type}}</p>
+  </div>
 
   <div class="single-input">
     <div class="single-input-left">
@@ -26,9 +31,38 @@ import ObjectInfoInput from "../../ObjectInfoInput.vue";
     <div class="single-input-right" id="color-gradient" :style="makeGradient()"></div>
   </div>
 
+  <apexchart v-if="series[0].data.length > 0" :options="chartOptions" :series="series"></apexchart>
+
 </template>
 
 <style scoped>
+
+.type-suggestions {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  flex-wrap: wrap;
+
+  margin-bottom: 20px;
+}
+
+.type-suggestion {
+  margin: 0 0 0 6px;
+  padding: 2px 10px;
+
+  background-color: #5c848f;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+
+  border-radius: 50em;
+
+  font-size: 12px;
+
+  cursor: pointer;
+}
+
+.type-suggestion:hover {
+  background-color: #547580;
+}
 
 .section {
   display: flex;
@@ -173,7 +207,7 @@ import ObjectInfoInput from "../../ObjectInfoInput.vue";
   flex-direction: row;
   justify-content: center;
 
-  margin-top: 8px;
+  margin-top: 16px;
   margin-bottom: 16px;
 }
 
@@ -259,9 +293,15 @@ input[type="color"]::-webkit-color-swatch:hover {
 import Subscriber from "../../../../scene/subscriber.js";
 import ColorGradient from "../../../../color/color_gradient.js";
 import {Color} from "@orillusion/core";
+import SubscriberSingleValue from "../../../../scene/subscriber_single_value.js";
+import Vue3Apexcharts from "vue3-apexcharts";
 
 export default {
   name: "SyncSubscriberSingleValue",
+
+  components: {
+    apexchart: Vue3Apexcharts
+  },
 
   props: {
     subscriber: {
@@ -272,6 +312,11 @@ export default {
 
   data() {
     return {
+      id: "",
+
+      showSuggestions: false,
+      suggestions: [],
+
       min: 0,
       max: 100,
       default: 0,
@@ -279,7 +324,62 @@ export default {
       color_1: "#5dc938",
       color_2: "#f24f44",
 
-      gradient: new ColorGradient()
+      gradient: new ColorGradient(),
+
+      series: [{
+        name: "Test",
+        data: []
+      }],
+      chartOptions: {
+        chart: {
+          height: 250,
+          type: 'line',
+          zoom: {
+            enabled: false
+          },
+          toolbar: {
+            show: false
+          }
+        },
+        dataLabels: {
+          enabled: false,
+          style: {
+            color: "white"
+          }
+        },
+        stroke: {
+          curve: 'straight',
+          width: 3,
+          color: "white"
+        },
+        title: {
+          text: 'Value History',
+          align: 'center',
+          style: {
+            color: "white",
+            fontWeight: "normal",
+            fontSize: 16
+          }
+        },
+        grid: {
+          row: {
+            colors: ['#f3f3f3', '#b4b4b4'],
+            opacity: 0.1
+          },
+        },
+        xaxis: {
+          labels: {
+            enable: false
+          }
+        },
+        yaxis: {
+          labels: {
+            style: {
+              colors: "rgba(255,255,255,0.8)"
+            }
+          }
+        }
+      },
     }
   },
 
@@ -304,9 +404,43 @@ export default {
       return "background-image: linear-gradient(to bottom, " + this.color_1 + ", " + this.color_2 + ");"
     },
 
+    getTypes() {
+      const all = new Set(SubscriberSingleValue.SUGGESTED_TYPES);
+      for (const type of this.subscriber.object.getSubscribers())
+        if (all.has(type))
+          all.delete(type);
+
+      this.suggestions = Array.from(all.values()).sort();
+    },
+
     setID(val) {
       this.subscriber.id = val;
+      this.id = val;
+    },
+
+    useSuggestion(type) {
+      this.$refs.typeInput.val = type;
+
+      this.setID(type);
+
+      this.getTypes();
+    },
+
+    updateData() {
+      this.series[0].data = this.subscriber.history;
     }
+  },
+
+  created() {
+    this.id = this.subscriber.type;
+
+    this.updateListener = this.subscriber.events.on("update", () => this.updateData());
+
+    this.getTypes();
+  },
+
+  destroyed() {
+    this.subscriber.events.remove(this.updateListener);
   }
 };
 

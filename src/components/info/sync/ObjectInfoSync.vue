@@ -16,15 +16,13 @@ import SyncSubscriber from "./subscriber/SyncSubscriber.vue";
 
     <sync-subscriber v-for="sub of subscribers" :key="sub" :subscriber="sub" :label="sub.getDisplayName()"/>
 
-    <p class="label" v-if="subscribers.length === 0">Add Subscribers...</p>
-    <p class="label" v-else-if="availableTypes.length > 0">Add...</p>
+    <p class="label">Add...</p>
 
     <sync-subscriber-add label="Position" v-if="availableTypes.includes(SubscriberPosition)"
                          @click="addSubscriber(SubscriberPosition)"/>
     <sync-subscriber-add label="Rotation" v-if="availableTypes.includes(SubscriberRotation)"
                          @click="addSubscriber(SubscriberRotation)"/>
-    <sync-subscriber-add label="Single value" v-if="availableTypes.includes(SubscriberSingleValue)"
-                         @click="addSubscriber(SubscriberSingleValue)"/>
+    <sync-subscriber-add label="Single value" @click="addSubscriber(SubscriberSingleValue)"/>
 
   </div>
 
@@ -55,6 +53,8 @@ import SyncSubscriber from "./subscriber/SyncSubscriber.vue";
 .section-inner {
   display: flex;
   flex-direction: column;
+
+  max-height: 75vh;
 
   overflow-y: scroll;
 
@@ -283,7 +283,7 @@ export default {
 
   methods: {
     addSubscriber(type) {
-      this.object.addSubscriber(new type());
+      this.object.addSubscriber(new type(this.object, ""));
 
       this.load();
     },

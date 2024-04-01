@@ -77,6 +77,23 @@ class DragComponent extends ComponentBase {
      * @private
      */
     _moveSelected(center, pos) {
+        if (this.mgr.isKeyDown("shift")) {
+            const bounds = this.mgr.getSelectedBounds();
+            const a = bounds.min;
+            const b = bounds.max;
+            a.y = 0;
+            b.y = 0;
+
+            const scale = b.subtract(a).length;
+            const snap = 10 ** Math.floor(Math.log10(scale));
+
+            pos = new Vector3(
+                Math.round(pos.x / snap) * snap,
+                pos.y,
+                Math.round(pos.z / snap) * snap
+            );
+        }
+
         for (const object of this.mgr.getSelected()) {
             const diff = object.pos.subtract(center);
             object.pos = pos.add(diff);

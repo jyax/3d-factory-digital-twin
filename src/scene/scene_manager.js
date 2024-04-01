@@ -276,7 +276,7 @@ class SceneManager {
 
             this._pressedKeys.add(event.key.toLowerCase());
 
-            switch (event.key) {
+            switch (event.key.toLowerCase()) {
                 case "a": {
                     if (!event.ctrlKey)
                         break;
@@ -339,7 +339,7 @@ class SceneManager {
                     break;
                 }
 
-                case "Tab": {
+                case "tab": {
                     if (document.querySelector(":focus"))
                         break;
 
@@ -349,7 +349,7 @@ class SceneManager {
                     break;
                 }
 
-                case "Delete": {
+                case "delete": {
                     if(this.editMode){
                         this.deleteSelected();
                         event.preventDefault();
@@ -365,7 +365,7 @@ class SceneManager {
                     break;
                 }
 
-                case "Control": {
+                case "control": {
                     this._ctrlPressed = true;
                     break;
                 }
@@ -375,14 +375,14 @@ class SceneManager {
         document.addEventListener("keyup", (event) => {
             this._pressedKeys.delete(event.key.toLowerCase());
 
-            switch (event.key) {
+            switch (event.key.toLowerCase()) {
                 case "e": {
                     this.events.do("drag", false);
                     this.dragging = false;
                     break;
                 }
 
-                case "Control": {
+                case "control": {
                     this._ctrlPressed = false;
                     break;
                 }
@@ -468,6 +468,10 @@ class SceneManager {
 
     getModelIDs() {
         return Array.from(this.models.keys());
+    }
+
+    isKeyDown(key) {
+        return this._pressedKeys.has(key);
     }
 
 
@@ -866,7 +870,7 @@ class SceneManager {
         if (this.selectedCount === 0)
             return;
 
-        const bounds = this._getSelectedBounds();
+        const bounds = this.getSelectedBounds();
         const pos = bounds.min.add(bounds.max).div(2);
         this._cameraController.target = pos;
 
@@ -893,7 +897,7 @@ class SceneManager {
         if (this.selectedCount === 0)
             return;
 
-        const bb = this._getSelectedBounds();
+        const bb = this.getSelectedBounds();
 
         this.view.graphic3D.drawBox("selection", bb.min, bb.max);
     }
@@ -903,7 +907,7 @@ class SceneManager {
      * @returns {BoundingBox}
      * @private
      */
-    _getSelectedBounds() {
+    getSelectedBounds() {
         let bb = null;
 
         for (const object of this._selected.values()) {
