@@ -4,7 +4,7 @@
     <p class="input-label">{{label}}</p>
 
     <input class="input" v-model="val" type="text" :placeholder="placeholder"
-           @input="doChange" v-on:keyup.enter="blurInput" :disabled="!enableUpdate">
+           @input="doChange" @focus="$emit('focus')" @blur="$emit('blur')" v-on:keyup.enter="blurInput" :disabled="!enableUpdate">
   </div>
 
 </template>
