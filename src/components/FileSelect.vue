@@ -119,17 +119,18 @@ export default{
       ev.preventDefault();
 
       if(ev.dataTransfer.files) {
-        const fr = new FileReader();
-        console.log(typeof(ev.dataTransfer.files[0]));
-        fr.readAsText(ev.dataTransfer.files[0]);
+        const file = ev.dataTransfer.files[0];
+        if (file.type === "application/json") {
+          const fr = new FileReader();
 
-        fr.addEventListener('load', () => {
-          const data = fr.result;
-          console.log("file contents: ", fr.result);
-          this.newFileName = file.name;
-          // this.mgr.LoadScene(file.name, data);
-          this.displayProject();
-        });
+          fr.onloadend = (event) => {
+            const data = JSON.parse(String(fr.result));
+            console.log("Data from FileSelect: ", data);
+            this.mgr.loadScene(data);
+            this.mgr.events.do('open project');
+          }
+          fr.readAsText(ev.dataTransfer.files[0]);
+        } else { this.mgr.alert("File is either corrupted or is not JSON") }
       }
       else {
         console.error("File Reading");

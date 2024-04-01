@@ -104,26 +104,37 @@ export default {
 
   methods: {
     doX() {
-      this.object.setX(parseFloat(this.xVal));
+      this.object.X = parseFloat(this.xVal);
     },
 
     doY() {
-      this.object.setY(parseFloat(this.yVal));
+      this.object.Y = parseFloat(this.yVal);
     },
 
     doZ() {
-      this.object.setZ(parseFloat(this.zVal));
+      this.object.Z = parseFloat(this.zVal);
     },
 
     blurInput(e) {
       e.target.blur();
+    },
+
+    update() {
+      this.xVal = Math.floor(this.pos.x * 100) / 100;
+      this.yVal = Math.floor(this.pos.y * 100) / 100;
+      this.zVal = Math.floor(this.pos.z * 100) / 100;
     }
   },  
 
   created() {
-    this.xVal = Math.floor(this.pos.x * 100) / 100;
-    this.yVal = Math.floor(this.pos.y * 100) / 100;
-    this.zVal = Math.floor(this.pos.z * 100) / 100;
+    this.pos = this.object.pos;
+
+    this.update();
+
+    this.object.events.on("pos", pos => {
+      this.pos = pos.clone();
+      this.update();
+    });
   }
 }
 

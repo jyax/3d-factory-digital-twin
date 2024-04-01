@@ -4,7 +4,7 @@
 
 
 <template>
-  <div class="section" id="tools">
+  <div class="section" id="files">
     <div class="tools-icon" v-if="!dragMode">
       <img class="section-header-icon" id="tools-icon" src="../assets/icon/wrench.svg" alt="Wrench" draggable="false">
       <span class="tooltip">
@@ -56,9 +56,11 @@
         <span class="tooltip">Delete <span class="soft">[Del]</span></span>
       </div>
 
+      <div class="tool-spacing"></div>
+
       <div class="tool" @click="OpenLineWindow()">
         <img src="../assets/icon/plus.svg" alt="Plus" draggable="false">
-        <span class="tooltip">New Line <span class="soft">[R]</span></span>
+        <span class="tooltip">New Line</span>
       </div>
 
     </div>
@@ -103,7 +105,7 @@
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
 }
 
-#tools {
+#files {
   position: absolute;
   bottom: 12px;
   left: 50%;
@@ -185,6 +187,7 @@
   padding: 6px;
 
   background-color: rgba(140, 140, 140, 0.15);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
   border-radius: 4px;
 
   cursor: pointer;
@@ -300,8 +303,7 @@ p{
 #line-title {
   margin-top: 5px;
   margin-bottom: 0px;
-  font-size: 2
-  0px;
+  font-size: 20px;
 }
 
 #width-p {

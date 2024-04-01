@@ -6,6 +6,8 @@
   import Alert from "./Alert.vue";
   import LoadBar from "./LoadBar.vue";
   import Login from "./Login.vue";
+  import FileMenu from "./FileMenu.vue";
+
   import FileSelect from "./FileSelect.vue";
 
   const canvas = ref("canvas");
@@ -19,6 +21,7 @@
   <div v-if="editOn">
     <toolbar :mgr="mgr"/>
   </div>
+  <file-menu :mgr="mgr"/>
   <login :mgr="mgr"/>
   <outline :mgr="mgr"/>
   <alert :mgr="mgr"/>
@@ -29,7 +32,8 @@
 
 <script>
   import Outline from "./outline/Outline.vue";
-  
+  import SceneManager from "../scene/scene_manager.js";
+
   export default {
     components: {
       Outline

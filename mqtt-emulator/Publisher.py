@@ -1,8 +1,10 @@
 
 import random
-import TEST_GUI as GUI
-from asset import animate
+import GUI
+# from asset import animate3cube
 from paho.mqtt import client as mqtt_client
+
+import test
 
 ###TOGGLE TEST MODES###
 #######################
@@ -21,7 +23,7 @@ topic = "python/mqtt"
 # Generate a Client ID with the publish prefix.
 client_id = f'publish-{random.randint(0, 1000)}'
 username = 'root'
-password = 'M0nG0$$w0rd'
+password = 'password'
 
 ## Connect to client
 def connect_mqtt():
@@ -54,14 +56,20 @@ def publish(client, msg):
 ## Code to run on launch
 def run():
     client = connect_mqtt()
+
     client.loop_start()
-    if not ANIMATE: 
-        GUI.main(client)
-    else:
-        animate(client)
+
+    GUI.main(client)
+    # test.testMain(client)
+
+
+   
+  
     client.loop_stop()
 
 
 
 if __name__ == '__main__':
     run()
+
+

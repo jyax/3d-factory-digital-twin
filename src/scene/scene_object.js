@@ -1,6 +1,5 @@
 import {
     BoundingBox,
-    BoxColliderShape,
     BoxGeometry,
     ColliderComponent,
     Color,
@@ -10,30 +9,29 @@ import {
     Vector3
 } from "@orillusion/core";
 import EventHandler from "../event/event_handler.js";
-import ColorGradient from "../color/color_gradient.js";
 import { createStore } from 'vuex';
-import keyboardScript from "./keyboardScript.js";
+import KeyboardScript from "./keyboard_script.js";
 
 //
 // Login/Logout Functionality
 // This is exported to be used in App.vue
 //
 const store = createStore({
-    state: {
-        user : null,
+  state: {
+    user: null,
+  },
+  mutations: {
+    setUser(state, userData) {
+      state.user = userData;
     },
-    mutations: {
-        setUser(state, userData){
-            state.user = userData;
-        },
+  },
+  getters: {
+    authenticated(state) {
+      return !!state.user;
     },
-    getters : {
-        authenticated(state){
-            return !!state.user;
-        },
-    },
-    actions: {},
-    modules: {},
+  },
+  actions: {},
+  modules: {},
 });
 import SubscriberPosition from "./subscriber_position.js";
 import SubscriberRotation from "./subscriber_rotation.js";
@@ -52,18 +50,18 @@ import subscriber from "./subscriber.js";
  * Allows for easy management and manipulation.
  */
 class SceneObject {
-    /**
-     * Get the root Object3D of an object.
-     * @param {Object3D} object Object to find root of
-     * @returns {Object3D} Root object
-     */
-    static GetRoot(object) {
-        if (object.parentObject != null)
-            if (object.parentObject instanceof Object3D)
-                return this.GetRoot(object.parentObject)
+  /**
+   * Get the root Object3D of an object.
+   * @param {Object3D} object Object to find root of
+   * @returns {Object3D} Root object
+   */
+  static GetRoot(object) {
+    if (object.parentObject != null)
+      if (object.parentObject instanceof Object3D)
+        return this.GetRoot(object.parentObject);
 
-        return object;
-    }
+    return object;
+  }
 
     /**
      * Create a new scene object.
@@ -78,31 +76,29 @@ class SceneObject {
         manager,
         pos = new Vector3(),
         id = "",
-        name = "",
         model: modelID = "",
         locked = false
     } = {}) {
         this._manager = manager;
 
-        this._id = id;
-        if (this._id !== "")
-            this.mgr.ids.set(this._id, this);
+    this._id = id;
+    if (this._id !== "") this.mgr.ids.set(this._id, this);
 
-        this.name = name;
+        this._pos = pos;
 
-        this._locked = locked;
+    this._locked = locked;
 
-        this.modelID = modelID;
+    this.modelID = modelID;
 
-        let mesh;
+    let mesh;
 
-        this._object = new Object3D();
+    this._object = new Object3D();
 
-        this._hoverPreview = "";
+    this._hoverPreview = "";
 
         if (modelID === "") {
             mesh = this._object.addComponent(MeshRenderer);
-            mesh.geometry = new BoxGeometry();
+            mesh.geometry = new BoxGeometry(100, 100, 100);
             mesh.material = new LitMaterial();
             mesh.material.baseColor = new Color(0.2, 0.5, 1);
             mesh.material.roughness = 1;
@@ -117,7 +113,7 @@ class SceneObject {
             });
         }
 
-        this._object.transform.localPosition = pos;
+    this._object.transform.localPosition = pos;
 
         this._events = new EventHandler();
 
@@ -128,27 +124,26 @@ class SceneObject {
     }
 
 
-    // Deletion
+  // Deletion
 
-    /**
-     * Delete the object and remove it from the scene manager.
-     */
-    delete() {
-        this.mgr.removeObject(this);
+  /**
+   * Delete the object and remove it from the scene manager.
+   */
+  delete() {
+    this.mgr.removeObject(this);
 
-        this._object.destroy();
-    }
+    this._object.destroy();
+  }
 
+  // Getters
 
-    // Getters
-
-    /**
-     * Get the scene manager.
-     * @returns {SceneManager} Parent scene manager
-     */
-    get mgr() {
-        return this._manager;
-    }
+  /**
+   * Get the scene manager.
+   * @returns {SceneManager} Parent scene manager
+   */
+  get mgr() {
+    return this._manager;
+  }
 
     /**
      * Get the global ID.
@@ -163,24 +158,40 @@ class SceneObject {
      * @returns {Vector3} Position/translation vector
      */
     get pos() {
-        return this._object.localPosition;
+        return this._object.localPosition.clone();
     }
 
     /**
-     * Get the event handler.
-     * @returns {EventHandler} Event handler
+     * Get the rotation of the object.
+     * @returns {Vector3} Rotation vector
      */
-    get events() {
-        return this._events;
+    get rot() {
+        return this._object.transform.localRotation.clone();
     }
 
     /**
-     * Check if the object is blocking user edits.
-     * @returns {boolean} Whether object is blocking user edits
+     * Get the scale of the object.
+     * @returns {Vector3} Scale vector
      */
-    get locked() {
-        return this._locked;
+    get scale() {
+        return this._object.transform.localScale.clone();
     }
+
+  /**
+   * Get the event handler.
+   * @returns {EventHandler} Event handler
+   */
+  get events() {
+    return this._events;
+  }
+
+  /**
+   * Check if the object is blocking user edits.
+   * @returns {boolean} Whether object is blocking user edits
+   */
+  get locked() {
+    return this._locked;
+  }
 
     /**
      * Toggle the locked status of the object.
@@ -188,85 +199,80 @@ class SceneObject {
     toggleLock() {
         this.locked = !this._locked;
 
-        this.events.do("lock", this._locked);
-    }
+    this.events.do("lock", this._locked);
+  }
 
-    /**
-     * Get the Orillusion Object3D.
-     * @returns {Object3D} Orillusion Object3D
-     */
-    getObject3D() {
-        return this._object;
-    }
+  /**
+   * Get the Orillusion Object3D.
+   * @returns {Object3D} Orillusion Object3D
+   */
+  getObject3D() {
+    return this._object;
+  }
 
-    /**
-     * Check if the object is currently selected.
-     * @returns {boolean} Whether object is selected
-     */
-    isSelected() {
-        console.log(this._manager);
-        return this._manager.isSelected(this);
-    }
+  /**
+   * Check if the object is currently selected.
+   * @returns {boolean} Whether object is selected
+   */
+  isSelected() {
+    return this._manager.isSelected(this);
+  }
 
-    /**
-     * Get the bounding box of the object.
-     */
-    getBoundingBox() {
-        let bb = null;
+  /**
+   * Get the bounding box of the object.
+   */
+  getBoundingBox() {
+    let bb = null;
 
-        this.forAll(obj => {
-            if (obj.hasComponent(MeshRenderer)) {
-                const bounds = obj.getComponent(MeshRenderer).geometry.bounds.clone();
+    this.forAll((obj) => {
+      if (obj.hasComponent(MeshRenderer)) {
+        const bounds = obj.getComponent(MeshRenderer).geometry.bounds.clone();
 
-                if (bb === null)
-                    bb = bounds;
-                else
-                    bb.merge(bounds);
-            }
-        });
+        if (bb === null) bb = bounds;
+        else bb.merge(bounds);
+      }
+    });
 
         if (bb !== null) {
             const matrix = this._object.transform.worldMatrix.clone();
             matrix.position = new Vector3();
             bb = Util.transformBoundingBox(bb, matrix);
             bb.setFromMinMax(
-                bb.min.add(this.pos),
-                bb.max.add(this.pos)
+                bb.min.add(this._pos),
+                bb.max.add(this._pos)
             );
         } else {
             bb = new BoundingBox();
         }
 
-        return bb;
-    }
+    return bb;
+  }
 
     getSubscribers() {
         return [...this._subscribers];
     }
 
 
-    // Setters
+  // Setters
 
-    /**
-     * Set the global ID.
-     * @param {string} val New global ID
-     */
-    set id(val) {
-        if (this._id !== "")
-            this.mgr.ids.delete(this._id);
+  /**
+   * Set the global ID.
+   * @param {string} val New global ID
+   */
+  set id(val) {
+    if (this._id !== "") this.mgr.ids.delete(this._id);
 
-        this._id = val;
+    this._id = val;
 
-        if (val !== "")
-            this.mgr.ids.set(this._id, this);
-    }
+    if (val !== "") this.mgr.ids.set(this._id, this);
+  }
 
-    /**
-     * Set the locked status of the object.
-     * @param val Whether object should block user edits
-     */
-    set locked(val) {
-        this._locked = val;
+  /**
+   * Set the locked status of the object.
+   * @param val Whether object should block user edits
+   */
+  set locked(val) {
+    this._locked = val;
 
         this.events.do("lock", val);
 
@@ -276,78 +282,90 @@ class SceneObject {
 
     /**
      * Set the local position.
-     * @param {Vector3} pos New local position
+     * @param {Vector3} newPos New local position
      */
-    setPos(pos) {
-        this._object.localPosition = pos;
+    set pos(newPos) {
+        this._object.localPosition = newPos;
+        this._pos = newPos;
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
+
+        this.events.do("pos", this.pos.clone());
     }
 
     /**
      * Set the x component of the local position.
      * @param {number} x New position along x-axis
      */
-    setX(x) {
+    set X(x) {
         if (isNaN(x))
             return;
 
-        this._object.x = x;
+    this._object.x = x;
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
+
+        this.events.do("pos", this.pos);
     }
 
     /**
      * Set the y component of the local position.
      * @param {number} y New position along y-axis
      */
-    setY(y) {
+    set Y(y) {
         if (isNaN(y))
             return;
 
-        this._object.y = y;
+    this._object.y = y;
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
+
+        this.events.do("pos", this.pos);
     }
 
     /**
      * Set the z component of the local position.
      * @param {number} z New position along z-axis
      */
-    setZ(z) {
+    set Z(z) {
         if (isNaN(z))
             return;
 
-        this._object.z = z;
+    this._object.z = z;
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
+
+        this.events.do("pos", this.pos);
     }
 
-    setRot(rot) {
-        this._object.transform.localRotation = rot.clone();
+    set rot(newRot) {
+        this._object.transform.localRotation = newRot.clone();
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
+
+        this.events.do("rot", newRot.clone());
     }
 
-    setScale(scale) {
-        this._object.transform.localScale = scale.clone();
+    set scale(newScale) {
+        this._object.transform.localScale = newScale.clone();
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
+
+        this.events.do("scale", newScale);
     }
 
-    /**
-     * Set the model for the object.
-     * @param {string} id ID of imported mesh
-     */
-    setModel(id) {
-        if (id === "" || !this.mgr.models.has(id))
-            return;
+  /**
+   * Set the model for the object.
+   * @param {string} id ID of imported mesh
+   */
+  setModel(id) {
+    if (id === "" || !this.mgr.models.has(id)) return;
 
         const copy = this.mgr.models.get(id).clone();
         this._object.transform.cloneTo(copy);
@@ -358,15 +376,15 @@ class SceneObject {
         this._object.transform.updateWorldMatrix(true);
         this.mgr.scene.addChild(this._object);
 
-        this.mgr.revObjects.set(this._object, this);
+    this.mgr.revObjects.set(this._object, this);
 
-        if (this.isSelected())
-            this.mgr.updateSelectBox();
+    if (this.isSelected()) this.mgr.updateSelectBox();
 
         this.modelID = id;
 
-        const ks = this._object.addComponent(keyboardScript);
+        const ks = this._object.addComponent(KeyboardScript);
         ks.mgr = this.mgr;
+        ks.object = this;
 
         this._object.forChild(child => {
             child.addComponent(ColliderComponent);
@@ -375,50 +393,48 @@ class SceneObject {
         this.mgr.scene.removeChild(old);
     }
 
-    /**
-     * Set the color for every part of the object.
-     * @param {Color} color New solid color
-     */
-    setSolidColor(color) {
-        this.forAll(obj => {
-            if (obj.hasComponent(MeshRenderer))
-                obj.getComponent(MeshRenderer).material.baseColor = color;
-        });
-    }
+  /**
+   * Set the color for every part of the object.
+   * @param {Color} color New solid color
+   */
+  setSolidColor(color) {
+    this.forAll((obj) => {
+      if (obj.hasComponent(MeshRenderer))
+        obj.getComponent(MeshRenderer).material.baseColor = color;
+    });
+  }
 
+  // Iteration
 
-    // Iteration
+  /**
+   * Iterate through all children of the root object and run a function for each.
+   * @param {function} func Function to run
+   */
+  forAllChildren(func = () => {}) {
+    this._object.forChild((child) => func(child));
+  }
 
-    /**
-     * Iterate through all children of the root object and run a function for each.
-     * @param {function} func Function to run
-     */
-    forAllChildren(func = () => {}) {
-        this._object.forChild(child => func(child));
-    }
+  /**
+   * Iterate through all descendants and the root object and run a function for each.
+   * @param {function} func Function to run
+   */
+  forAll(func = () => {}) {
+    this._forAllRecursive(this._object, func);
+  }
 
-    /**
-     * Iterate through all descendants and the root object and run a function for each.
-     * @param {function} func Function to run
-     */
-    forAll(func = () => {}) {
-        this._forAllRecursive(this._object, func);
-    }
+  /**
+   * Recursively iterate through all children and their children and run a function for each.
+   * @param {Object3D} obj Orillusion Object3D object
+   * @param {function} func Function to run
+   * @private
+   */
+  _forAllRecursive(obj, func = () => {}) {
+    func(obj);
 
-    /**
-     * Recursively iterate through all children and their children and run a function for each.
-     * @param {Object3D} obj Orillusion Object3D object
-     * @param {function} func Function to run
-     * @private
-     */
-    _forAllRecursive(obj, func = () => {}) {
-        func(obj);
+    obj.forChild((child) => this._forAllRecursive(child, func));
+  }
 
-        obj.forChild(child => this._forAllRecursive(child, func));
-    }
-
-
-    // Selection
+  // Selection
 
     /**
      * Select this actor.
@@ -431,91 +447,94 @@ class SceneObject {
     }
 
 
-    // Duplication
+  // Duplication
 
-    /**
-     * Create and get a copy of the object.
-     * @returns {SceneObject} Duplicate object
-     */
-    copy() {
-        const newObj = new SceneObject({
-            manager: this.mgr
-        });
+  /**
+   * Create and get a copy of the object.
+   * @returns {SceneObject} Duplicate object
+   */
+  copy() {
+    const newObj = new SceneObject({
+      manager: this.mgr,
+    });
 
         newObj.setModel(this.modelID);
         this._object.transform.cloneTo(newObj.getObject3D());
 
-        return newObj;
-    }
+    return newObj;
+  }
 
-    /**
-     * Create and get a copy of the object, and add it to the scene.
-     * @returns {SceneObject} Duplicate object
-     */
-    duplicate() {
-        cloned
-        const copy = this.copy();
+  /**
+   * Create and get a copy of the object, and add it to the scene.
+   * @returns {SceneObject} Duplicate object
+   */
+  duplicate() {
+    cloned;
+    const copy = this.copy();
 
-        this.mgr.addObject(copy);
+    this.mgr.addObject(copy);
 
-        return copy;
-    }
+    return copy;
+  }
 
+  // Interaction
 
-    // Interaction
-
-    /**
-     * Handle when the mouse hovers over the object.
-     * @param e Event
-     */
-    mouseOver(e) {
-        document.body.style.cursor = "pointer";
+  /**
+   * Handle when the mouse hovers over the object.
+   * @param e Event
+   */
+  mouseOver(e) {
+    document.body.style.cursor = "pointer";
 
         if (this.isSelected() || this.locked)
             return;
 
-        if (this._hoverPreview !== "")
-            this.mgr.view.graphic3D.Clear(this._hoverPreview);
-        this._hoverPreview = "";
+    if (this._hoverPreview !== "")
+      this.mgr.view.graphic3D.Clear(this._hoverPreview);
+    this._hoverPreview = "";
 
-        const bb = this.getBoundingBox();
+    const bb = this.getBoundingBox();
 
-        this._hoverPreview = String(Math.floor(Math.random() * 4096));
-        this.mgr.view.graphic3D.drawBoundingBox(this._hoverPreview, bb, new Color(0.7, 0.7, 0.7));
-    }
+    this._hoverPreview = String(Math.floor(Math.random() * 4096));
+    this.mgr.view.graphic3D.drawBoundingBox(
+      this._hoverPreview,
+      bb,
+      new Color(0.7, 0.7, 0.7)
+    );
+  }
 
-    /**
-     * Handle when the mouse is no longer hovering over the object.
-     * @param e Event
-     */
-    mouseOff(e) {
-        document.body.style.cursor = "default";
+  /**
+   * Handle when the mouse is no longer hovering over the object.
+   * @param e Event
+   */
+  mouseOff(e) {
+    document.body.style.cursor = "default";
 
-        if (this._hoverPreview !== "")
-            this.mgr.view.graphic3D.Clear(this._hoverPreview);
-        this._hoverPreview = "";
-    }
+    if (this._hoverPreview !== "")
+      this.mgr.view.graphic3D.Clear(this._hoverPreview);
+    this._hoverPreview = "";
+  }
 
-    /**
-     * Handle when the mouse is no longer hovering over the object.
-     * @param e Event
-     */
-    mouseDown(e) {
-        // console.log("Down");
-        this.mgr.ObjectToMove = this;
-    }
+  /**
+   * Handle when the mouse is no longer hovering over the object.
+   * @param e Event
+   */
+  mouseDown(e) {
+    // console.log("Down");
+    this.mgr.ObjectToMove = this;
+  }
 
-    /**
-     * Handle when the mouse clicks on the object.
-     * @param e Event
-     */
-    click(e) {
-        this.select();
+  /**
+   * Handle when the mouse clicks on the object.
+   * @param e Event
+   */
+  click(e) {
+    this.select();
 
-        if (this._hoverPreview !== "")
-            this.mgr.view.graphic3D.Clear(this._hoverPreview);
-        this._hoverPreview = "";
-    }
+    if (this._hoverPreview !== "")
+      this.mgr.view.graphic3D.Clear(this._hoverPreview);
+    this._hoverPreview = "";
+  }
 
     drag(elapsed) {
 
@@ -533,8 +552,8 @@ class SceneObject {
             subscriber.handleData(data);
     }
 
-    addSubscriber(type) {
-        return this._subscribers.push(new type(this));
+    addSubscriber(sub) {
+        this._subscribers.push(sub);
     }
 
     removeSubscriber(subscriber) {
@@ -556,7 +575,7 @@ class SceneObject {
         this._subscribers.forEach(sub => {
             if (sub instanceof SubscriberSingleValue)
             {
-                let type = sub.type || 'default'
+                let type = sub.id || 'default'
                 singleValSubs[type] = sub.serialize()
             }
         })
@@ -571,9 +590,9 @@ class SceneObject {
                     z: this._object.z
                 },
                 rot: {
-                    xDeg: this._object.transform.localRotation.x,
-                    yDeg: this._object.transform.localRotation.y,
-                    zDeg: this._object.transform.localRotation.z
+                    x: this._object.transform.localRotation.x,
+                    y: this._object.transform.localRotation.y,
+                    z: this._object.transform.localRotation.z
                 },
                 scale: {
                     x: this._object.transform.localScale.x,

@@ -69,7 +69,7 @@ class Line{
             originPoint.x += (startPoint.x + endPoint.x) / 2;
             originPoint.y += (startPoint.y + endPoint.y) / 2;
             originPoint.z += (startPoint.z + endPoint.z) / 2
-            line.setPos(originPoint);
+            line.pos = originPoint;
             line._object.rotationY = -(Math.atan( (endPoint.z - startPoint.z) / (endPoint.x - startPoint.x)) * (180/Math.PI));
 
 

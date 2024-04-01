@@ -27,9 +27,10 @@ import EventHandler from "../event/event_handler.js";
 import Util from "../util/util.js";
 import MQTTHandler from "../event/mqtt_handler.js";
 import Line from "./line.js";
-import keyboardScript from "./keyboardScript.js";
-import KeyboardScript from "./keyboard_component.js";
+import KeyboardScript from "./keyboard_script.js";
 import DragComponent from "./drag_component.js";
+import SubscriberSingleValue from "./subscriber_single_value.js";
+import CameraControl from "./camera_control.js";
 
 /**
  * @module SceneManager
@@ -61,6 +62,7 @@ class SceneManager {
         "tank": "./src/assets/glb_models/UN-COMPLIANT IBC TANK.glb",
         "boiler": "./src/assets/glb_models/downloadsGLB/boiler_from_the_puffer_vic_32 (1).glb",
         "roboticArm": "./src/assets/glb_models/downloadsGLB/black_honey_-_robotic_arm (1).glb",
+        "testfactory": "./src/assets/glb_models/testfactory1.glb",
 
         // Hidden models for editor use only
 
@@ -184,6 +186,7 @@ class SceneManager {
         this.cam = camObj.addComponent(Camera3D);
         const drag = camObj.addComponent(DragComponent);
         drag.mgr = this;
+        camObj.addComponent(CameraControl);
 
         this.camera = camObj;
 
@@ -194,12 +197,12 @@ class SceneManager {
         // this._cameraController.moveSpeed = 30;
 
         this._cameraController.smooth = 0;
-        this._cameraController.panFactor = 0.01;
+        this._cameraController.panFactor = 1;
         this._cameraController.wheelStep = 0.01;
 
         camObj.localPosition = new Vector3(0, 0, 4);
 
-        this.cam.perspective(60, c.width / c.height, 0.1, 5000);
+        this.cam.perspective(60, c.width / c.height, 10, 50000);
 
         this.scene.addChild(camObj);
 
@@ -244,18 +247,11 @@ class SceneManager {
         }
 
         // this.createNewObject(new Vector3(), false);
+        this.createNewObject({select:false,model:"testfactory",pos: new Vector3()})
+        
 
-        // let obj = this.createNewObject(new Vector3(0,0,0));
+        
 
-        // // obj.setPos(new Vector3(0,0,0));
-        
-        // let obj2 = this.createNewObject(new Vector3(11,0,0));
-        // obj2.setPos(new Vector3(11,0,0));
-        
-        // let obj3 = this.createNewObject(new Vector3(11,0,0));
-        // obj3.setPos(new Vector3(11,0,-11));
-        
-        
         /**
          * Event listener for File Input
          */
@@ -336,11 +332,13 @@ class SceneManager {
                     break;
                 }
                 case "s": {
-                    if (event.ctrlKey) {
-                        event.preventDefault()
-                        this.saveScene()
+                    if (!event.ctrlKey) {
+                        break;
                     }
-                    break
+                    event.preventDefault()
+                    this.saveScene()
+
+                    break;
                 }
 
                 case "Tab": {
@@ -469,6 +467,10 @@ class SceneManager {
         return this.cam.screenPointToRay(input.mouseX, input.mouseY).direction;
     }
 
+    getModelIDs() {
+        return Array.from(this.models.keys());
+    }
+
 
     // Setters
     // --------
@@ -568,14 +570,16 @@ class SceneManager {
         pos = null,
         select = true,
         model = ""
-        } = {}) {
+    } = {}) {
         if (pos === null)
-            pos = this.getMouseForward().mul(8).add(this.camera.transform.worldPosition);
+            pos = this.getMouseForward().mul(256).add(this.camera.transform.worldPosition);
+
         const object = new SceneObject.SceneObject({
             manager: this,
             pos: pos,
             model: model
         });
+
         this.addObject(object);
 
         if (select)
@@ -659,23 +663,45 @@ class SceneManager {
     /**
      * Load scene information from JSON
      */
-    LoadScene(fileName, sceneFile) {
+    loadScene(fileName, sceneData) {
         this.name = fileName;
+        console.log("Data imported to scene: ", sceneData)
         this.clearObjects()
-        for (const objectInfo in sceneFile) {
-            const object = new SceneObject.SceneObject({
+        for (let object of sceneData) {
+            const sceneObj = new SceneObject.SceneObject({
                 manager: this,
-                pos: new Vector3(objectInfo.pos.x,
-                                objectInfo.pos.y,
-                                objectInfo.pos.z),
-                id: objectInfo.id,
-                name: objectInfo.name,
-                model: objectInfo.modelID,
-                locked: objectInfo.locked
-            })
+                id: object.objInfo.id,
+                model: object.objInfo.model,
+                locked: object.objInfo.locked,
+                //transformers: object.subscribers.transformers
+            });
 
-            this.addObject(object)
+            sceneObj.pos = new Vector3(object.objInfo.pos.x, object.objInfo.pos.y, object.objInfo.pos.z);
+            sceneObj.rot = new Vector3(object.objInfo.rot.x, object.objInfo.rot.y, object.objInfo.rot.z);
+            sceneObj.scale = new Vector3(object.objInfo.scale.x, object.objInfo.scale.y, object.objInfo.scale.z);
+
+            for (let subType in object.subscribers.singleValue) {
+                const subInfo = object.subscribers.singleValue[subType];
+                const subscriber = new SubscriberSingleValue(
+                    sceneObj,
+                    subType,
+                    subInfo.min,
+                    subInfo.max,
+                    subInfo.gradient
+                );
+
+                sceneObj.addSubscriber(subscriber);
+            }
+
+            this.addObject(sceneObj);
         }
+    }
+
+    async loadModel(id, file) {
+        const model = await Engine3D.res.loadGltf(file);
+        this.models.set(id, model);
+
+        this.events.do("load_model", 1);
     }
 
     // -------------------
@@ -725,9 +751,12 @@ class SceneManager {
         }
 
         this.events.do("select", Array.from(this._selected.values()));
-        // console.log(object);
-        const ks = object.getObject3D().addComponent(keyboardScript);
-        ks.mgr = this;
+
+        if (!object.getObject3D().hasComponent(KeyboardScript)) {
+            const ks = object.getObject3D().addComponent(KeyboardScript);
+            ks.mgr = this;
+            ks.object = object;
+        }
 
         this.updateSelectBox();
     }
@@ -914,6 +943,7 @@ class SceneManager {
 
         return bb;
     }
+
     _onOver(e) {
         console.log('onOver: Name-', this.revObjects);
         // console.log('onOver: Parent-', e.target.parent.object3D.name, e.data.pickInfo);
