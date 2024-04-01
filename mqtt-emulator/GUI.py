@@ -3,6 +3,7 @@ from tkinter import ttk, filedialog
 import json
 from asset import Asset
 from PIL import Image, ImageTk
+import test
 
 
 # COLOR SCHEME## -> sampled from Discord
@@ -280,7 +281,7 @@ class demoMode(tk.Frame):
 		button1= tk.Button(self,text='Temp Demo',bg=PANE,fg='white',height=5,width=20)#, command=lambda client=client: tempSpikeDemo(client))
 		button1.pack(side='left',padx=5)
 
-		button2= tk.Button(self,text='Factory Demo',bg=PANE,fg='white',height=5,width=20)#, command=lambda client=client: factoryDemo(client))
+		button2= tk.Button(self,text='Factory Demo',bg=PANE,fg='white',height=5,width=20, command=lambda client=CLIENT: test.testMain(client))
 		button2.pack(side='left',padx=5)
 
 		button3= tk.Button(self,text='012 Animate',bg=PANE,fg='white',height=5,width=20)#, command=lambda client=client: animate3cube(client))
