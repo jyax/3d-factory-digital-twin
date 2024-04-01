@@ -126,6 +126,8 @@ class SceneManager {
 
         this.name = '';
 
+        // localStorage.setItem('prev_files', '');
+
         // mongodb stuff
         this.modelsMap = {};
         this.LoadModels();
@@ -622,6 +624,9 @@ class SceneManager {
         let currentScene = this.getAllObjects().map(obj => obj.serializeObject())
         let jsonString = JSON.stringify(currentScene, null, 3)
 
+        let prev_files = localStorage.getItem('prev_files');
+        prev_files += ',' + this.name;
+        localStorage.setItem('prev_files', prev_files);
         localStorage.setItem(this.name, jsonString);
 
         let sceneBlob = new Blob([jsonString], {type: "application/json"})
@@ -633,7 +638,7 @@ class SceneManager {
 
         // Need to add for it to ask for file name if none set
         let saveName = "scene"
-        downloadLink.download = `${saveName}.json`
+        downloadLink.download = `${this.name}.json`
         downloadLink.click()
 
         // Remove the URL from usage
@@ -667,6 +672,7 @@ class SceneManager {
         this.name = fileName;
         console.log("Data imported to scene: ", sceneData)
         this.clearObjects()
+        if(sceneData === null) return;
         for (let object of sceneData) {
             const sceneObj = new SceneObject.SceneObject({
                 manager: this,

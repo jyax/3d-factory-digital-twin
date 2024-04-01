@@ -3,7 +3,7 @@
       <div class="panel" id="left-panel">
         <h2>Past Files</h2>
         <div id="files" v-for="file in savedFiles">
-        <FileListing class="item" :fileName=file @click="loadFile(file)"/>
+        <FileListing class="item" :fileName=file @click="loadFile(file)" v-if="file!=''"/>
         </div>
       </div>
       <div class="panel" id="right-panel">
@@ -12,7 +12,7 @@
         <div id="file-drop" @dragover.prevent @drop.prevent @drop="dropHandler" @dragover="dragOverHandler">
           <p class="center">Click here or drag an drop a factory JSON file to upload</p>
         </div>
-        <button id="create-button" @click="mgr.LoadScene({}); displayProject();">Create</button>
+        <button id="create-button" @click="mgr.loadScene(newFileName, null); displayProject();">Create</button>
       </div>
     </div>
 </template>
@@ -126,7 +126,7 @@ export default{
           fr.onloadend = (event) => {
             const data = JSON.parse(String(fr.result));
             console.log("Data from FileSelect: ", data);
-            this.mgr.loadScene(data);
+            this.mgr.loadScene(file.name, data);
             this.mgr.events.do('open project');
           }
           fr.readAsText(ev.dataTransfer.files[0]);
@@ -149,12 +149,13 @@ export default{
     loadFile(fileName){
 
       let json = JSON.parse(localStorage.getItem(fileName));
-      this.mgr.LoadScene(fileName, json);
+      this.mgr.loadScene(fileName, json);
     }
   },
 
   created() {
-    this.savedFiles = ['test_scene_1', 'test_scene_2'];
+    console.log("local storage", localStorage.getItem('prev_files').split(','));
+    this.savedFiles = localStorage.getItem('prev_files').split(',');
   }
 }
 </script>
