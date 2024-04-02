@@ -2,12 +2,20 @@ import Subscriber from "./subscriber.js";
 import ColorGradient from "../color/color_gradient.js";
 
 class SubscriberSingleValue extends Subscriber {
+    static SUGGESTED_TYPES = ["temp", "voltage", "inventory"];
+
     constructor(object, id = "", min = 0, max = 0, gradient = new ColorGradient()) {
         super(object, id);
 
         this.gradient = new ColorGradient();
         this.min = 0;
         this.max = 0;
+
+        this._history = [];
+    }
+
+    get history() {
+        return [...this._history];
     }
 
     handleData(data) {
@@ -23,6 +31,7 @@ class SubscriberSingleValue extends Subscriber {
             return;
 
         let val = parseFloat(data[this.id]);
+        this._history.push(val);
 
         const d = (val - this.min) / (this.max - this.min);
 

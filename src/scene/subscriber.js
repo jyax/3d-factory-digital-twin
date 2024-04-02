@@ -40,8 +40,9 @@ class Subscriber {
             suffix = "PM";
         }
 
+        const str = hours + ":" + min + " " + suffix;
 
-        return "Last update received at " + hours+ ":" + min + " " + suffix;
+        return "Last update received at " + str;
     }
 }
 

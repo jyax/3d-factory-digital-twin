@@ -22,9 +22,10 @@ import ObjectInfoSync from "./info/sync/ObjectInfoSync.vue";
         </div>
       </div>
 
-      <object-info-general :object="object" :key="object" v-if="tab === 'general'"/>
-
-      <object-info-sync :object="object" :key="object" v-if="tab === 'live_data'"/>
+      <div class="section-body">
+        <object-info-general :object="object" :key="object" v-if="tab === 'general'"/>
+        <object-info-sync :object="object" :key="object" v-if="tab === 'live_data'"/>
+      </div>
 
     </div>
   </div>
@@ -35,6 +36,8 @@ import ObjectInfoSync from "./info/sync/ObjectInfoSync.vue";
 .section {
   display: flex;
   flex-direction: column;
+
+  overflow-y: scroll;
 }
 
 #info-parent {
@@ -44,7 +47,8 @@ import ObjectInfoSync from "./info/sync/ObjectInfoSync.vue";
 
   min-width: 20%;
   max-width: 25%;
-  max-height: 75%;
+
+  overflow-y: scroll;
 }
 
 #info {
@@ -65,6 +69,10 @@ import ObjectInfoSync from "./info/sync/ObjectInfoSync.vue";
   border-radius: 8px;
 
   user-select: none;
+}
+
+.section-body {
+  overflow-y: scroll;
 }
 
 .section-header-icon {
