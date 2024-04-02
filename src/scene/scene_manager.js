@@ -120,6 +120,10 @@ class SceneManager {
 
         this.editMode = true;
 
+        this.name = '';
+
+        // localStorage.setItem('prev_files', '');
+
         // mongodb stuff
         this.modelsMap = {};
         this.LoadModels();
@@ -241,7 +245,7 @@ class SceneManager {
         }
 
         // this.createNewObject(new Vector3(), false);
-        this.createNewObject({select:false,model:"testfactory",pos: new Vector3()})
+        // this.createNewObject({select:false,model:"testfactory",pos: new Vector3()})
         
 
         
@@ -621,6 +625,11 @@ class SceneManager {
         let currentScene = this.getAllObjects().map(obj => obj.serializeObject())
         let jsonString = JSON.stringify(currentScene, null, 3)
 
+        let prev_files = localStorage.getItem('prev_files');
+        prev_files += ',' + this.name;
+        localStorage.setItem('prev_files', prev_files);
+        localStorage.setItem(this.name, jsonString);
+
         let sceneBlob = new Blob([jsonString], {type: "application/json"})
         const blobUrl = URL.createObjectURL(sceneBlob);
 
@@ -630,7 +639,7 @@ class SceneManager {
 
         // Need to add for it to ask for file name if none set
         let saveName = "scene"
-        downloadLink.download = `${saveName}.json`
+        downloadLink.download = `${this.name}.json`
         downloadLink.click()
 
         // Remove the URL from usage
@@ -644,6 +653,7 @@ class SceneManager {
                 },
                 body: JSON.stringify({ sceneData: jsonString })
             });
+            console.log(jsonString);
     
             if (response.ok) {
                 console.log('Scene saved successfully to server.');
@@ -675,12 +685,14 @@ class SceneManager {
             console.error("Error saving model to server:", error);
         }
     }
-    
+
 
     /**
      * Load scene information from JSON
      */
-    loadScene(sceneData) {
+    loadScene(fileName, sceneData) {
+        console.log(sceneData);
+        this.name = fileName;
         console.log("Data imported to scene: ", sceneData)
 
         const models = new Set();
@@ -695,6 +707,8 @@ class SceneManager {
             promises.push();
 
         this.clearObjects();
+        this.clearObjects()
+        if(sceneData === null) return;
         for (let object of sceneData) {
             const sceneObj = new SceneObject.SceneObject({
                 manager: this,

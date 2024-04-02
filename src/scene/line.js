@@ -5,7 +5,8 @@ import {
     MeshRenderer,
     BoxGeometry,
     LitMaterial,
-    Object3D
+    Object3D,
+    scale
 } from "@orillusion/core";
 import SceneObject from './scene_object'
 
@@ -61,15 +62,18 @@ class Line{
                 select: true
                 });
 
-            console.log([startPoint, endPoint]);
-            line._object.scaleX = Vector3.distance(startPoint, endPoint);
-            line._object.scaleY = 0;
-            line._object.scaleZ = width;
+            console.log("points", [startPoint, endPoint]);
+            line.scale = new Vector3(.01, .01, .01);
+            line._object.scaleX *= Vector3.distance(startPoint, endPoint);
+            line._object.scaleY *= 0;
+            line._object.scaleZ *= width;
             let originPoint = new Vector3(0,0,0);
             originPoint.x += (startPoint.x + endPoint.x) / 2;
             originPoint.y += (startPoint.y + endPoint.y) / 2;
-            originPoint.z += (startPoint.z + endPoint.z) / 2
+            originPoint.z += (startPoint.z + endPoint.z) / 2;
             line.pos = originPoint;
+            console.log("origin", originPoint);
+            console.log("line object: ", line);
             line._object.rotationY = -(Math.atan( (endPoint.z - startPoint.z) / (endPoint.x - startPoint.x)) * (180/Math.PI));
 
 
