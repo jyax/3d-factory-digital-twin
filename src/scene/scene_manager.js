@@ -249,7 +249,7 @@ class SceneManager {
         }
 
         // this.createNewObject(new Vector3(), false);
-        this.createNewObject({select:false,model:"testfactory",pos: new Vector3()})
+        // this.createNewObject({select:false,model:"testfactory",pos: new Vector3()})
         
 
         
@@ -670,6 +670,7 @@ class SceneManager {
      * Load scene information from JSON
      */
     loadScene(fileName, sceneData) {
+        console.log(sceneData);
         this.name = fileName;
         console.log("Data imported to scene: ", sceneData)
         this.clearObjects()

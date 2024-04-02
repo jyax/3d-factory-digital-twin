@@ -3,7 +3,7 @@
       <div class="panel" id="left-panel">
         <h2>Past Files</h2>
         <div id="files" v-for="file in savedFiles">
-        <FileListing class="item" :fileName=file @click="loadFile(file)" v-if="file!=''"/>
+        <FileListing class="item" :fileName=file @click="loadFile(file); displayProject();" v-if="file!=''"/>
         </div>
       </div>
       <div class="panel" id="right-panel">
@@ -143,7 +143,7 @@ export default{
 
     displayProject() {
       this.mgr.events.do('open project');
-      console.log(this.newFileName);
+      console.log("open project", this.newFileName);
     },
 
     loadFile(fileName){
