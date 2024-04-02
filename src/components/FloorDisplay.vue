@@ -1,6 +1,4 @@
 <script setup>
-  import {onMounted, ref} from "vue";
-  import SceneManager from "../scene/scene_manager.js";
   import ObjectInfo from "./ObjectInfo.vue";
   import Toolbar from "./Toolbar.vue";
   import Alert from "./Alert.vue";
@@ -10,17 +8,12 @@
 
   import FileSelect from "./FileSelect.vue";
 
-  const canvas = ref("canvas");
-
 </script>
 
 <template>
   <FileSelect :mgr="mgr" v-if="startMenuOn"/>
-  <canvas id="canvas" ref="canvas" @mousedown="mgr.startDrag" @mouseleave="mgr.stopDrag" @mouseup="mgr.stopDrag"></canvas>
   <object-info :mgr="mgr"/>
-  <div v-if="editOn">
-    <toolbar :mgr="mgr"/>
-  </div>
+  <toolbar v-if="editOn" :mgr="mgr"/>
   <file-menu :mgr="mgr"/>
   <login :mgr="mgr"/>
   <outline :mgr="mgr"/>

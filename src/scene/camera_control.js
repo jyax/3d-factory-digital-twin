@@ -33,7 +33,7 @@ class CameraControl extends ComponentBase {
 
         if (event.keyCode === KeyCode.Key_Space)
             this._up -= 1;
-        else if (event.keyCode === KeyCode.Key_Shift_L)
+        else if (event.keyCode === KeyCode.Key_Z)
             this._up += 1;
     }
 
@@ -53,7 +53,7 @@ class CameraControl extends ComponentBase {
 
         if (event.keyCode === KeyCode.Key_Space)
             this._up += 1;
-        else if (event.keyCode === KeyCode.Key_Shift_L)
+        else if (event.keyCode === KeyCode.Key_Z)
             this._up -= 1;
     }
 
