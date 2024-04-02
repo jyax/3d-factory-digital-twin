@@ -131,10 +131,10 @@ export default {
 
     this.update();
 
-    this.object.events.on("pos", pos => {
-      this.pos = pos.clone();
-      this.update();
-    });
+    //this.object.events.on("pos", pos => {
+    //  this.pos = pos.clone();
+    //  this.update();
+    //});
   }
 }
 

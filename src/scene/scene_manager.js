@@ -63,10 +63,6 @@ class SceneManager {
         "boiler": "./src/assets/glb_models/downloadsGLB/boiler_from_the_puffer_vic_32 (1).glb",
         "roboticArm": "./src/assets/glb_models/downloadsGLB/black_honey_-_robotic_arm (1).glb",
         "testfactory": "./src/assets/glb_models/testfactory1.glb",
-
-        // Hidden models for editor use only
-
-        ".translation-handle": "/glb_models/translation_handle.glb"
     };
 
     /**
@@ -648,7 +644,6 @@ class SceneManager {
                 },
                 body: JSON.stringify({ sceneData: jsonString })
             });
-            console.log(jsonString);
     
             if (response.ok) {
                 console.log('Scene saved successfully to server.');
@@ -659,6 +654,27 @@ class SceneManager {
             console.error('Error saving scene to server:', error);
         }
     }
+
+    async uploadModel(name, file) {
+        try {
+            const formData = new FormData();
+            formData.append("modelName", name);
+            formData.append("modelData", file);
+
+            const response = fetch("http://localhost:9000/Upload_Model", {
+                method: "POST",
+                body: formData
+            });
+
+            if (response.ok) {
+                console.log('Model saved successfully to server.');
+            } else {
+                console.error('Failed to save model to server.');
+            }
+        } catch (error) {
+            console.error("Error saving model to server:", error);
+        }
+    }
     
 
     /**
@@ -666,7 +682,19 @@ class SceneManager {
      */
     loadScene(sceneData) {
         console.log("Data imported to scene: ", sceneData)
-        this.clearObjects()
+
+        const models = new Set();
+        for (const object of sceneData)
+            if (object.model !== "")
+                models.add(object.model);
+
+        this.models.clear();
+
+        const promises = [];
+        for (const model of models.values())
+            promises.push();
+
+        this.clearObjects();
         for (let object of sceneData) {
             const sceneObj = new SceneObject.SceneObject({
                 manager: this,

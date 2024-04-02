@@ -1,7 +1,13 @@
 import express from 'express';
 import { MongoClient, GridFSBucket } from 'mongodb';
 
+import { Readable } from "stream";
+import multer from "multer";
+
 const app = express();
+
+const storage = multer.memoryStorage();
+const upload = multer({storage: storage});
 
 const port = 9000;
 const host = 'http://127.0.0.1' + port;
@@ -18,7 +24,7 @@ app.use((req, res, next) => {
 
 app.listen(port, ()=> console.log(host));
 
-// MongoDB Coonection
+// MongoDB Connection
 const mongodbURL = 'mongodb://127.0.0.1:27017';
 const client = new MongoClient(mongodbURL);
 
@@ -59,8 +65,6 @@ app.post('/Factory_Floors', async (req, res) => {
 
         const uploadStream = bucket.openUploadStream('scene.json');
 
-        console.log(sceneData);
-
         uploadStream.write(bufferData);
         uploadStream.end();
 
@@ -72,6 +76,42 @@ app.post('/Factory_Floors', async (req, res) => {
         console.error('Error saving scene to MongoDB:', error);
         res.sendStatus(500);
     }
+});
+
+app.post('/Upload_Model', upload.single('modelData'), async (req, res) => {
+    try {
+        const db = await connectToDB();
+        const bucket = new GridFSBucket(db, {bucketName: 'modelFiles'});
+
+        const uploadStream = bucket.openUploadStream(req.file.originalname, {
+            metadata: {modelName: req.body.modelName}
+        });
+
+        uploadStream.end(req.file.buffer);
+        uploadStream.on("finish", () => {
+            res.send("File uploaded successfully.");
+            console.log("Model uploaded successfully.");
+        });
+    } catch (error) {
+        console.error('Error saving model to MongoDB:', error);
+        res.sendStatus(500);
+    }
+});
+
+app.post('/Get_Model', async (req, res) => {
+    const db = await connectToDB();
+    const bucket = new GridFSBucket(db, {bucketName: 'modelFiles'});
+
+    const name = req.body.modelName;
+
+    await bucket.find({filename: name}).toArray((err, files) => {
+        if (!files || files.length === 0)
+            return res.status(404).json({
+                err: "Model does not exist."
+            });
+    });
+
+    bucket.openDownloadStreamByName(name).pipe(res);
 });
 
 app.get('/',(req, res)=>{

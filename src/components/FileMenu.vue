@@ -378,14 +378,8 @@ export default {
 
     fileUploaded(event) {
       const file = event.target.files[0];
-      const name = file.name.slice(0, file.name.indexOf('.'));
 
-      const reader = new FileReader();
-      reader.onload = e => {
-        this.mgr.loadModel(name, e.target.result);
-      }
-
-      reader.readAsText(file);
+      this.mgr.uploadModel(name, file);
     }
   },
 

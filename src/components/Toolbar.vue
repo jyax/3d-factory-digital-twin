@@ -25,41 +25,41 @@
     <div class="section-inner tools-inner">
 
       <div class="tool" @click="mgr.resetCamera()">
-        <img src="../assets/icon/square3d-from-center.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/video-camera.svg" alt="Camera" draggable="false">
         <span class="tooltip">Reset Camera <span class="soft">[Ctrl+R]</span></span>
       </div>
 
       <div class="tool" @click="mgr.focusOnSelected()" v-if="selected.length !== 0">
-        <img src="../assets/icon/cube.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/eye.svg" alt="Eye" draggable="false">
         <span class="tooltip">Focus on Selection <span class="soft">[F]</span></span>
       </div>
 
       <div class="tool-spacing"></div>
 
       <div class="tool" @click="mgr.createNewObject()">
-        <img src="../assets/icon/plus.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/cube.svg" alt="Cube" draggable="false">
         <span class="tooltip">New Object <span class="soft">[R]</span></span>
       </div>
 
       <div class="tool" @click="mgr.clearSelection()" v-if="selected.length !== 0">
-        <img src="../assets/icon/xmark.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/xmark.svg" alt="XMark" draggable="false">
         <span class="tooltip">Deselect <span class="soft">[Tab]</span></span>
       </div>
 
       <div class="tool" @click="mgr.duplicateSelected()" v-if="selected.length !== 0">
-        <img src="../assets/icon/copy.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/copy.svg" alt="Copy" draggable="false">
         <span class="tooltip">Duplicate <span class="soft">[Ctrl+D]</span></span>
       </div>
 
       <div class="tool" @click="mgr.deleteSelected()" v-if="selected.length !== 0">
-        <img src="../assets/icon/trash.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/trash.svg" alt="Trash" draggable="false">
         <span class="tooltip">Delete <span class="soft">[Del]</span></span>
       </div>
 
       <div class="tool-spacing"></div>
 
       <div class="tool" @click="OpenLineWindow()">
-        <img src="../assets/icon/plus.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/ease-curve-control-points.svg" alt="Lines" draggable="false">
         <span class="tooltip">New Line</span>
       </div>
 

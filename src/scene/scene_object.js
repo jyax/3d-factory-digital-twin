@@ -302,12 +302,12 @@ class SceneObject {
         if (isNaN(x))
             return;
 
-    this._object.x = x;
+        this._object.transform.x = x;
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
 
-        this.events.do("pos", this.pos);
+        this.events.do("pos", this.pos.clone());
     }
 
     /**
@@ -318,12 +318,12 @@ class SceneObject {
         if (isNaN(y))
             return;
 
-    this._object.y = y;
+        this._object.transform.y = y;
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
 
-        this.events.do("pos", this.pos);
+        this.events.do("pos", this.pos.clone());
     }
 
     /**
@@ -334,12 +334,12 @@ class SceneObject {
         if (isNaN(z))
             return;
 
-    this._object.z = z;
+        this._object.transform.z = z;
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
 
-        this.events.do("pos", this.pos);
+        this.events.do("pos", this.pos.clone());
     }
 
     set rot(newRot) {
@@ -469,7 +469,6 @@ class SceneObject {
    * @returns {SceneObject} Duplicate object
    */
   duplicate() {
-    cloned;
     const copy = this.copy();
 
     this.mgr.addObject(copy);
