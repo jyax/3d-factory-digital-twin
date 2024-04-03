@@ -15,7 +15,11 @@ import AssetListing from "./AssetListing.vue";
         <p class="assets-title">Models</p>
 
         <div id="assets-inner">
+          <p class="external-label" style="text-align: center; margin-top: 0;"
+             v-if="models.length === 0">There are no models in this project.</p>
           <asset-listing v-for="id of filteredModels" :id="id" :mgr="mgr"/>
+          <p class="external-label" v-if="filteredExternalModels.length > 0">Also available...</p>
+          <asset-listing v-for="id of filteredExternalModels" :id="id" :mgr="mgr" :external="true"/>
         </div>
         <input class="input" v-model="filter" type="text" placeholder="Filter..."
                @input="doFilter">
@@ -32,7 +36,7 @@ import AssetListing from "./AssetListing.vue";
         <span class="tooltip">Upload Model...</span>
       </div>
 
-      <div class="tool" @click="">
+      <div class="tool" @click="mgr.events.do('projects')">
         <img src="../assets/icon/view-grid.svg" alt="Projects" draggable="false">
         <span class="tooltip">Projects</span>
       </div>
@@ -168,6 +172,15 @@ import AssetListing from "./AssetListing.vue";
   align-items: center;
 
   position: relative;
+}
+
+.external-label {
+  margin: 8px;
+  text-align: left;
+
+  font-size: 15px;
+  font-style: italic;
+  opacity: 0.8;
 }
 
 .tools-icon {
@@ -361,15 +374,21 @@ export default {
   data() {
     return {
       models: [],
+      externalModels: [],
       showAssets: false,
       filter: "",
-      filteredModels: []
+      filteredModels: [],
+      filteredExternalModels: []
     }
   },
 
   methods: {
     doFilter() {
-      this.filteredModels = this.models.filter(id => id.includes(this.filter));
+      this.filteredModels = this.models.filter(id => id.includes(this.filter)).sort();
+
+      this.filteredExternalModels = this.externalModels.filter(id => {
+        return id.includes(this.filter) && !this.models.includes(id);
+      }).sort();
     },
 
     promptUpload() {
@@ -379,7 +398,20 @@ export default {
     fileUploaded(event) {
       const file = event.target.files[0];
 
-      this.mgr.uploadModel(name, file);
+      this.mgr.uploadModel(name, file, () => {
+        this.loadExternalModels();
+      });
+    },
+
+    loadExternalModels() {
+      fetch("http://localhost:9000/Get_All_Models", {
+        method: "POST"
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        this.externalModels = data.map(val => val.replaceAll(".glb", ""));
+        this.doFilter();
+      });
     }
   },
 
@@ -388,6 +420,8 @@ export default {
       this.models = this.mgr.getModelIDs();
       this.doFilter();
     });
+
+    this.loadExternalModels();
   }
 };
 

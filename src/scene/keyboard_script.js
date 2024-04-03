@@ -2,7 +2,7 @@ import {
     ComponentBase,
     Engine3D,
     KeyEvent,
-    KeyCode
+    KeyCode, Time
 } from "@orillusion/core";
 
 import Util from "../util/util";
@@ -43,9 +43,15 @@ class KeyboardScript extends ComponentBase
         if (!this.object.isSelected())
             return;
 
+        const elapsed = Time.delta / 1000;
+
+        let speed = 150;
+        if (this.mgr.isKeyDown("shift"))
+            speed = 75;
+
         let trans = this.object3D.transform;
-        if (this.left) trans.rotationY -= 2;
-        if (this.right) trans.rotationY += 2;
+        if (this.left) trans.rotationY -= speed * elapsed;
+        if (this.right) trans.rotationY += speed * elapsed;
         trans.rotationY %= 360;
 
         if (this.mgr !== null)

@@ -1,7 +1,6 @@
 import express from 'express';
 import { MongoClient, GridFSBucket } from 'mongodb';
 
-import { Readable } from "stream";
 import multer from "multer";
 
 const app = express();
@@ -25,7 +24,7 @@ app.use((req, res, next) => {
 app.listen(port, ()=> console.log(host));
 
 // MongoDB Connection
-const mongodbURL = 'mongodb://127.0.0.1:27017';
+const mongodbURL = 'mongodb://34.162.94.101:27017';
 const client = new MongoClient(mongodbURL);
 
 // Create bucket
@@ -54,9 +53,9 @@ async function connectToDB(){
 
 // Save scene data to MongoDB using GridFS
 app.post('/Factory_Floors', async (req, res) => {
-    
     const db = await connectToDB();
     const sceneData = req.body.sceneData;
+    console.log(sceneData)
 
     try {
         const bucket = new GridFSBucket(db, {bucketName: 'sceneFiles'});
@@ -76,6 +75,59 @@ app.post('/Factory_Floors', async (req, res) => {
         console.error('Error saving scene to MongoDB:', error);
         res.sendStatus(500);
     }
+});
+
+app.post('/Get_All_Floors', async (req, res) => {
+    const db = await connectToDB();
+
+    try {
+        const bucket = new GridFSBucket(db, {bucketName: 'sceneFiles'});
+        const names = [];
+
+        const files = await bucket.find({}).toArray();
+
+        files.forEach(file => names.push(file.filename));
+
+        res.send(JSON.stringify(names));
+
+    } catch (error) {
+        console.error('Error saving scene to MongoDB:', error);
+        res.sendStatus(500);
+    }
+});
+
+app.post('/Get_Floor', async (req, res) => {
+    const db = await connectToDB();
+    const bucket = new GridFSBucket(db, {bucketName: 'sceneFiles'});
+
+    const name = req.body.floorName;
+
+    const files = await bucket.find({filename: name}).toArray();
+    if (!files || files.length === 0)
+        return res.status(404).json({
+            err: "Model does not exist."
+        });
+
+    const stream = bucket.openDownloadStreamByName(name);
+    let buffer = "";
+
+    stream.on("data", chunk => {
+
+        buffer += chunk.toString();
+    });
+
+    stream.on("error", err => {
+        res.status(500).json({err: "Failed to download JSON file."});
+    });
+
+    stream.on("end", () => {
+        try {
+            const data = JSON.parse(buffer);
+            res.json(data);
+        } catch (error) {
+            res.status(500).json({err: "Failed to parse JSON data."});
+        }
+    });
 });
 
 app.post('/Upload_Model', upload.single('modelData'), async (req, res) => {
@@ -102,16 +154,34 @@ app.post('/Get_Model', async (req, res) => {
     const db = await connectToDB();
     const bucket = new GridFSBucket(db, {bucketName: 'modelFiles'});
 
-    const name = req.body.modelName;
+    const name = req.body.modelName + ".glb";
 
-    await bucket.find({filename: name}).toArray((err, files) => {
-        if (!files || files.length === 0)
-            return res.status(404).json({
-                err: "Model does not exist."
-            });
-    });
+    const files = await bucket.find({filename: name}).toArray();
+    if (!files || files.length === 0)
+        return res.status(404).json({
+            err: "Model does not exist."
+        });
 
     bucket.openDownloadStreamByName(name).pipe(res);
+});
+
+app.post('/Get_All_Models', async (req, res) => {
+    const db = await connectToDB();
+
+    try {
+        const bucket = new GridFSBucket(db, {bucketName: 'modelFiles'});
+        const names = [];
+
+        const files = await bucket.find({}).toArray();
+
+        files.forEach(file => names.push(file.filename));
+
+        res.send(JSON.stringify(names));
+
+    } catch (error) {
+        console.error('Error saving scene to MongoDB:', error);
+        res.sendStatus(500);
+    }
 });
 
 app.get('/',(req, res)=>{
