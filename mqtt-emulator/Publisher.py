@@ -59,8 +59,8 @@ def run():
 
     client.loop_start()
 
-    GUI.main(client)
-    # test.testMain(client)
+    # GUI.main(client)
+    test.oscillate(client)
 
 
    

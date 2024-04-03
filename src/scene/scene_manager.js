@@ -64,7 +64,9 @@ class SceneManager {
         "roboticArm": "./src/assets/glb_models/boxarm.glb",
         "testfactory": "./src/assets/glb_models/testfactory1.glb",
         "human": "./src/assets/glb_models/human.glb",
-        "shelf": "./src/assets/glb_models/shelf.glb"
+        "shelf": "./src/assets/glb_models/shelf.glb",
+        "material_bot":  "./src/assets/glb_models/material_bot.glb",
+        "storage_tote":  "./src/assets/glb_models/storage_tote.glb"
         // Hidden models for editor use only
 
         // ".translation-handle": "/glb_models/translation_handle.glb"
