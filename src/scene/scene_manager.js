@@ -63,10 +63,11 @@ class SceneManager {
         "boiler": "./src/assets/glb_models/downloadsGLB/boiler_from_the_puffer_vic_32 (1).glb",
         "roboticArm": "./src/assets/glb_models/boxarm.glb",
         "testfactory": "./src/assets/glb_models/testfactory1.glb",
-
+        "human": "./src/assets/glb_models/human.glb",
+        "shelf": "./src/assets/glb_models/shelf.glb"
         // Hidden models for editor use only
 
-        ".translation-handle": "/glb_models/translation_handle.glb"
+        // ".translation-handle": "/glb_models/translation_handle.glb"
     };
 
     /**
