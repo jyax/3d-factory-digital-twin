@@ -60,6 +60,7 @@
     created() {
       this.mgr.events.on('switch view', this.switchView);
       this.mgr.events.on('open project', this.showStartMenu);
+      this.mgr.events.on('projects', () => this.startMenuOn = true);
     }
   }
 </script> 

@@ -7,6 +7,8 @@ class CameraControl extends ComponentBase {
     constructor() {
         super();
 
+        this.mgr = null;
+
         this._fwd = 0;
         this._sdw = 0;
         this._up = 0;
@@ -58,6 +60,9 @@ class CameraControl extends ComponentBase {
     }
 
     onUpdate(view) {
+        if (this.mgr.isKeyDown("control"))
+            return;
+
         const elapsed = Time.delta / 1000;
 
         const forward = this.object3D.transform.forward.mul(this._fwd * CameraControl.SPEED * elapsed);

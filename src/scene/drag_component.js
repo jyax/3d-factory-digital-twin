@@ -81,6 +81,9 @@ class DragComponent extends ComponentBase {
             const bounds = this.mgr.getSelectedBounds();
             const a = bounds.min;
             const b = bounds.max;
+
+            const bottom = a.y;
+
             a.y = 0;
             b.y = 0;
 
@@ -92,6 +95,13 @@ class DragComponent extends ComponentBase {
                 pos.y,
                 Math.round(pos.z / snap) * snap
             );
+
+            const gridPos = center.clone();
+            gridPos.y = bottom;
+
+            this.mgr.showSnapGrid(gridPos, snap);
+        } else {
+            this.mgr.hideSnapGrid();
         }
 
         for (const object of this.mgr.getSelected()) {

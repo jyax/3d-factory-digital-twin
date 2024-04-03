@@ -3,6 +3,8 @@
 
     <p class="listing-name">{{ id }}</p>
 
+    <img src="../assets/icon/download.svg" alt="Download" v-if="external">
+
     <div class="listing-buttons"></div>
 
   </div>
@@ -34,6 +36,12 @@
 
   margin: 4px;
   text-align: left;
+}
+
+.listing img {
+  filter: invert();
+  opacity: 0.6;
+  width: 1.5rem;
 }
 
 .anonymous {
@@ -94,14 +102,22 @@ export default {
     mgr: {
       type: SceneManager,
       required: true
+    },
+
+    external: {
+      default: false
     }
   },
 
   methods: {
     doClick() {
-      this.mgr.createNewObject({
-        model: this.id
-      });
+      if (this.external) {
+        this.mgr.getModelFromDB(this.id)
+      } else {
+        this.mgr.createNewObject({
+          model: this.id
+        });
+      }
     }
   }
 };
