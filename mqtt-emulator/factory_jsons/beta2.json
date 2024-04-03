@@ -1,0 +1,496 @@
+[
+   {
+      "objInfo": {
+         "id": "floor",
+         "model": "testfactory",
+         "locked": false,
+         "pos": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "rot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+         }
+      },
+      "subscribers": {
+         "singleValue": {},
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "0",
+         "model": "storage_tote",
+         "locked": false,
+         "pos": {
+            "x": 3074.549,
+            "y": 120,
+            "z": -1780
+         },
+         "rot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+         }
+      },
+      "subscribers": {
+         "singleValue": {},
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "1",
+         "model": "storage_tote",
+         "locked": false,
+         "pos": {
+            "x": 2914.376,
+            "y": 120,
+            "z": -1780
+         },
+         "rot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+         }
+      },
+      "subscribers": {
+         "singleValue": {},
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "2",
+         "model": "storage_tote",
+         "locked": false,
+         "pos": {
+            "x": 2636.005,
+            "y": 120,
+            "z": -1780
+         },
+         "rot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+         }
+      },
+      "subscribers": {
+         "singleValue": {},
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "3",
+         "model": "storage_tote",
+         "locked": false,
+         "pos": {
+            "x": 2223.927,
+            "y": 120,
+            "z": -1780
+         },
+         "rot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+         }
+      },
+      "subscribers": {
+         "singleValue": {},
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "4",
+         "model": "storage_tote",
+         "locked": false,
+         "pos": {
+            "x": 1752.399,
+            "y": 120,
+            "z": -1780
+         },
+         "rot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+         }
+      },
+      "subscribers": {
+         "singleValue": {},
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "5",
+         "model": "storage_tote",
+         "locked": false,
+         "pos": {
+            "x": 3199.557,
+            "y": 120,
+            "z": -1780
+         },
+         "rot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+         }
+      },
+      "subscribers": {
+         "singleValue": {},
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "forklift1",
+         "model": "forklift",
+         "locked": false,
+         "pos": {
+            "x": 366.021,
+            "y": 120,
+            "z": -3775
+         },
+         "rot": {
+            "x": 0,
+            "y": -90,
+            "z": 0
+         },
+         "scale": {
+            "x": 200,
+            "y": 200,
+            "z": 200
+         }
+      },
+      "subscribers": {
+         "singleValue": {},
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "kuka_arm1",
+         "model": "roboticArm",
+         "locked": false,
+         "pos": {
+            "x": 2465.000000000062,
+            "y": -42,
+            "z": -3475
+         },
+         "rot": {
+            "x": 0,
+            "y": 89,
+            "z": 0
+         },
+         "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+         }
+      },
+      "subscribers": {
+         "singleValue": {
+            "default": {
+               "min": 0,
+               "max": 100,
+               "gradient": {
+                  "points": [
+                     0,
+                     1
+                  ],
+                  "colors": [
+                     {
+                        "r": 0.36470588235294116,
+                        "g": 0.788235294117647,
+                        "b": 0.2196078431372549,
+                        "a": 1
+                     },
+                     {
+                        "r": 0.9490196078431372,
+                        "g": 0.30980392156862746,
+                        "b": 0.26666666666666666,
+                        "a": 1
+                     }
+                  ],
+                  "snap": false
+               }
+            }
+         },
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "person",
+         "model": "human",
+         "locked": false,
+         "pos": {
+            "x": 1836.4638945312672,
+            "y": 0,
+            "z": -1133.9399037021278
+         },
+         "rot": {
+            "x": -90,
+            "y": 0,
+            "z": 0
+         },
+         "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+         }
+      },
+      "subscribers": {
+         "singleValue": {},
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "bot_1",
+         "model": "material_bot",
+         "locked": false,
+         "pos": {
+            "x": 1544.1166645488913,
+            "y": 0,
+            "z": -1248.2342189901551
+         },
+         "rot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+         }
+      },
+      "subscribers": {
+         "singleValue": {},
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "tote_1",
+         "model": "storage_tote",
+         "locked": false,
+         "pos": {
+            "x": 1714.8565952015595,
+            "y": 50.0000000000002,
+            "z": -1074.4555378937685
+         },
+         "rot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+         }
+      },
+      "subscribers": {
+         "singleValue": {},
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "bot_2",
+         "model": "material_bot",
+         "locked": false,
+         "pos": {
+            "x": 1484.2665004614191,
+            "y": 0,
+            "z": -2372.30828982427
+         },
+         "rot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+         }
+      },
+      "subscribers": {
+         "singleValue": {},
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "bot_3",
+         "model": "material_bot",
+         "locked": false,
+         "pos": {
+            "x": 1488.803236268195,
+            "y": 0,
+            "z": -2675.306885942101
+         },
+         "rot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+         }
+      },
+      "subscribers": {
+         "singleValue": {},
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "bot_4",
+         "model": "material_bot",
+         "locked": false,
+         "pos": {
+            "x": 1488.4251759878061,
+            "y": 0,
+            "z": -2529.3652610571767
+         },
+         "rot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+         }
+      },
+      "subscribers": {
+         "singleValue": {},
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "boiler_1",
+         "model": "boiler",
+         "locked": false,
+         "pos": {
+            "x": 2727.4083331801967,
+            "y": 2.2737367544323206e-13,
+            "z": -5874.829674086479
+         },
+         "rot": {
+            "x": -90,
+            "y": 0,
+            "z": 0
+         },
+         "scale": {
+            "x": 100,
+            "y": 100,
+            "z": 100
+         }
+      },
+      "subscribers": {
+         "singleValue": {
+            "temp": {
+               "min": 0,
+               "max": 100,
+               "gradient": {
+                  "points": [
+                     0,
+                     1
+                  ],
+                  "colors": [
+                     {
+                        "r": 0.36470588235294116,
+                        "g": 0.788235294117647,
+                        "b": 0.2196078431372549,
+                        "a": 1
+                     },
+                     {
+                        "r": 0.9490196078431372,
+                        "g": 0.30980392156862746,
+                        "b": 0.26666666666666666,
+                        "a": 1
+                     }
+                  ],
+                  "snap": false
+               }
+            }
+         },
+         "transformers": true
+      }
+   },
+   {
+      "objInfo": {
+         "id": "forklift_2",
+         "model": "forklift",
+         "locked": false,
+         "pos": {
+            "x": 1086.741354271102,
+            "y": 225,
+            "z": -3930.62919094808
+         },
+         "rot": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "scale": {
+            "x": 200,
+            "y": 200,
+            "z": 200
+         }
+      },
+      "subscribers": {
+         "singleValue": {},
+         "transformers": true
+      }
+   }
+]

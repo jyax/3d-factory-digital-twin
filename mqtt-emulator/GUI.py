@@ -278,14 +278,17 @@ class demoMode(tk.Frame):
 		self.createButtons()
 
 	def createButtons(self):
-		button1= tk.Button(self,text='Temp Demo',bg=PANE,fg='white',height=5,width=20)#, command=lambda client=client: tempSpikeDemo(client))
+		button1= tk.Button(self,text='Temp Demo',bg=PANE,fg='white',height=5,width=10, command=lambda client=CLIENT: test.tempSpikeDemo(client))
 		button1.pack(side='left',padx=5)
 
-		button2= tk.Button(self,text='Factory Demo',bg=PANE,fg='white',height=5,width=20, command=lambda client=CLIENT: test.testMain(client))
+		button2= tk.Button(self,text='Factory Demo',bg=PANE,fg='white',height=5,width=10, command=lambda client=CLIENT: test.testMain(client))
 		button2.pack(side='left',padx=5)
 
-		button3= tk.Button(self,text='012 Animate',bg=PANE,fg='white',height=5,width=20)#, command=lambda client=client: animate3cube(client))
-		button3.pack(side='left',padx=5)    
+		button3= tk.Button(self,text='Follow Line',bg=PANE,fg='white',height=5,width=10, command=lambda client=CLIENT: test.followLine(client))
+		button3.pack(side='left',padx=5)
+
+		button4= tk.Button(self,text='Oscillate',bg=PANE,fg='white',height=5,width=10, command=lambda client=CLIENT: test.oscillate(client))
+		button4.pack(side='left',padx=5)        
 
 
 class editKeyframe(tk.Frame):
