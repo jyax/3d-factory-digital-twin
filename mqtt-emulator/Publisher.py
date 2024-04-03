@@ -8,8 +8,7 @@ import test
 
 ###TOGGLE TEST MODES###
 #######################
-SERVERLESS  =   True###
-ANIMATE     =  False###
+SERVERLESS  =  False###
 #######################
 
 if not SERVERLESS:
@@ -60,11 +59,7 @@ def run():
     client.loop_start()
 
     GUI.main(client)
-    # test.testMain(client)
 
-
-   
-  
     client.loop_stop()
 
 

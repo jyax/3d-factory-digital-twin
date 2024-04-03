@@ -8,6 +8,8 @@ def calcVal(start_val, end_val, start_time, duration, curr_time):
     fraction = (curr_time-start_time)/(duration*10)
     return round(start_val + (delta*fraction),3)
 
+
+    
 class Asset:
 
     def __init__(self,id='0',x=0,y=0,z=0,rot_x=0,rot_y=0,rot_z=0,temp=25,voltage=12,qty=0,qty_MAX=10):
