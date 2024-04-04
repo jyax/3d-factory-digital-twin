@@ -1,6 +1,7 @@
 from changes import *
 import math
 import asset as a
+import numpy as np
 
 
 
@@ -44,16 +45,17 @@ def oscillate(client):
     # arm = a.Asset(id='kuka_arm1',x=2350,y=-42,z=-3805,rot_y=90)
     # arm.liveUpdate(client)
     angle = 90
-    originX,originZ = (2465,-3475)
+    originX,originZ = (arm.x,arm.z)
     rads = math.radians(angle)
+    
+    offsetX, offsetZ = (150,300)
    
-    # time.sleep(2)
+    time.sleep(2)
     
     for i in range(0,angle):
         rads = math.radians(i)
-        rotatedX = math.cos(rads) * (arm.x-originX) - math.sin(rads) * (arm.z - originZ) + originX
-        rotatedZ = math.cos(rads) * (arm.x-originX) + math.sin(rads) * (arm.z - originZ) + originZ
-
+        rotatedX = math.cos(rads) * (arm.x-offsetX) - math.sin(rads) * (arm.z - offsetZ) + originX
+        rotatedZ = math.cos(rads) * (arm.x-offsetX) + math.sin(rads) * (arm.z - offsetZ) + originZ
         arm = a.Asset(id='kuka_arm1',x=rotatedX,y=-42,z=rotatedZ,rot_y= i)
         arm.liveUpdate(client)
         time.sleep(.05)
@@ -61,7 +63,7 @@ def oscillate(client):
 def tempSpikeDemo(client):
     seqs = []
     name = 'boiler_1'
-    x,y,z =(1000,0,-1000)
+    x,y,z =(-1300,0,-2800)
     rot_x =-90
     boiler = Sequence([])
     boiler.add_state(a.Asset(id=name,x=x,y=y,z=z,temp=25,rot_x=rot_x))
@@ -70,14 +72,11 @@ def tempSpikeDemo(client):
     boiler.add_duration(1)
     boiler.add_state(a.Asset(id=name,x=x,y=y,z=z,temp=48,rot_x=rot_x))
     boiler.add_duration(2)
-    boiler.add_state(a.Asset(id=name,x=x,y=y,z=z,temp=82,rot_x=rot_x))
-    boiler.add_duration(2)
     boiler.add_state(a.Asset(id=name,x=x,y=y,z=z,temp=125,rot_x=rot_x))
     boiler.add_duration(.1)
     boiler.add_state(a.Asset(id=name,x=x,y=y,z=z,temp=25,rot_x=rot_x))
     seqs.append(boiler)
-    runAsGroup(seqs,client)
-    a.Asset(id=name,x=x,y=y,z=z,temp=88,rot_x=rot_x).liveUpdate(client)
+    boiler.runSolo(client)
 
 def followLine(client):
     seqs = []
@@ -85,14 +84,13 @@ def followLine(client):
     height = 0
     points = [
         [0,0],
-        [500,0],
-        [500,400],
-        [0,400]
+        [1000,0],
+        [1000,1000],
+        [0,1000]
     ]
-    forklift1 = Sequence([])
+    bot_1 = Sequence([])
     for point in points:
-        forklift1.add_state(a.Asset(id=subName,x=point[0],y=height,z=point[1]))
-        forklift1.add_duration(1) # add duration based on dist
-    forklift1.add_state(a.Asset(id=subName,x=points[-1][0],y=height,z=points[-1][1]))
-    seqs.append(forklift1)
-    runAsGroup(seqs,client)
+        bot_1.add_state(a.Asset(id=subName,x=point[0],y=height,z=point[1]))
+        bot_1.add_duration(3.5) # add duration based on dist
+    bot_1.add_state(a.Asset(id=subName,x=points[-1][0],y=height,z=points[-1][1]))
+    bot_1.runSolo(client)

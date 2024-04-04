@@ -33,7 +33,7 @@ class Sequence:
 	def runSolo(self,client):
 		
 		#constants
-		CYCLE_TIME = .05 # in seconds
+		CYCLE_TIME = .07 # in seconds
 		START_TIME = time.perf_counter()
 		LIMIT = sum(self.durations)
 
@@ -70,9 +70,9 @@ class Sequence:
 def runAsGroup(sequences,client):
 
 	#constants
-		CYCLE_TIME = .07 # in seconds
+		CYCLE_TIME = .25 # in seconds
 		START_TIME = time.perf_counter()
-		LIMIT = 30 # seconds
+		LIMIT = 5 # seconds
 
 		# GETTER for current time
 		def getTime():

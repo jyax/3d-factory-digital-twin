@@ -8,7 +8,7 @@ import test
 
 ###TOGGLE TEST MODES###
 #######################
-SERVERLESS  =   True###
+SERVERLESS  =  False###
 #######################
 
 if not SERVERLESS:

@@ -32,6 +32,7 @@
   transform: translate(-50%, -50%);
   max-width: 40%;
   max-height: 50%;
+  z-index: 2;
 }
 
 .alert-menu {
