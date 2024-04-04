@@ -431,8 +431,9 @@ export default {
     }
   },
 
-  created() {
+  mounted() {
     this.id = this.subscriber.type;
+    this.$refs.typeInput.val = this.subscriber.type;
 
     this.updateListener = this.subscriber.events.on("update", () => this.updateData());
 

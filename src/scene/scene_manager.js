@@ -46,7 +46,7 @@ class SceneManager {
         "workstation2": "/glb_models/Station 10x Layout v31.glb",
         "lathe": "./src/assets/glb_models/downloadsGLB/desk_lathe.glb",
         "ladder": "./src/assets/glb_models/downloadsGLB/escada_movel_-_moving_ladder.glb",
-        "forklift": "./src/assets/glb_models/downloadsGLB/forklift_gameready.glb",
+        "forklift": "./src/assets/glb_models/downloadsGLB/forklift.glb",
         "picaMachine": "./src/assets/glb_models/downloadsGLB/pica_pica_-_machines.glb",
         "robot": "./src/assets/glb_models/FANUC-430 Robot.glb",
         "bin": "./src/assets/glb_models/Slatwall_Bin_5.5in.glb",
@@ -122,40 +122,6 @@ class SceneManager {
 
         this.grid = [];
         this._prevGridCenter = null;
-
-        // localStorage.setItem('prev_files', '');
-
-        // mongodb stuff
-        this.modelsMap = {};
-        this.LoadModels();
-    }
-
-    /**
-     * Load models from MongoDB
-     * @constructor
-     */
-    LoadModels() {
-        // fetch('http://localhost:3000/api/loadModels', {
-        //     method: "POST",
-        //     headers: {
-        //         "Content-Type": "application/json"
-        //     },
-        //     body: JSON.stringify({
-        //         thing: "yes"
-        //     })
-        // })
-        //     .then(response => {
-        //         if (!response.ok) {
-        //             throw new Error('network response was not ok');
-        //         }
-        //         return response.json();
-        //     })
-        //     .then(data => {
-        //         this.modelsMap = data.models;
-        //     })
-        //     .catch(error => {
-        //         console.error('error:', error);
-        //     });
     }
 
     /**
@@ -685,7 +651,10 @@ class SceneManager {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ sceneData: jsonString })
+                body: JSON.stringify({
+                    sceneData: jsonString,
+                    sceneName: this.name
+                })
             });
     
             if (response.ok) {
@@ -740,6 +709,8 @@ class SceneManager {
             if (object.objInfo.model !== "")
                 models.add(object.objInfo.model);
 
+        const local = [];
+
         for (const id of this.models.keys()) {
             if (models.has(id)) {
                 models.delete(id);
@@ -747,6 +718,22 @@ class SceneManager {
                 this.models.delete(id);
             }
         }
+
+        const toGetLocal = [];
+
+        for (const id of Object.keys(SceneManager.MODELS)) {
+            if (models.has(id)) {
+                models.delete(id);
+
+                const promise = Engine3D.res.loadGltf(SceneManager.MODELS[id])
+                    .then(object => {
+                        this.models.set(id, object);
+                    });
+                toGetLocal.push(promise);
+            }
+        }
+
+        await Promise.all(toGetLocal);
 
         const toGet = Array.from(models.values());
 
@@ -805,6 +792,7 @@ class SceneManager {
             sceneObj.rot = new Vector3(object.objInfo.rot.x, object.objInfo.rot.y, object.objInfo.rot.z);
             sceneObj.scale = new Vector3(object.objInfo.scale.x, object.objInfo.scale.y, object.objInfo.scale.z);
 
+            console.log(object.objInfo.model, object.subscribers.singleValue)
             for (let subType in object.subscribers.singleValue) {
                 const subInfo = object.subscribers.singleValue[subType];
                 const subscriber = new SubscriberSingleValue(
