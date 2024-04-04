@@ -106,7 +106,7 @@ class SceneManager {
 
         this._mqttHandler = new MQTTHandler({
             mgr: this,
-            server: false
+            server: true
         });
 
         this.editMode = true;
@@ -631,8 +631,10 @@ class SceneManager {
         downloadLink.href = blobUrl
 
         // Need to add for it to ask for file name if none set
-        let saveName = "scene"
-        downloadLink.download = `${this.name}.json`
+        let saveName = this.name;
+        if (!saveName.includes(".json"))
+            saveName += ".json";
+        downloadLink.download = saveName;
         downloadLink.click()
 
         // Remove the URL from usage

@@ -41,9 +41,16 @@ import AssetListing from "./AssetListing.vue";
         <span class="tooltip">Projects</span>
       </div>
 
+      <div class="tool-spacing"></div>
+
       <div class="tool" @click="mgr.saveScene()">
         <img src="../assets/icon/floppy-disk.svg" alt="Save" draggable="false">
         <span class="tooltip">Save <span class="soft">[Ctrl+S]</span></span>
+      </div>
+
+      <div class="tool" @click="mgr.saveScene()">
+        <img src="../assets/icon/import.svg" alt="Import" draggable="false">
+        <span class="tooltip">Export</span>
       </div>
 
     </div>
