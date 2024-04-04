@@ -25,7 +25,12 @@ app.listen(port, ()=> console.log(host));
 
 // MongoDB Connection
 const mongodbURL = 'mongodb://34.162.94.101:27017';
-const client = new MongoClient(mongodbURL);
+const client = new MongoClient(mongodbURL, {
+    auth: {
+        username: "admin",
+        password: "m@gn@_2024!"
+    }
+});
 
 // Create bucket
 //const bucket = new mongodb.GridFSBucket(db);
