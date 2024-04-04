@@ -210,7 +210,7 @@
    {
       "objInfo": {
          "id": "kuka_arm1",
-         "model": "roboticArm",
+         "model": "boxarm",
          "locked": false,
          "pos": {
             "x": 2465.000000000062,

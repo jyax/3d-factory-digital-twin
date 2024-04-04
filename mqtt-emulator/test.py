@@ -60,18 +60,24 @@ def oscillate(client):
 
 def tempSpikeDemo(client):
     seqs = []
+    name = 'boiler_1'
+    x,y,z =(1000,0,-1000)
+    rot_x =-90
     boiler = Sequence([])
-    boiler.add_state(a.Asset(id='boiler_1',x=2350,y=-42,z=-3805,temp=25))
+    boiler.add_state(a.Asset(id=name,x=x,y=y,z=z,temp=25,rot_x=rot_x))
     boiler.add_duration(1)
-    boiler.add_state(a.Asset(id='boiler_1',x=2350,y=-42,z=-3805,temp=60))
+    boiler.add_state(a.Asset(id=name,x=x,y=y,z=z,temp=60,rot_x=rot_x))
     boiler.add_duration(1)
-    boiler.add_state(a.Asset(id='boiler_1',x=2350,y=-42,z=-3805,temp=48))
+    boiler.add_state(a.Asset(id=name,x=x,y=y,z=z,temp=48,rot_x=rot_x))
     boiler.add_duration(2)
-    boiler.add_state(a.Asset(id='boiler_11',x=2350,y=-42,z=-3805,temp=82))
+    boiler.add_state(a.Asset(id=name,x=x,y=y,z=z,temp=82,rot_x=rot_x))
     boiler.add_duration(2)
-    boiler.add_state(a.Asset(id='boiler_1',x=2350,y=-42,z=-3805,temp=125))
+    boiler.add_state(a.Asset(id=name,x=x,y=y,z=z,temp=125,rot_x=rot_x))
+    boiler.add_duration(.1)
+    boiler.add_state(a.Asset(id=name,x=x,y=y,z=z,temp=25,rot_x=rot_x))
     seqs.append(boiler)
     runAsGroup(seqs,client)
+    a.Asset(id=name,x=x,y=y,z=z,temp=88,rot_x=rot_x).liveUpdate(client)
 
 def followLine(client):
     seqs = []
