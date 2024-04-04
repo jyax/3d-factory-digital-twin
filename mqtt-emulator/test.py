@@ -81,12 +81,13 @@ def tempSpikeDemo(client):
 
 def followLine(client):
     seqs = []
-    subName = 'forklift_1'
-    height = 120
+    subName = 'bot_1'
+    height = 0
     points = [
         [0,0],
-        [0,0],
-        [0,0]
+        [500,0],
+        [500,400],
+        [0,400]
     ]
     forklift1 = Sequence([])
     for point in points:
