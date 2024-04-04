@@ -72,7 +72,7 @@ def runAsGroup(sequences,client):
 	#constants
 		CYCLE_TIME = .07 # in seconds
 		START_TIME = time.perf_counter()
-		LIMIT = 90 # seconds
+		LIMIT = 50 # seconds
 
 		# GETTER for current time
 		def getTime():
