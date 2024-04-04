@@ -581,7 +581,7 @@ class SceneObject {
 
       const height = bounds.max.y - bounds.min.y;
 
-      this._object.y = y + height / 2 + diff;
+      this._object.y = y + height / 2 - diff;
       this.events.do("pos", this.pos);
 
       if (this.isSelected())
