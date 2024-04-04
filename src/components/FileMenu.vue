@@ -5,7 +5,7 @@ import AssetListing from "./AssetListing.vue";
 
 <template>
 
-  <input id="upload-model" ref="modelUpload" type="file" @change="fileUploaded">
+  <input id="upload-model" ref="modelUpload" type="file" @change="fileUploaded" multiple>
 
   <div class="section" id="files">
     <div class="section-inner tools-inner">
@@ -41,9 +41,16 @@ import AssetListing from "./AssetListing.vue";
         <span class="tooltip">Projects</span>
       </div>
 
+      <div class="tool-spacing"></div>
+
       <div class="tool" @click="mgr.saveScene()">
         <img src="../assets/icon/floppy-disk.svg" alt="Save" draggable="false">
         <span class="tooltip">Save <span class="soft">[Ctrl+S]</span></span>
+      </div>
+
+      <div class="tool" @click="mgr.saveScene()">
+        <img src="../assets/icon/import.svg" alt="Import" draggable="false">
+        <span class="tooltip">Export</span>
       </div>
 
     </div>
@@ -396,11 +403,11 @@ export default {
     },
 
     fileUploaded(event) {
-      const file = event.target.files[0];
-
-      this.mgr.uploadModel(name, file, () => {
-        this.loadExternalModels();
-      });
+      for (const file of event.target.files) {
+        this.mgr.uploadModel(name, file, () => {
+          this.loadExternalModels();
+        });
+      }
     },
 
     loadExternalModels() {
