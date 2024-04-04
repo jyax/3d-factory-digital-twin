@@ -70,9 +70,9 @@ class Sequence:
 def runAsGroup(sequences,client):
 
 	#constants
-		CYCLE_TIME = .25 # in seconds
+		CYCLE_TIME = .07 # in seconds
 		START_TIME = time.perf_counter()
-		LIMIT = 5 # seconds
+		LIMIT = 90 # seconds
 
 		# GETTER for current time
 		def getTime():
@@ -90,6 +90,8 @@ def runAsGroup(sequences,client):
 	   
 		while getTime() < LIMIT:
 			for seq in sequences:
+				if sum(seq.durations) < getTime():
+					continue
 				for idx in range(0,len(seq.states)-1):
 					if(idx < len(seq.durations)-1):
 						if seq.start_times[idx] <= getTime() and getTime() < seq.start_times[idx + 1]:

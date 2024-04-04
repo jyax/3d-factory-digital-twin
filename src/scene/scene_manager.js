@@ -113,7 +113,7 @@ class SceneManager {
 
         this._mqttHandler = new MQTTHandler({
             mgr: this,
-            server: true
+            server: false
         });
 
         this.editMode = true;

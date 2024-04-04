@@ -23,17 +23,89 @@ def testMain(client):
         s.add_state(a.Asset(id=str(i),x=3200,y=80,z=-1780))
         seqs.append(s)
 
+
+    h1 = 120
+    f1 = 'forklift_1'
     forklift1 = Sequence([])
-    forklift1.add_state(a.Asset(id='forklift_1',x=1162,y=120,z=-2013))
+    forklift1.add_state(a.Asset(id=f1,x=1162,y=h1,z=-2013))
     forklift1.add_duration(6)
-    forklift1.add_state(a.Asset(id='forklift_1',x=1162,y=120,z=-3775/2))
+    forklift1.add_state(a.Asset(id=f1,x=1162,y=h1,z=-3775/2))
     forklift1.add_duration(6)
-    forklift1.add_state(a.Asset(id='forklift_1',x=1162,y=120,z=-3775))
+    forklift1.add_state(a.Asset(id=f1,x=1162,y=h1,z=-3775))
     forklift1.add_duration(1)
-    forklift1.add_state(a.Asset(id='forklift_1',x=1162,y=120,z=-3775,rot_y=-90))
+    forklift1.add_state(a.Asset(id=f1,x=1162,y=h1,z=-3775,rot_y=-90))
     forklift1.add_duration(4)
-    forklift1.add_state(a.Asset(id='forklift_1',x=366,y=120,z=-3775,rot_y=-90))
+    forklift1.add_state(a.Asset(id=f1,x=366,y=h1,z=-3775,rot_y=-90))
+    forklift1.add_duration(2.5)
+    forklift1.add_state(a.Asset(id=f1,x=1162,y=h1,z=-3775,rot_y=-90))
+    forklift1.add_duration(2)
+    forklift1.add_state(a.Asset(id=f1,x=1162,y=h1,z=-3775,rot_y=-180))
+    forklift1.add_duration(4)
+    forklift1.add_state(a.Asset(id=f1,x=1162,y=h1,z=-4525,rot_y=-180))
     seqs.append(forklift1)
+
+   
+    f2 = 'forklift_2'
+    forklift2 = Sequence([])
+    forklift2.add_state(a.Asset(id=f2,x=1730,y=h1,z=-4500))
+    forklift2.add_duration(6)
+    forklift2.add_state(a.Asset(id=f2,x=1730,y=h1,z=-3360))
+    forklift2.add_duration(3)
+    forklift2.add_state(a.Asset(id=f2,x=1730,y=h1,z=-3660))
+    forklift2.add_duration(2)
+    forklift2.add_state(a.Asset(id=f2,x=1730,y=h1,z=-3660,rot_y=-90))
+    forklift2.add_duration(12)
+    forklift2.add_state(a.Asset(id=f2,x=1730,y=h1,z=-3660,rot_y=-90))
+    forklift2.add_duration(4)
+    forklift2.add_state(a.Asset(id=f2,x=1000,y=h1,z=-3660,rot_y=-90))
+    forklift2.add_duration(2)
+    forklift2.add_state(a.Asset(id=f2,x=1000,y=h1,z=-3660,rot_y=0))
+    forklift2.add_duration(8)
+    forklift2.add_state(a.Asset(id=f2,x=1000,y=h1,z=-2100,rot_y=0))
+    forklift2.add_duration(2.5)
+    forklift2.add_state(a.Asset(id=f2,x=1000,y=h1,z=-2100,rot_y=-90))
+    forklift2.add_duration(4)
+    forklift2.add_state(a.Asset(id=f2,x=-300,y=h1,z=-2100,rot_y=-90))
+    seqs.append(forklift2)
+
+    b1 = 'bot_1'
+    t1 = 'tote_1'
+    h2 = 35
+    bot1 = Sequence([])
+    tote1 = Sequence([])
+    bot1.add_state(a.Asset(id=b1,x=1650,y=0,z=-1172))
+    bot1.add_duration(6)
+    tote1.add_state(a.Asset(id=t1,x=1650,y=h2,z=-1172))
+    tote1.add_duration(6)
+    
+
+    seqs.append(bot1)
+    seqs.append(tote1)
+
+    b2 = 'bot_2'
+    t2 = 'tote_2'
+    
+    bot2 = Sequence([])
+    tote2 = Sequence([])
+    bot2.add_state(a.Asset(id=b2,x=2325,y=0,z=-4342))
+    bot2.add_duration(6.5)
+    bot2.add_state(a.Asset(id=b2,x=2325,y=0,z=-4342))
+    bot2.add_duration(3)
+    bot2.add_state(a.Asset(id=b2,x=1670,y=0,z=-4342))
+
+
+    tote2.add_state(a.Asset(id=t2,x=2552.86,y=80,z=-4205.26))
+    tote2.add_duration(3)
+    tote2.add_state(a.Asset(id=t2,x=2552.86,y=80,z=-4205.26))
+    tote2.add_duration(3.5)
+    tote2.add_state(a.Asset(id=t2,x=2325+50,y=h2,z=-4342+50))
+    tote2.add_duration(3)
+    tote2.add_state(a.Asset(id=t2,x=1670+50,y=h2,z=-4342+50))
+
+
+    seqs.append(bot2)
+    seqs.append(tote2)
+
 
 
     runAsGroup(seqs,client)
