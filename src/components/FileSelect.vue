@@ -18,8 +18,9 @@
             <h2>New</h2>
           </div>
           <input class="file-name-input" type="text" placeholder="Name..." v-model="newFileName"/>
-          <div id="file-drop" @dragover.prevent @drop.prevent @drop="dropHandler" @dragover="dragOverHandler">
-            <p class="center">Click here or drag and drop a factory floor JSON file to upload.</p>
+          <div :class="dragClass" id="file-drop" @dragover.prevent @drop.prevent @drop="dropHandler"
+               @dragover="fileOver = true" @dragleave="fileOver = false">
+            <p class="center">Drag and drop a factory floor JSON file to upload.</p>
           </div>
           <button id="create-button" @click="mgr.loadScene(newFileName, null); displayProject();"
                   :disabled="newFileName.trim().length === 0 || allFloors.includes(newFileName + '.json')">Create</button>
@@ -142,13 +143,13 @@
   justify-content: center; /* Align horizontal */
   align-items: center; /* Align vertical */
 
-  cursor: pointer;
-
   user-select: none;
 }
 
-#file-drop:hover {
-  background-color: rgba(140, 140, 140, 0.05);
+.file-over {
+  outline: 2px solid #64a5c7 !important;
+  background-color: #3c4750 !important;
+  box-shadow: inset 0 0 32px #64a5c7 !important;
 }
 
 .center {
@@ -212,7 +213,18 @@ export default{
       savedFiles: [],
 
       leftTab: "all",
-      allFloors: []
+      allFloors: [],
+
+      fileOver: false
+    }
+  },
+
+  computed: {
+    dragClass() {
+      if (this.fileOver)
+        return "file-over";
+
+      return "";
     }
   },
 

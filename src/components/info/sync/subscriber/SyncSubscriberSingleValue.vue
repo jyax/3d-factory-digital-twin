@@ -328,7 +328,7 @@ export default {
 
       series: [{
         name: "Test",
-        data: []
+        data: [0, 5, 2, 7, 3, 8]
       }],
       chartOptions: {
         chart: {
@@ -346,6 +346,9 @@ export default {
           style: {
             color: "white"
           }
+        },
+        tooltip: {
+          enabled: false
         },
         stroke: {
           curve: 'straight',
@@ -370,6 +373,9 @@ export default {
         xaxis: {
           labels: {
             enable: false
+          },
+          axisTicks: {
+            show: false
           }
         },
         yaxis: {

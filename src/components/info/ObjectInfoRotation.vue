@@ -3,13 +3,13 @@
   <div class="input-vector">
 
     <input class="input-vector-comp c-x" v-model="xVal" type="text" placeholder="x"
-           @input="doChange" v-on:keyup.enter="blurInput">
+           @input="doX" v-on:keyup.enter="blurInput" @blur="blurX" :disabled="!editMode">
 
     <input class="input-vector-comp c-y" v-model="yVal" type="text" placeholder="y"
-           @input="doChange" v-on:keyup.enter="blurInput">
+           @input="doY" v-on:keyup.enter="blurInput" @blur="blurY" :disabled="!editMode">
 
     <input class="input-vector-comp c-z" v-model="zVal" type="text" placeholder="z"
-           @input="doChange" v-on:keyup.enter="blurInput" style="margin-right: 0;">
+           @input="doZ" v-on:keyup.enter="blurInput" @blur="blurZ" style="margin-right: 0;" :disabled="!editMode">
 
   </div>
 </template>
@@ -79,6 +79,7 @@
 <script>
 import {Vector3} from "@orillusion/core";
 import SceneObject from "../../scene/scene_object.js";
+import Util from "../../util/util.js";
 
 export default {
   name: "ObjectInfoRotation",
@@ -98,19 +99,36 @@ export default {
       yVal: 0,
       zVal: 0,
 
-      enableUpdate: true
+      editMode: true
     }
   },
 
   methods: {
-    doChange() {
-      this.rot = new Vector3(
-          parseFloat(this.xVal),
-          parseFloat(this.yVal),
-          parseFloat(this.zVal)
-      );
+    doX() {
+      if (this.xVal.length > 0 && Util.isNumber(this.xVal))
+        this.object.rotX = parseFloat(this.xVal);
+    },
 
-      this.object.rot = this.rot.clone();
+    blurX() {
+      this.xVal = this.object.rotX;
+    },
+
+    doY() {
+      if (this.yVal.length > 0 && Util.isNumber(this.yVal))
+        this.object.rotY = parseFloat(this.yVal);
+    },
+
+    blurY() {
+      this.yVal = this.object.rotY;
+    },
+
+    doZ() {
+      if (this.zVal.length > 0 && Util.isNumber(this.zVal))
+        this.object.rotZ = parseFloat(this.zVal);
+    },
+
+    blurZ() {
+      this.zVal = this.object.rotZ;
     },
 
     blurInput(e) {
@@ -121,6 +139,10 @@ export default {
       this.xVal = Math.floor(this.rot.x * 100) / 100;
       this.yVal = Math.floor(this.rot.y * 100) / 100;
       this.zVal = Math.floor(this.rot.z * 100) / 100;
+    },
+
+    switchView() {
+      this.editMode = !this.editMode;
     }
   },
 
@@ -133,6 +155,12 @@ export default {
       this.rot = rot.clone();
       this.update();
     });
+
+    this.editListener = this.object.mgr.events.on("switch view", this.switchView);
+  },
+
+  destroyed() {
+    this.object.mgr.events.remove(this.editListener);
   }
 }
 </script>

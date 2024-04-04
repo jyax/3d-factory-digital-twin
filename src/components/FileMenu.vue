@@ -10,7 +10,7 @@ import AssetListing from "./AssetListing.vue";
   <div class="section" id="files">
     <div class="section-inner tools-inner">
 
-      <div id="assets" v-if="showAssets">
+      <div id="assets" v-if="showAssets && editMode">
 
         <p class="assets-title">Models</p>
 
@@ -25,30 +25,32 @@ import AssetListing from "./AssetListing.vue";
                @input="doFilter">
       </div>
 
-      <div class="tool" @click="toggleAssets" style="margin-left: 0">
+      <div class="tool" @click="mgr.events.do('projects')" style="margin-left: 0">
+        <img src="../assets/icon/view-grid.svg" alt="Projects" draggable="false">
+        <span class="tooltip">Projects</span>
+      </div>
+
+      <div class="tool" @click="toggleAssets" v-if="editMode">
         <img src="../assets/icon/folder.svg" alt="Assets" draggable="false" v-if="!showAssets">
         <img src="../assets/icon/nav-arrow-down.svg" alt="Assets" draggable="false" v-else>
         <span class="tooltip">Assets</span>
       </div>
 
-      <div class="tool" @click="promptUpload" v-if="showAssets">
+      <div class="tool" @click="promptUpload" v-if="showAssets && editMode">
         <img src="../assets/icon/import.svg" alt="Assets" draggable="false">
         <span class="tooltip">Upload Model...</span>
       </div>
 
-      <div class="tool" @click="mgr.events.do('projects')">
-        <img src="../assets/icon/view-grid.svg" alt="Projects" draggable="false">
-        <span class="tooltip">Projects</span>
-      </div>
-
       <div class="tool-spacing"></div>
 
-      <div class="tool" @click="mgr.saveScene()">
-        <img src="../assets/icon/floppy-disk.svg" alt="Save" draggable="false">
-        <span class="tooltip">Save <span class="soft">[Ctrl+S]</span></span>
+      <div class="tool" :class="saveClass" @click="mgr.saveScene()" v-if="editMode">
+        <img src="../assets/icon/floppy-disk.svg" alt="Save" draggable="false" v-if="!justSaved">
+        <img src="../assets/icon/check.svg" alt="Check" draggable="false" v-else>
+        <span class="tooltip" v-if="!justSaved">Save <span class="soft">[Ctrl+S]</span></span>
+        <span class="tooltip" v-else>Saved successfully.</span>
       </div>
 
-      <div class="tool" @click="mgr.saveScene()">
+      <div class="tool" @click="mgr.exportScene()">
         <img src="../assets/icon/import.svg" alt="Import" draggable="false">
         <span class="tooltip">Export</span>
       </div>
@@ -288,6 +290,7 @@ import AssetListing from "./AssetListing.vue";
   padding: 6px;
   border-radius: 8px;
 
+
   position: absolute;
   bottom: calc(100% + 16px);
   left: 50%;
@@ -314,6 +317,10 @@ import AssetListing from "./AssetListing.vue";
   display: inherit;
 }
 
+.just-saved .tooltip {
+  display: inherit;
+}
+
 .tools-icon:hover .tooltip {
   display: flex;
 }
@@ -327,41 +334,9 @@ import AssetListing from "./AssetListing.vue";
   background-color: rgba(255, 255, 255, 0.5);
 }
 
-#line-menu {
-  position: absolute;
-  bottom: 75px;
-  height: auto;
-  width: 393px;
-  left: 50%;
-  transform: translate(-50%);
-  flex-direction: column;
-}
-
-#exit-button {
-  position: relative;
-  left: 80%;
-}
-
-#draw-line-button {
-  position: relative;
-  align-self: flex-end;
-}
-
-.row {
-  display: flex;
-  flex-direction: row;
-  padding: 1%;
-}
-
-p{
-  vertical-align: baseline;
-  font-size: 20px;
-}
-
-#line-title {
-  margin-top: 5px;
-  margin-bottom: 0px;
-  font-size: 20px;
+.just-saved {
+  outline: 2px solid #42ce6c;
+  box-shadow: inset 0 0 4px #42ce6c;
 }
 
 </style>
@@ -385,7 +360,21 @@ export default {
       showAssets: false,
       filter: "",
       filteredModels: [],
-      filteredExternalModels: []
+      filteredExternalModels: [],
+
+      saveTimer: null,
+      justSaved: false,
+
+      editMode: true
+    }
+  },
+
+  computed: {
+    saveClass() {
+      if (this.justSaved)
+        return "just-saved";
+
+      return "";
     }
   },
 
@@ -426,6 +415,22 @@ export default {
 
       if (this.showAssets)
         this.loadExternalModels();
+    },
+
+    startTimer() {
+      if (this.saveTimer !== null) {
+        clearTimeout(this.saveTimer);
+        this.saveTimer = null;
+      }
+
+      this.justSaved = true;
+      this.timer = setTimeout(() => {
+        this.justSaved = false;
+      }, 2500);
+    },
+
+    switchView() {
+      this.editMode = !this.editMode;
     }
   },
 
@@ -434,6 +439,12 @@ export default {
       this.models = this.mgr.getModelIDs();
       this.doFilter();
     });
+
+    this.mgr.events.on("save_success", () => {
+      this.startTimer();
+    });
+
+    this.mgr.events.on('switch view', this.switchView);
 
     this.loadExternalModels();
   }
