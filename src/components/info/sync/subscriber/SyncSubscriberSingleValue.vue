@@ -328,7 +328,7 @@ export default {
 
       series: [{
         name: "Test",
-        data: [0, 5, 2, 7, 3, 8]
+        data: []
       }],
       chartOptions: {
         chart: {
