@@ -55,14 +55,21 @@ async function connectToDB(){
 app.post('/Factory_Floors', async (req, res) => {
     const db = await connectToDB();
     const sceneData = req.body.sceneData;
-    console.log(sceneData)
 
     try {
         const bucket = new GridFSBucket(db, {bucketName: 'sceneFiles'});
-
         const bufferData = Buffer.from(sceneData, 'utf-8');
 
-        const uploadStream = bucket.openUploadStream('scene.json');
+        let name = req.body.sceneName;
+        if (!name.includes(".json"))
+            name += ".json";
+
+        const check = await bucket.find({filename: name}).toArray();
+        if (check.length > 0) {
+            await bucket.delete(check[0]._id);
+        }
+
+        const uploadStream = bucket.openUploadStream(name);
 
         uploadStream.write(bufferData);
         uploadStream.end();
@@ -134,6 +141,11 @@ app.post('/Upload_Model', upload.single('modelData'), async (req, res) => {
     try {
         const db = await connectToDB();
         const bucket = new GridFSBucket(db, {bucketName: 'modelFiles'});
+
+        const check = await bucket.find({filename: req.body.modelName}).toArray();
+        if (check.length > 0) {
+            await bucket.delete(check[0]._id);
+        }
 
         const uploadStream = bucket.openUploadStream(req.file.originalname, {
             metadata: {modelName: req.body.modelName}

@@ -25,7 +25,7 @@ import AssetListing from "./AssetListing.vue";
                @input="doFilter">
       </div>
 
-      <div class="tool" @click="showAssets = !showAssets" style="margin-left: 0">
+      <div class="tool" @click="toggleAssets" style="margin-left: 0">
         <img src="../assets/icon/folder.svg" alt="Assets" draggable="false" v-if="!showAssets">
         <img src="../assets/icon/nav-arrow-down.svg" alt="Assets" draggable="false" v-else>
         <span class="tooltip">Assets</span>
@@ -412,6 +412,13 @@ export default {
         this.externalModels = data.map(val => val.replaceAll(".glb", ""));
         this.doFilter();
       });
+    },
+
+    toggleAssets() {
+      this.showAssets = !this.showAssets;
+
+      if (this.showAssets)
+        this.loadExternalModels();
     }
   },
 
