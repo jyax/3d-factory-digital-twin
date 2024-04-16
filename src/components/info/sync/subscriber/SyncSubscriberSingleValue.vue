@@ -347,6 +347,9 @@ export default {
             color: "white"
           }
         },
+        tooltip: {
+          enabled: false
+        },
         stroke: {
           curve: 'straight',
           width: 3,
@@ -370,6 +373,9 @@ export default {
         xaxis: {
           labels: {
             enable: false
+          },
+          axisTicks: {
+            show: false
           }
         },
         yaxis: {
@@ -431,8 +437,9 @@ export default {
     }
   },
 
-  created() {
+  mounted() {
     this.id = this.subscriber.type;
+    this.$refs.typeInput.val = this.subscriber.type;
 
     this.updateListener = this.subscriber.events.on("update", () => this.updateData());
 

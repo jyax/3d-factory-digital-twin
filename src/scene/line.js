@@ -41,7 +41,7 @@ class Line{
             let direction = ray.direction;
 
             console.log(mgr);
-            mgr.view.graphic3D.drawLines("line"+i, [startPoint, endPoint], new Color().hexToRGB(Color.WHITE));
+            // mgr.view.graphic3D.drawLines("line"+i, [startPoint, endPoint], new Color().hexToRGB(Color.WHITE));
 
             let slope = direction;
             if(direction.x == 0){
@@ -72,15 +72,15 @@ class Line{
             line._object.rotationY = -(Math.atan( (endPoint.z - startPoint.z) / (endPoint.x - startPoint.x)) * (180/Math.PI));
 
 
-            mgr.view.graphic3D.drawLines("lineL"+i, [startPoint.add(slope.multiply(new Vector3(-1, 1, 1)).mul(width)), 
-                        endPoint.add(slope.multiply(new Vector3(-1, 1, 1)).mul(width))], new Color().hexToRGB(Color.RED));
-            console.log([startPoint.add(slope.multiply(new Vector3(-1, 1, 1)).mul(width)), 
-                endPoint.add(slope.multiply(new Vector3(-1, 1, 1)).mul(width))]);
-
-            mgr.view.graphic3D.drawLines("lineR"+i, [startPoint.add(slope.multiply(new Vector3(1, 1, -1)).mul(width)),
-                        endPoint.add(slope.multiply(new Vector3(1, 1, -1)).mul(width))], new Color().hexToRGB(Color.BLUE));
-            console.log([startPoint.add(slope.multiply(new Vector3(1, 1, -1)).mul(width)),
-                endPoint.add(slope.multiply(new Vector3(1, 1, -1)).mul(width))]);
+            // mgr.view.graphic3D.drawLines("lineL"+i, [startPoint.add(slope.multiply(new Vector3(-1, 1, 1)).mul(width)),
+            //             endPoint.add(slope.multiply(new Vector3(-1, 1, 1)).mul(width))], new Color().hexToRGB(Color.RED));
+            // console.log([startPoint.add(slope.multiply(new Vector3(-1, 1, 1)).mul(width)),
+            //     endPoint.add(slope.multiply(new Vector3(-1, 1, 1)).mul(width))]);
+            //
+            // mgr.view.graphic3D.drawLines("lineR"+i, [startPoint.add(slope.multiply(new Vector3(1, 1, -1)).mul(width)),
+            //             endPoint.add(slope.multiply(new Vector3(1, 1, -1)).mul(width))], new Color().hexToRGB(Color.BLUE));
+            // console.log([startPoint.add(slope.multiply(new Vector3(1, 1, -1)).mul(width)),
+            //     endPoint.add(slope.multiply(new Vector3(1, 1, -1)).mul(width))]);
             
         }
     }

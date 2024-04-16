@@ -10,6 +10,10 @@ import {BoundingBox, Vector3} from "@orillusion/core";
  * Contains globally accessible functions for utility purposes.
  */
 class Util {
+    static isNumber(string) {
+        return string.match(/^-?\d+(\.\d+)?$|^-?0?\.\d+$/);
+    }
+
     static getBoundingBoxScale(boundingBox) {
         const min = boundingBox.min;
         const max = boundingBox.max;

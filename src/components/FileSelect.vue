@@ -1,76 +1,160 @@
 <template>
     <div class="overlay">
-      <div class="panel" id="left-panel">
-        <h2>Past Files</h2>
-        <div id="files" v-for="file in savedFiles">
-        <FileListing class="item" :fileName=file @click="loadFile(file); displayProject();" v-if="file!=''"/>
+
+      <div id="file-select">
+        <div class="panel" id="left-panel">
+          <div class="panel-header">
+            <img src="../assets/icon/perspective-view.svg" alt="Floor" draggable="false">
+            <h2>Factory Floors</h2>
+          </div>
+          <div id="files" v-for="file in allFloors">
+            <FileListing class="item" :fileName="file.replaceAll('.json', '')" @click="loadFile(file); displayProject();" v-if="file!=''"/>
+          </div>
+        </div>
+
+        <div class="panel" id="right-panel">
+          <div class="panel-header">
+            <img src="../assets/icon/plus.svg" alt="Plus" draggable="false">
+            <h2>New</h2>
+          </div>
+          <input class="file-name-input" type="text" placeholder="Name..." v-model="newFileName"/>
+          <div :class="dragClass" id="file-drop" @dragover.prevent @drop.prevent @drop="dropHandler"
+               @dragover="fileOver = true" @dragleave="fileOver = false">
+            <p class="center">Drag and drop a factory floor JSON file to upload.</p>
+          </div>
+          <button id="create-button" @click="mgr.loadScene(newFileName, null); displayProject();"
+                  :disabled="newFileName.trim().length === 0 || allFloors.includes(newFileName + '.json')">Create</button>
         </div>
       </div>
-      <div class="panel" id="right-panel">
-        <h2>New</h2>
-        <input class="file-name-input" type="text" placeholder="Name..." v-model="newFileName"/>
-        <div id="file-drop" @dragover.prevent @drop.prevent @drop="dropHandler" @dragover="dragOverHandler">
-          <p class="center">Click here or drag an drop a factory JSON file to upload</p>
-        </div>
-        <button id="create-button" @click="mgr.loadScene(newFileName, null); displayProject();">Create</button>
-      </div>
+
     </div>
 </template>
 
-<style>
+<style scoped>
 
 .overlay {
-  width: 100%;
-  height: 100%;
-  position: fixed;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
   background-color: rgba(115, 113, 113, 1);
-  top: 0px;
   z-index: 1;
   display: flex;
   flex-direction: row;
 }
 
+#file-select {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  flex-direction: row;
+}
+
 .panel {
-    width: 30%;
-    height: 60%;
-    position: relative;
-    background-color: rgba(24, 24, 24, 0.67);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
-    margin: 10% 0 10% 0;
-    top:10%;
-    border-radius: 5%;
+  height: 60vh;
+  position: relative;
+  background-color: rgba(24, 24, 24, 0.67);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+  margin: 10% 0 10% 0;
+  top:10%;
+  border-radius: 8px;
 }
 
 #left-panel {
-    margin-left: 20%;
-    margin-right: 2%;
+  margin-left: 20%;
+  margin-right: 2vw;
+
+  width: 30vw;
 }
 
 #right-panel {
-    margin-left: 2%;
-    margin-right: 20%;
+  margin-right: 20%;
+
+  width: 50vw;
+}
+
+.panel-header {
+  display: flex;
+  flex-direction: row;
+
+  justify-content: center;
+
+  user-select: none;
+}
+
+.panel-header img {
+  width: 2.5rem;
+  filter: invert();
+}
+
+#left-panel .panel-header img {
+  width: 2rem;
+  margin-right: 8px;
 }
 
 .file-name-input {
-  width: 80%;
+  width: 50%;
   height: 30px;
   margin: 0 auto 0 auto;
   font-size: 20px;
+
+  outline: none;
+  border: none;
+
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  padding: 8px;
+
+  text-align: center;
+}
+
+.file-name-input:hover, .file-name-input:focus {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.file-name-input:focus {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.file-name-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  font-style: italic;
 }
 
 #file-drop {
-  background-color: rgba(140, 140, 140, 0.15);
+  background-color: rgba(140, 140, 140, 0.1);
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
   height: 50%;
   width: 80%;
-  margin: 8% auto 0 auto;
-  border-radius: 5%;
-  border-color: rgb(118, 118, 118);
-  border-style: dashed;
+  margin: 5% auto 0 auto;
+  border-radius: 16px;
+  border: 2px dashed rgb(118, 118, 118);
   display: flex;
   justify-content: center; /* Align horizontal */
   align-items: center; /* Align vertical */
+
+  user-select: none;
+}
+
+.file-over {
+  outline: 2px solid #64a5c7 !important;
+  background-color: #3c4750 !important;
+  box-shadow: inset 0 0 32px #64a5c7 !important;
+}
+
+.center {
+  opacity: 0.8;
+  font-style: italic;
 }
 
 p {
@@ -82,9 +166,26 @@ p {
 }
 
 #create-button {
+  margin: 5% 1% 1% 1%;
+
   background-color: rgba(140, 140, 140, 0.15);
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
-  margin: 5% 1% 1% 1%
+  border-radius: 4px;
+
+  user-select: none;
+
+  outline: none;
+  border: none;
+}
+
+#create-button:disabled {
+  cursor: default;
+}
+
+#create-button:hover:enabled {
+  background-color: rgba(103, 103, 103, 0.15);
+  outline: none;
+  border: none;
 }
 
 </style>
@@ -109,7 +210,21 @@ export default{
   data () {
     return {
       newFileName: "",
-      savedFiles: []
+      savedFiles: [],
+
+      leftTab: "all",
+      allFloors: [],
+
+      fileOver: false
+    }
+  },
+
+  computed: {
+    dragClass() {
+      if (this.fileOver)
+        return "file-over";
+
+      return "";
     }
   },
 
@@ -125,7 +240,6 @@ export default{
 
           fr.onloadend = (event) => {
             const data = JSON.parse(String(fr.result));
-            console.log("Data from FileSelect: ", data);
             this.mgr.loadScene(file.name, data);
             this.mgr.events.do('open project');
           }
@@ -137,25 +251,35 @@ export default{
       }
     },
 
-    dragOverHandler(ev) {
-        console.log("over");
-    },
+    dragOverHandler(ev) {},
 
     displayProject() {
       this.mgr.events.do('open project');
-      console.log("open project", this.newFileName);
     },
 
-    loadFile(fileName){
+    loadFile(fileName) {
+      this.mgr.getSceneFromDB(fileName);
+    },
 
-      let json = JSON.parse(localStorage.getItem(fileName));
-      this.mgr.loadScene(fileName, json);
+    loadAllFloors() {
+      fetch("http://localhost:9000/Get_All_Floors", {
+        method: "POST"
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        this.allFloors = data;
+      });
     }
   },
 
   created() {
-    console.log("local storage", localStorage.getItem('prev_files').split(','));
-    this.savedFiles = localStorage.getItem('prev_files').split(',');
+    let prevFiles = localStorage.getItem('prev_files');
+    if (prevFiles === null)
+      prevFiles = "";
+
+    this.savedFiles = prevFiles.split(',');
+
+    this.loadAllFloors();
   }
 }
 </script>

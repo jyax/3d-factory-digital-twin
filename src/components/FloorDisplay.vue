@@ -49,7 +49,6 @@
     methods : {
       switchView() {
           this.editOn = !(this.editOn);
-          console.log("switch", this.editOn);
       },
 
       showStartMenu() {
@@ -60,6 +59,7 @@
     created() {
       this.mgr.events.on('switch view', this.switchView);
       this.mgr.events.on('open project', this.showStartMenu);
+      this.mgr.events.on('projects', () => this.startMenuOn = true);
     }
   }
 </script> 

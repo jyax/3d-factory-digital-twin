@@ -4,6 +4,6 @@
 ./mqtt-emulator/__pycache__
 ./node_modules/
 ./vite-project/node_modules/
-./glb_models
+./glb_models/
 node_modules
 *.pyc

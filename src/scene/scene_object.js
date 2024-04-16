@@ -107,6 +107,7 @@ class SceneObject {
             this._object.addComponent(ColliderComponent);
         } else {
             this._object = this.mgr.models.get(modelID).clone();
+            this._object.addComponent(ColliderComponent);
             this._object.forChild(child => {
                 if (child.hasComponent(MeshRenderer))
                     child.addComponent(ColliderComponent);
@@ -169,6 +170,18 @@ class SceneObject {
         return this._object.transform.localRotation.clone();
     }
 
+    get rotX() {
+        return this._object.transform.localRotation.x;
+    }
+
+    get rotY() {
+        return this._object.transform.localRotation.y;
+    }
+    get rotZ() {
+        return this._object.transform.localRotation.z;
+    }
+
+
     /**
      * Get the scale of the object.
      * @returns {Vector3} Scale vector
@@ -220,8 +233,10 @@ class SceneObject {
 
   /**
    * Get the bounding box of the object.
+   * @param {boolean} transform Whether to apply object transform
+   * @returns {BoundingBox} Object bounding box
    */
-  getBoundingBox() {
+  getBoundingBox(transform = true) {
     let bb = null;
 
     this.forAll((obj) => {
@@ -233,17 +248,17 @@ class SceneObject {
       }
     });
 
-        if (bb !== null) {
-            const matrix = this._object.transform.worldMatrix.clone();
-            matrix.position = new Vector3();
-            bb = Util.transformBoundingBox(bb, matrix);
-            bb.setFromMinMax(
-                bb.min.add(this._pos),
-                bb.max.add(this._pos)
-            );
-        } else {
-            bb = new BoundingBox();
-        }
+    if (bb !== null && transform) {
+        const matrix = this._object.transform.worldMatrix.clone();
+        matrix.position = new Vector3();
+        bb = Util.transformBoundingBox(bb, matrix);
+        bb.setFromMinMax(
+            bb.min.add(this._object.localPosition),
+            bb.max.add(this._object.localPosition)
+        );
+    } else {
+        bb = new BoundingBox();
+    }
 
     return bb;
   }
@@ -302,12 +317,12 @@ class SceneObject {
         if (isNaN(x))
             return;
 
-    this._object.x = x;
+        this._object.transform.x = x;
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
 
-        this.events.do("pos", this.pos);
+        this.events.do("pos", this.pos.clone());
     }
 
     /**
@@ -318,12 +333,12 @@ class SceneObject {
         if (isNaN(y))
             return;
 
-    this._object.y = y;
+        this._object.transform.y = y;
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
 
-        this.events.do("pos", this.pos);
+        this.events.do("pos", this.pos.clone());
     }
 
     /**
@@ -334,12 +349,12 @@ class SceneObject {
         if (isNaN(z))
             return;
 
-    this._object.z = z;
+        this._object.transform.z = z;
 
         if (this.isSelected())
             this.mgr.updateSelectBox();
 
-        this.events.do("pos", this.pos);
+        this.events.do("pos", this.pos.clone());
     }
 
     set rot(newRot) {
@@ -349,6 +364,24 @@ class SceneObject {
             this.mgr.updateSelectBox();
 
         this.events.do("rot", newRot.clone());
+    }
+
+    set rotX(x) {
+        const rot = this.rot;
+        rot.x = x;
+        this.rot = rot;
+    }
+
+    set rotY(y) {
+        const rot = this.rot;
+        rot.y = y;
+        this.rot = rot;
+    }
+
+    set rotZ(z) {
+        const rot = this.rot;
+        rot.z = z;
+        this.rot = rot;
     }
 
     set scale(newScale) {
@@ -469,7 +502,6 @@ class SceneObject {
    * @returns {SceneObject} Duplicate object
    */
   duplicate() {
-    cloned;
     const copy = this.copy();
 
     this.mgr.addObject(copy);
@@ -484,10 +516,10 @@ class SceneObject {
    * @param e Event
    */
   mouseOver(e) {
-    document.body.style.cursor = "pointer";
+  if (this.isSelected() || this.locked)
+      return;
 
-        if (this.isSelected() || this.locked)
-            return;
+    document.body.style.cursor = "pointer";
 
     if (this._hoverPreview !== "")
       this.mgr.view.graphic3D.Clear(this._hoverPreview);
@@ -538,6 +570,22 @@ class SceneObject {
 
     drag(elapsed) {
 
+    }
+
+    snapDown(y = 0) {
+      const bounds = this.getBoundingBox();
+
+      const center = bounds.center;
+      const pos = this.pos;
+      const diff = center.y - pos.y;
+
+      const height = bounds.max.y - bounds.min.y;
+
+      this._object.y = y + height / 2 - diff;
+      this.events.do("pos", this.pos);
+
+      if (this.isSelected())
+          this.mgr.updateSelectBox();
     }
 
 

@@ -25,42 +25,43 @@
     <div class="section-inner tools-inner">
 
       <div class="tool" @click="mgr.resetCamera()">
-        <img src="../assets/icon/square3d-from-center.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/video-camera.svg" alt="Camera" draggable="false">
         <span class="tooltip">Reset Camera <span class="soft">[Ctrl+R]</span></span>
       </div>
 
       <div class="tool" @click="mgr.focusOnSelected()" v-if="selected.length !== 0">
-        <img src="../assets/icon/cube.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/eye.svg" alt="Eye" draggable="false">
         <span class="tooltip">Focus on Selection <span class="soft">[F]</span></span>
       </div>
 
       <div class="tool-spacing"></div>
 
       <div class="tool" @click="mgr.createNewObject()">
-        <img src="../assets/icon/plus.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/cube.svg" alt="Cube" draggable="false">
         <span class="tooltip">New Object <span class="soft">[R]</span></span>
       </div>
 
       <div class="tool" @click="mgr.clearSelection()" v-if="selected.length !== 0">
-        <img src="../assets/icon/xmark.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/xmark.svg" alt="XMark" draggable="false">
         <span class="tooltip">Deselect <span class="soft">[Tab]</span></span>
       </div>
 
       <div class="tool" @click="mgr.duplicateSelected()" v-if="selected.length !== 0">
-        <img src="../assets/icon/copy.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/copy.svg" alt="Copy" draggable="false">
         <span class="tooltip">Duplicate <span class="soft">[Ctrl+D]</span></span>
       </div>
 
       <div class="tool" @click="mgr.deleteSelected()" v-if="selected.length !== 0">
-        <img src="../assets/icon/trash.svg" alt="Plus" draggable="false">
+        <img src="../assets/icon/trash.svg" alt="Trash" draggable="false">
         <span class="tooltip">Delete <span class="soft">[Del]</span></span>
       </div>
 
       <div class="tool-spacing"></div>
 
-      <div class="tool" @click="OpenLineWindow()">
-        <img src="../assets/icon/plus.svg" alt="Plus" draggable="false">
-        <span class="tooltip">New Line</span>
+      <div class="tool" @click="ToggleLineWindow()">
+        <img src="../assets/icon/ease-curve-control-points.svg" alt="Lines" draggable="false" v-if="!isLineMenuVisible">
+        <img src="../assets/icon/nav-arrow-down.svg" alt="Assets" draggable="false" v-else>
+        <span class="tooltip">New Line...</span>
       </div>
 
     </div>
@@ -68,23 +69,23 @@
 
   <div class="section" id="line-menu" v-if="isLineMenuVisible">
 
-        <div class="row">
+        <div class="row row-top">
+          <img src="../assets/icon/ease-curve-control-points.svg" alt="Lines">
           <p id="line-title">Create Line</p>
-          <button id="exit-button" @click="CloseLineMenu()">X</button>
         </div>
         <div id="point-list">
           <div class="row" v-for="index in line.pointMap.keys()">
             <PointPosition :mgr="mgr" :line="line" :index="index"/>
           </div>
-        <button id="add-point" @click="AddPoint()">Add Point</button>
+        <button id="add-point" @click="AddPoint()"><img src="../assets/icon/plus.svg" alt="Plus">Add Point</button>
         </div>
-        <div class="row">
+        <div class="row row-bottom">
           <div class="col">
             <p id="width-p">Width</p>
             <input class="width-input" v-model="width" type="text" placeholder=1
                   @input="doZ" v-on:keyup.enter="blurInput" style="margin-right: 0;">
           </div>
-          <button id="draw-line-button" @click="line.drawLine(mgr, width); CloseLineMenu()">Draw Line</button>
+          <button id="draw-line-button" @click="line.drawLine(mgr, width); CloseLineMenu()">Draw Line<img src="../assets/icon/check.svg" alt="Check"></button>
         </div>
 
   </div>
@@ -264,57 +265,147 @@
 }
 
 #line-menu {
+  display: flex;
+  flex-direction: column;
+
   position: absolute;
   bottom: 75px;
   height: auto;
   width: 393px;
   left: 50%;
   transform: translate(-50%);
-  flex-direction: column;
 }
 
-#exit-button {
-  position: relative;
-  left: 80%;
-}
-
-#draw-line-button {
-  position: relative;
-  align-self: flex-end;
+#draw-line-button img {
+  width: 1.5rem;
+  margin-left: 8px;
 }
 
 .row {
   display: flex;
   flex-direction: row;
-  padding: 1%;
+  align-items: center;
+
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 8px;
+}
+
+.row-top img {
+  filter: invert();
+  width: 1.5rem;
+}
+
+.row-bottom {
+  align-items: end;
+}
+
+#point-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .col {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  /* padding: 1%; */
 }
 
-p{
+p {
   vertical-align: baseline;
   font-size: 20px;
 }
 
 #line-title {
-  margin-top: 5px;
-  margin-bottom: 0px;
+  flex: 1;
+
+  display: flex;
+
+  margin: 0;
+  margin-left: 6px;
   font-size: 20px;
 }
 
 #width-p {
-  margin-left:0px;
-  margin-right: 0px;
-  width: 40%;
+  margin: 0 0 0 8px;
+  text-align: left;
+  font-size: 16px;
 }
 
 .width-input {
-  width: 40%;
+  width: 64px;
+
+  font-size: 16px;
+
+  outline: none;
+  border: none;
+
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  padding: 8px;
+
   text-align: center;
+}
+
+.width-input:hover, .width-input:focus {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.width-input:focus {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.width-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  font-style: italic;
+}
+
+button {
+  display: flex;
+  align-items: center;
+
+  margin: 5% 1% 1% 1%;
+  padding: 10px;
+
+  background-color: rgba(140, 140, 140, 0.15);
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+
+  user-select: none;
+
+  outline: none;
+  border: none;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+button:hover:enabled {
+  background-color: rgba(103, 103, 103, 0.15);
+  outline: none;
+  border: none;
+}
+
+button img {
+  filter: invert();
+}
+
+#exit-button {
+  display: flex;
+  align-items: center;
+
+  margin: 0;
+  padding: 8px;
 }
 
 </style>
@@ -347,13 +438,20 @@ p{
     },
 
     methods : {
-      OpenLineWindow(){
+      ToggleLineWindow() {
+        if (this.isLineMenuVisible)
+          this.CloseLineMenu();
+        else
+          this.OpenLineWindow();
+      },
+
+      OpenLineWindow() {
         this.isLineMenuVisible = true;
         this.line = this.mgr.createLine();
         this.lineIndex++;
       }, 
 
-      CloseLineMenu(){
+      CloseLineMenu() {
         this.isLineMenuVisible = false;
       },
 

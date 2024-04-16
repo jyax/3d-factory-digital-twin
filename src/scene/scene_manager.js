@@ -1,5 +1,4 @@
 import {
-    ComponentBase,
     BoundingBox,
     Camera3D,
     Color,
@@ -13,14 +12,7 @@ import {
     SkyRenderer,
     SolidColorSky,
     Vector3,
-    View3D,
-    BoxGeometry,
-    FlyCameraController,
-    AtmosphericComponent,
-    KeyEvent,
-    KeyCode,
-    Ray,
-    Graphic3D
+    View3D
 } from "@orillusion/core";
 import SceneObject from "./scene_object.js";
 import EventHandler from "../event/event_handler.js";
@@ -51,22 +43,24 @@ class SceneManager {
         "wall": "/glb_models/Slatwall_Bin_5.5in.glb",
         "floor": "./src/assets/glb_models/factory_floor_sample_1.glb",
         "workstation1": "/glb_models/workstation.glb",
-        "workstation1_whole": "/glb_models/workstation_whole.glb",
         "workstation2": "/glb_models/Station 10x Layout v31.glb",
         "lathe": "./src/assets/glb_models/downloadsGLB/desk_lathe.glb",
         "ladder": "./src/assets/glb_models/downloadsGLB/escada_movel_-_moving_ladder.glb",
-        "forklift": "./src/assets/glb_models/downloadsGLB/forklift_gameready.glb",
+        "forklift": "./src/assets/glb_models/downloadsGLB/forklift.glb",
         "picaMachine": "./src/assets/glb_models/downloadsGLB/pica_pica_-_machines.glb",
         "robot": "./src/assets/glb_models/FANUC-430 Robot.glb",
         "bin": "./src/assets/glb_models/Slatwall_Bin_5.5in.glb",
         "tank": "./src/assets/glb_models/UN-COMPLIANT IBC TANK.glb",
-        "boiler": "./src/assets/glb_models/downloadsGLB/boiler_from_the_puffer_vic_32 (1).glb",
-        "roboticArm": "./src/assets/glb_models/downloadsGLB/black_honey_-_robotic_arm (1).glb",
-        "testfactory": "./src/assets/glb_models/testfactory1.glb",
-
+        "boiler": "./src/assets/glb_models/downloadsGLB/boiler.glb",
+        "roboticArm": "./src/assets/glb_models/boxarm.glb",
+        "testfactory": "./src/assets/glb_models/testfactory.glb",
+        "human": "./src/assets/glb_models/human.glb",
+        "shelf": "./src/assets/glb_models/shelf.glb",
+        "material_bot":  "./src/assets/glb_models/material_bot.glb",
+        "storage_tote":  "./src/assets/glb_models/storage_tote.glb"
         // Hidden models for editor use only
 
-        ".translation-handle": "/glb_models/translation_handle.glb"
+        // ".translation-handle": "/glb_models/translation_handle.glb"
     };
 
     /**
@@ -126,39 +120,8 @@ class SceneManager {
 
         this.name = '';
 
-        // localStorage.setItem('prev_files', '');
-
-        // mongodb stuff
-        this.modelsMap = {};
-        this.LoadModels();
-    }
-
-    /**
-     * Load models from MongoDB
-     * @constructor
-     */
-    LoadModels() {
-        // fetch('http://localhost:3000/api/loadModels', {
-        //     method: "POST",
-        //     headers: {
-        //         "Content-Type": "application/json"
-        //     },
-        //     body: JSON.stringify({
-        //         thing: "yes"
-        //     })
-        // })
-        //     .then(response => {
-        //         if (!response.ok) {
-        //             throw new Error('network response was not ok');
-        //         }
-        //         return response.json();
-        //     })
-        //     .then(data => {
-        //         this.modelsMap = data.models;
-        //     })
-        //     .catch(error => {
-        //         console.error('error:', error);
-        //     });
+        this.grid = [];
+        this._prevGridCenter = null;
     }
 
     /**
@@ -188,7 +151,8 @@ class SceneManager {
         this.cam = camObj.addComponent(Camera3D);
         const drag = camObj.addComponent(DragComponent);
         drag.mgr = this;
-        camObj.addComponent(CameraControl);
+        const controller = camObj.addComponent(CameraControl);
+        controller.mgr = this;
 
         this.camera = camObj;
 
@@ -213,6 +177,7 @@ class SceneManager {
         this.view.scene = this.scene;
         this.view.camera = this.cam;
 
+        /**
         const promises = [];
         const total = Object.keys(SceneManager.MODELS).length;
         let i = 0;
@@ -247,6 +212,8 @@ class SceneManager {
             const model = await Engine3D.res.loadGltf(this.modelsMap[id]);
             this.models.set(id, model);
         }
+
+            */
 
         // this.createNewObject(new Vector3(), false);
         // this.createNewObject({select:false,model:"testfactory",pos: new Vector3()})
@@ -294,11 +261,27 @@ class SceneManager {
                     break;
                 }
 
+                case "d": {
+                    if (event.ctrlKey) {
+                        event.preventDefault();
+                        this.duplicateSelected();
+                    }
+
+                    break;
+                }
+
                 case "e": {
                     if (this.selectedCount > 0) {
                         this.events.do("drag", true);
                         this.dragging = true;
                     }
+                    break;
+                }
+
+                case "end": {
+                    event.preventDefault();
+                    this.snapSelectedDown();
+
                     break;
                 }
 
@@ -364,7 +347,6 @@ class SceneManager {
                 // Switches between view and edit mode
                 case "q": {
                     this.editMode = !this.editMode;
-                    console.log(this.editMode);
                     this.events.do('switch view');
                     break;
                 }
@@ -383,6 +365,8 @@ class SceneManager {
                 case "e": {
                     this.events.do("drag", false);
                     this.dragging = false;
+                    this.hideSnapGrid();
+
                     break;
                 }
 
@@ -399,28 +383,40 @@ class SceneManager {
             if (this.isKeyDown('e'))
                 return;
 
-            const object = this.revObjects.get(e.target);
-            object.click();
+            const object = this.reverseLookup(e.target);
+            if (object !== null)
+                object.click();
         }, this);
 
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_OVER, e => {
-            const object = this.revObjects.get(e.target);
-            object.mouseOver();
+            if (this.isKeyDown('e'))
+                return;
+
+            const object = this.reverseLookup(e.target);
+            if (object !== null)
+                object.mouseOver();
         }, this);
 
         this.view.pickFire.addEventListener(PointerEvent3D.PICK_OUT, e => {
-            const object = this.revObjects.get(e.target);
-            object.mouseOff();
+            const object = this.reverseLookup(e.target);
+            if (object !== null)
+                object.mouseOff();
         }, this);
-
-        this.view.pickFire.addEventListener(PointerEvent3D.PICK_DOWN, e => this._onMouseDown(e), this);
-        this.view.pickFire.addEventListener(PointerEvent3D.PICK_UP, e => this._onMouseUp(e), this);
-        this.view.pickFire.addEventListener(PointerEvent3D.PICK_MOVE, e => this._onMouseMove(e), this);
     }
 
     // --------
     // Getters
     // --------
+
+    reverseLookup(object3D) {
+        if (this.revObjects.has(object3D))
+            return this.revObjects.get(object3D);
+
+        if (object3D.parentObject instanceof Object3D)
+            return this.reverseLookup(object3D.parentObject);
+
+        return null;
+    }
 
     /**
      * Get an object in the manager by its global ID.
@@ -621,64 +617,182 @@ class SceneManager {
     // Scene Saving & Loading
     // -----------------------
 
+    serializeScene() {
+        return this.getAllObjects().map(obj => obj.serializeObject());
+    }
+
     /**
      * Save scene information to JSON.
      * @returns JSON Downloadable JSON file
      */
-    saveScene() {
-        let currentScene = this.getAllObjects().map(obj => obj.serializeObject())
-        let jsonString = JSON.stringify(currentScene, null, 3)
+    async saveScene() {
+        let jsonString = JSON.stringify(this.serializeScene(), null, 3);
+
+        try {
+            const response = await fetch('http://localhost:9000/Factory_Floors', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sceneData: jsonString,
+                    sceneName: this.name
+                })
+            });
+    
+            if (response.ok) {
+                console.log('Scene saved successfully to server.');
+                this.events.do("save_success");
+            } else {
+                console.error('Failed to save scene to server.');
+                this.events.do("save_error");
+            }
+        } catch (error) {
+            console.error('Error saving scene to server:', error);
+            this.events.do("save_error");
+        }
+    }
+
+    exportScene() {
+        let jsonString = JSON.stringify(this.serializeScene(), null, 3);
 
         let prev_files = localStorage.getItem('prev_files');
         prev_files += ',' + this.name;
         localStorage.setItem('prev_files', prev_files);
         localStorage.setItem(this.name, jsonString);
 
-        let sceneBlob = new Blob([jsonString], {type: "application/json"})
+        let sceneBlob = new Blob([jsonString], {type: "application/json"});
         const blobUrl = URL.createObjectURL(sceneBlob);
 
         // Create element to do a click event for blobUrl
-        const downloadLink = document.createElement("a")
-        downloadLink.href = blobUrl
+        const downloadLink = document.createElement("a");
+        downloadLink.href = blobUrl;
 
         // Need to add for it to ask for file name if none set
-        let saveName = "scene"
-        downloadLink.download = `${this.name}.json`
-        downloadLink.click()
+        let saveName = this.name;
+        if (!saveName.includes(".json"))
+            saveName += ".json";
+        downloadLink.download = saveName;
+        downloadLink.click();
 
         // Remove the URL from usage
-        URL.revokeObjectURL(blobUrl)
+        URL.revokeObjectURL(blobUrl);
+    }
 
+    uploadModel(name, file, onDone = () => {}) {
         try {
-            const response = fetch('http://localhost:9000/Factory_Floors', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ sceneData: jsonString })
+            const formData = new FormData();
+            formData.append("modelName", name);
+            formData.append("modelData", file);
+
+            const response = fetch("http://localhost:9000/Upload_Model", {
+                method: "POST",
+                body: formData
+            }).then(() => {
+                onDone();
             });
-            console.log(jsonString);
-    
+
+            console.log(response)
+
             if (response.ok) {
-                console.log('Scene saved successfully to server.');
+                console.log('Model saved successfully to server.');
             } else {
-                console.error('Failed to save scene to server.');
+                console.error('Failed to save model to server.');
             }
         } catch (error) {
-            console.error('Error saving scene to server:', error);
+            console.error("Error saving model to server:", error);
         }
     }
-    
+
 
     /**
      * Load scene information from JSON
      */
-    loadScene(fileName, sceneData) {
-        console.log(sceneData);
+    async loadScene(fileName, sceneData) {
         this.name = fileName;
-        console.log("Data imported to scene: ", sceneData)
-        this.clearObjects()
-        if(sceneData === null) return;
+
+        if (sceneData === null) {
+            this.events.do("load_models", 1);
+            return;
+        }
+
+        const models = new Set();
+        for (const object of sceneData)
+            if (object.objInfo.model !== "")
+                models.add(object.objInfo.model);
+
+        const local = [];
+
+        for (const id of this.models.keys()) {
+            if (models.has(id)) {
+                models.delete(id);
+            } else {
+                this.models.delete(id);
+            }
+        }
+
+        const toGetLocal = [];
+
+        for (const id of Object.keys(SceneManager.MODELS)) {
+            if (models.has(id)) {
+                models.delete(id);
+
+                const promise = Engine3D.res.loadGltf(SceneManager.MODELS[id])
+                    .then(object => {
+                        this.models.set(id, object);
+                    });
+                toGetLocal.push(promise);
+            }
+        }
+
+        await Promise.all(toGetLocal);
+
+        const toGet = Array.from(models.values());
+
+        const promises = [];
+        for (const id of toGet)
+            promises.push(fetch("http://localhost:9000/Get_Model", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    modelName: id
+                })
+            }));
+
+        await Promise.all(promises)
+            .then(responses => Promise.all(responses.map(res => res.blob())))
+            .then(async blobs => {
+                const loadPromises = [];
+
+                let i = 0;
+
+                blobs.forEach(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const promise = Engine3D.res.loadGltf(url);
+
+                    const id = toGet[i];
+                    const n = i;
+                    promise.then(model => {
+                        this.models.set(id, model);
+                        this.events.do("load_models", n / toGet.length);
+                    });
+
+                    loadPromises.push(promise);
+
+                    i++;
+                });
+
+                await Promise.all(loadPromises);
+            });
+
+        this.events.do("load_models", 1);
+
+        this.clearObjects();
+        this.hideSnapGrid();
+        this.view.graphic3D.ClearAll();
+
         for (let object of sceneData) {
             const sceneObj = new SceneObject.SceneObject({
                 manager: this,
@@ -692,6 +806,7 @@ class SceneManager {
             sceneObj.rot = new Vector3(object.objInfo.rot.x, object.objInfo.rot.y, object.objInfo.rot.z);
             sceneObj.scale = new Vector3(object.objInfo.scale.x, object.objInfo.scale.y, object.objInfo.scale.z);
 
+            console.log(object.objInfo.model, object.subscribers.singleValue)
             for (let subType in object.subscribers.singleValue) {
                 const subInfo = object.subscribers.singleValue[subType];
                 const subscriber = new SubscriberSingleValue(
@@ -707,13 +822,55 @@ class SceneManager {
 
             this.addObject(sceneObj);
         }
+
+        this.cam.transform.localPosition.y += 2048;
+        this.resetCamera();
     }
 
-    async loadModel(id, file) {
-        const model = await Engine3D.res.loadGltf(file);
-        this.models.set(id, model);
+    async getSceneFromDB(name) {
+        this.events.do("load_models", 0);
 
-        this.events.do("load_model", 1);
+        await fetch("http://localhost:9000/Get_Floor", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                floorName: name
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                this.loadScene(name, data);
+            });
+    }
+
+    getModelFromDB(id, onDone = () => {}) {
+        this.events.do("load_model", 0);
+
+        fetch("http://localhost:9000/Get_Model", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                modelName: id
+            })
+        })
+            .then(response => response.blob())
+            .then(async blob => {
+                const url = URL.createObjectURL(blob);
+                const model = await Engine3D.res.loadGltf(url, {
+                    onProgress: (curr, total) => {
+                        this.events.do("load_models", curr / total);
+                    }
+                });
+
+                this.models.set(id, model);
+                this.events.do("load_models", 1);
+
+                onDone();
+            });
     }
 
     // -------------------
@@ -956,79 +1113,22 @@ class SceneManager {
         return bb;
     }
 
-    _onOver(e) {
-        console.log('onOver: Name-', this.revObjects);
-        // console.log('onOver: Parent-', e.target.parent.object3D.name, e.data.pickInfo);
-        // let node = e.target;
-        // while(node.parent.parent != null)
-        // {
-        //     // console.log('parent', node.name);
-        //     node = node.parent.object3D;
-        //     // console.log('parent', node.name);
-        // }
-        // this.targetObj = node;
-        // // console.log("target object", this.targetObj.name);
-        // if(this.targetObj.numChildren > 0){
-        //     this.targetObj.forChild((n) => {
-        //         if (n.hasComponent(MeshRenderer)) {
-        //             let mr = n.getComponent(MeshRenderer);
-        //             this.mat1 = mr.material;
-        //             this.matList.push(mr.material);
-        //             let colorMat = new LitMaterial();
-        //             colorMat.baseColor = new Color(5, 5, 5, 0.5);
-        //             mr.material = colorMat;
-        //         }
-        //     });
-        // }
-        // else{
-        //     let mr = this.targetObj.getComponent(MeshRenderer);
-        //     this.mat1 = mr.material;
-        //     let colorMat = new LitMaterial();
-        //     colorMat.baseColor = new Color(5, 5, 5, 0.5);
-        //     mr.material = colorMat;
-        // }
-    }
+    snapSelectedDown() {
+        if (this.selectedCount === 0)
+            return;
 
-    /**
-     * (OLD) Handles when the mouse is no longer hovering over an object.
-     * @param e Event
-     * @private
-     */
-    _onOut(e) {
-        console.log('onOut', e.target.name, e.data.pickInfo);
-        if(this.targetObj.numChildren > 0){
-            let i  = this.matList.length - 1;
-            this.targetObj.forChild((n) => {
-                if (n.hasComponent(MeshRenderer)) {
-                    console.log("node", n.name);
-                    let mr = n.getComponent(MeshRenderer);
-                    let colorMat1 = new LitMaterial();
-                    colorMat1.baseColor = Color.COLOR_BLUE;
-                    // mr.material = this.mat1;
-                    mr.material = this.matList[i];
-                    i = i - 1;
-                }
-            });
-        }
-        else{
-            let obj = e.target;
-            let mr = obj.getComponent(MeshRenderer);
-            let colorMat1 = new LitMaterial();
-            colorMat1.baseColor = Color.COLOR_RED;
-            mr.material = this.mat1;
-        }
+        for (const object of this.getSelected())
+            object.snapDown();
     }
 
     _onMouseDown(e) {
         if (e.mouseCode === 2) {
-            // console.log("Scene click down");
             this.lastTime = Date.now();
             this.canMove = true;
             const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, 0);
             this.lastX = pos.x;
             this.lastY = pos.y;
             this.lastZ = pos.z;
-
         }
     }
 
@@ -1055,9 +1155,55 @@ class SceneManager {
     }
 
     _onMouseUp(e){
-        // console.log("Up");
         this.ObjectToMove = undefined;
         this.canMove = false;
+    }
+
+    showSnapGrid(center, gap) {
+        if (this._prevGridCenter !== null && this._prevGridCenter.equals(center))
+            return;
+
+        this.hideSnapGrid();
+
+        const count = 6;
+
+        const color = new Color(0.2, 0.5, 1);
+
+        for (let x = -count; x < count; x++) {
+            for (let z = -count; z < count; z++) {
+                const uuid = "grid-" + x + "-" + z;
+                this.grid.push(uuid);
+
+                const c1 = new Vector3(x * gap, 0, z * gap);
+                const c3 = new Vector3((x + 1) * gap, 0, (z + 1) * gap);
+
+                const c2 = new Vector3(c1.x, 0, c3.z);
+                const c4 = new Vector3(c3.x, 0, c1.z);
+
+                const points = [
+                    c1.add(center),
+                    c2.add(center),
+                    c3.add(center),
+                    c4.add(center),
+                    c1.add(center)
+                ];
+
+                const cc = color.clone();
+                cc.a = Math.sqrt(x ** 2 + z ** 2) / count;
+
+                this.view.graphic3D.drawLines(uuid, points, cc);
+            }
+        }
+    }
+
+    hideSnapGrid() {
+        if (this.grid.length > 0) {
+            for (const graphic of this.grid)
+                this.view.graphic3D.Clear(graphic);
+        }
+
+        this.grid = [];
+        this._prevGridCenter = null;
     }
 }
 

@@ -16,14 +16,21 @@
   </template>
   
   <style scoped>
+
+  .input-vector {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    margin: 0 16px;
+
+    width: 100%;
+  }
   
   .input-label {
-    /* margin: 16px 0 4px; */
-  
-    text-align: left;
+    flex: 0;
+    margin-right: 8px;
     font-weight: bold;
-
-    vertical-align: baseline;
   }
   
   .input-vector {

@@ -277,6 +277,10 @@ export default {
     update(sel) {
       this.selected = sel;
       this.object = this.mgr.getFirstSelected();
+    },
+
+    switchView() {
+      this.editMode = !this.editMode;
     }
   },
 
