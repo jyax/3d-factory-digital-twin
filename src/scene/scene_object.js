@@ -14,7 +14,7 @@ import KeyboardScript from "./keyboard_script.js";
 
 //
 // Login/Logout Functionality
-// This is exported to be used in App.vue
+// This is exported to be used in FloorDisplay.vue
 //
 const store = createStore({
   state: {

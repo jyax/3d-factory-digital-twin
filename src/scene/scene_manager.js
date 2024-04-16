@@ -59,8 +59,6 @@ class SceneManager {
         "material_bot":  "./src/assets/glb_models/material_bot.glb",
         "storage_tote":  "./src/assets/glb_models/storage_tote.glb"
         // Hidden models for editor use only
-
-        // ".translation-handle": "/glb_models/translation_handle.glb"
     };
 
     /**
@@ -732,7 +730,6 @@ class SceneManager {
                 id: object.objInfo.id,
                 model: object.objInfo.model,
                 locked: object.objInfo.locked,
-                //transformers: object.subscribers.transformers
             });
 
             sceneObj.pos = new Vector3(object.objInfo.pos.x, object.objInfo.pos.y, object.objInfo.pos.z);
