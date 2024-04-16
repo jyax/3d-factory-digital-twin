@@ -347,6 +347,9 @@ export default {
             color: "white"
           }
         },
+        tooltip: {
+          enabled: false
+        },
         stroke: {
           curve: 'straight',
           width: 3,
@@ -370,6 +373,9 @@ export default {
         xaxis: {
           labels: {
             enable: false
+          },
+          axisTicks: {
+            show: false
           }
         },
         yaxis: {

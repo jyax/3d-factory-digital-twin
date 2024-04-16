@@ -170,6 +170,18 @@ class SceneObject {
         return this._object.transform.localRotation.clone();
     }
 
+    get rotX() {
+        return this._object.transform.localRotation.x;
+    }
+
+    get rotY() {
+        return this._object.transform.localRotation.y;
+    }
+    get rotZ() {
+        return this._object.transform.localRotation.z;
+    }
+
+
     /**
      * Get the scale of the object.
      * @returns {Vector3} Scale vector
@@ -352,6 +364,24 @@ class SceneObject {
             this.mgr.updateSelectBox();
 
         this.events.do("rot", newRot.clone());
+    }
+
+    set rotX(x) {
+        const rot = this.rot;
+        rot.x = x;
+        this.rot = rot;
+    }
+
+    set rotY(y) {
+        const rot = this.rot;
+        rot.y = y;
+        this.rot = rot;
+    }
+
+    set rotZ(z) {
+        const rot = this.rot;
+        rot.z = z;
+        this.rot = rot;
     }
 
     set scale(newScale) {
@@ -551,7 +581,7 @@ class SceneObject {
 
       const height = bounds.max.y - bounds.min.y;
 
-      this._object.y = y + height / 2 + diff;
+      this._object.y = y + height / 2 - diff;
       this.events.do("pos", this.pos);
 
       if (this.isSelected())

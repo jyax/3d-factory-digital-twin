@@ -617,38 +617,19 @@ class SceneManager {
     // Scene Saving & Loading
     // -----------------------
 
+    serializeScene() {
+        return this.getAllObjects().map(obj => obj.serializeObject());
+    }
+
     /**
      * Save scene information to JSON.
      * @returns JSON Downloadable JSON file
      */
-    saveScene() {
-        let currentScene = this.getAllObjects().map(obj => obj.serializeObject())
-        let jsonString = JSON.stringify(currentScene, null, 3)
-
-        let prev_files = localStorage.getItem('prev_files');
-        prev_files += ',' + this.name;
-        localStorage.setItem('prev_files', prev_files);
-        localStorage.setItem(this.name, jsonString);
-
-        let sceneBlob = new Blob([jsonString], {type: "application/json"})
-        const blobUrl = URL.createObjectURL(sceneBlob);
-
-        // Create element to do a click event for blobUrl
-        const downloadLink = document.createElement("a")
-        downloadLink.href = blobUrl
-
-        // Need to add for it to ask for file name if none set
-        let saveName = this.name;
-        if (!saveName.includes(".json"))
-            saveName += ".json";
-        downloadLink.download = saveName;
-        downloadLink.click()
-
-        // Remove the URL from usage
-        URL.revokeObjectURL(blobUrl)
+    async saveScene() {
+        let jsonString = JSON.stringify(this.serializeScene(), null, 3);
 
         try {
-            const response = fetch('http://localhost:9000/Factory_Floors', {
+            const response = await fetch('http://localhost:9000/Factory_Floors', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -661,12 +642,41 @@ class SceneManager {
     
             if (response.ok) {
                 console.log('Scene saved successfully to server.');
+                this.events.do("save_success");
             } else {
                 console.error('Failed to save scene to server.');
+                this.events.do("save_error");
             }
         } catch (error) {
             console.error('Error saving scene to server:', error);
+            this.events.do("save_error");
         }
+    }
+
+    exportScene() {
+        let jsonString = JSON.stringify(this.serializeScene(), null, 3);
+
+        let prev_files = localStorage.getItem('prev_files');
+        prev_files += ',' + this.name;
+        localStorage.setItem('prev_files', prev_files);
+        localStorage.setItem(this.name, jsonString);
+
+        let sceneBlob = new Blob([jsonString], {type: "application/json"});
+        const blobUrl = URL.createObjectURL(sceneBlob);
+
+        // Create element to do a click event for blobUrl
+        const downloadLink = document.createElement("a");
+        downloadLink.href = blobUrl;
+
+        // Need to add for it to ask for file name if none set
+        let saveName = this.name;
+        if (!saveName.includes(".json"))
+            saveName += ".json";
+        downloadLink.download = saveName;
+        downloadLink.click();
+
+        // Remove the URL from usage
+        URL.revokeObjectURL(blobUrl);
     }
 
     uploadModel(name, file, onDone = () => {}) {
@@ -780,6 +790,8 @@ class SceneManager {
         this.events.do("load_models", 1);
 
         this.clearObjects();
+        this.hideSnapGrid();
+        this.view.graphic3D.ClearAll();
 
         for (let object of sceneData) {
             const sceneObj = new SceneObject.SceneObject({
@@ -816,6 +828,8 @@ class SceneManager {
     }
 
     async getSceneFromDB(name) {
+        this.events.do("load_models", 0);
+
         await fetch("http://localhost:9000/Get_Floor", {
             method: "POST",
             headers: {

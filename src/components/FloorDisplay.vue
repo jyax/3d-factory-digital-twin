@@ -49,7 +49,6 @@
     methods : {
       switchView() {
           this.editOn = !(this.editOn);
-          console.log("switch", this.editOn);
       },
 
       showStartMenu() {

@@ -15,8 +15,8 @@ class CameraControl extends ComponentBase {
     }
 
     start() {
-        Engine3D.inputSystem.addEventListener(KeyEvent.KEY_UP, this._keyUp, this);
-        Engine3D.inputSystem.addEventListener(KeyEvent.KEY_DOWN, this._keyDown, this);
+        //Engine3D.inputSystem.addEventListener(KeyEvent.KEY_UP, this._keyUp, this);
+        //Engine3D.inputSystem.addEventListener(KeyEvent.KEY_DOWN, this._keyDown, this);
     }
 
     _keyUp(event) {
@@ -62,6 +62,25 @@ class CameraControl extends ComponentBase {
     onUpdate(view) {
         if (this.mgr.isKeyDown("control"))
             return;
+
+        this._fwd = 0;
+        this._sdw = 0;
+        this._up = 0;
+
+        if (this.mgr.isKeyDown("w"))
+            this._fwd += 1;
+        if (this.mgr.isKeyDown("s"))
+            this._fwd -= 1;
+
+        if (this.mgr.isKeyDown("a"))
+            this._sdw += 1;
+        if (this.mgr.isKeyDown("d"))
+            this._sdw -= 1;
+
+        if (this.mgr.isKeyDown(" "))
+            this._up += 1;
+        if (this.mgr.isKeyDown("z"))
+            this._up -= 1;
 
         const elapsed = Time.delta / 1000;
 
