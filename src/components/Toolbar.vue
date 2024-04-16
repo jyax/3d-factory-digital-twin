@@ -412,7 +412,6 @@ button img {
 
 <script>
   import SceneManager from "../scene/scene_manager.js";
-  import Line from "../scene/line.js";
   import { Vector3 } from "@orillusion/core";
 
   export default {
@@ -425,15 +424,15 @@ button img {
 
     data() {
       return {
-        selected: [],
-        dragMode: false,
+        selected: [], // Selected objects
+        dragMode: false, 
 
         isLineMenuVisible: false,
-        pointIndex: 0,
-        lineIndex: 0,
-        width: 1,
+        pointIndex: 0,  // Current point editing
+        lineIndex: 0,   // Current line 
+        width: 1,       // Width of the line
 
-        line: undefined
+        line: undefined // Line object
       }
     },
 
@@ -445,30 +444,30 @@ button img {
           this.OpenLineWindow();
       },
 
+      // Opens the UI for adding a Line
       OpenLineWindow() {
         this.isLineMenuVisible = true;
         this.line = this.mgr.createLine();
         this.lineIndex++;
       }, 
 
+      // Closes the UI for adding a Line
       CloseLineMenu() {
         this.isLineMenuVisible = false;
       },
 
-      // Makes this
-      // <div class="row">
-      //     <PointPosition :mgr="mgr" :index="pointIndex"/>
-      //  </div>
+      // Adds another point input in the UI
+      // <PointPosition :mgr="mgr" :line="line" :index="index"/>
+      // Also adds point to the line
       AddPoint(){
         this.line.addPoint(new Vector3(0,0,0));
-        console.log(this.line.pointMap);
         this.pointIndex++;
       }
     },
 
     created() {
-      this.mgr.events.on("select", sel => this.selected = [...sel]);
-      this.mgr.events.on("drag", val => this.dragMode = val);
+      this.mgr.events.on("select", sel => this.selected = [...sel]);  // Event for selecting objects
+      this.mgr.events.on("drag", val => this.dragMode = val);       // Event for dragging objects
     }
   }
 </script>
