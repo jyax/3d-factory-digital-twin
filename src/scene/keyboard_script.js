@@ -7,6 +7,9 @@ import {
 
 import Util from "../util/util";
 
+//
+// Script to rotate objects with arrow keys
+//
 class KeyboardScript extends ComponentBase
 {
     right = false;

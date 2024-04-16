@@ -32,19 +32,7 @@ const client = new MongoClient(mongodbURL, {
     }
 });
 
-// Create bucket
-//const bucket = new mongodb.GridFSBucket(db);
-
-
 async function connectToDB(){
-    // try{
-    //     const conn = await client.connect();
-    //     const db = await conn.db('Magna');
-    //     const coll = await db.collection('Factory_Floors');
-    //     const result = await coll.find().toArray();
-    //     return result;
-    // } catch (err) { console.log(err) };
-    // return [];
     try {
         await client.connect();
         console.log('Connected to MongoDB');
@@ -89,6 +77,7 @@ app.post('/Factory_Floors', async (req, res) => {
     }
 });
 
+// Saving scene files to the factory floor
 app.post('/Get_All_Floors', async (req, res) => {
     const db = await connectToDB();
 
@@ -108,6 +97,7 @@ app.post('/Get_All_Floors', async (req, res) => {
     }
 });
 
+// Loading the scene files from the database
 app.post('/Get_Floor', async (req, res) => {
     const db = await connectToDB();
     const bucket = new GridFSBucket(db, {bucketName: 'sceneFiles'});
@@ -142,6 +132,7 @@ app.post('/Get_Floor', async (req, res) => {
     });
 });
 
+// Uploading model files to the database
 app.post('/Upload_Model', upload.single('modelData'), async (req, res) => {
     try {
         const db = await connectToDB();
@@ -167,6 +158,7 @@ app.post('/Upload_Model', upload.single('modelData'), async (req, res) => {
     }
 });
 
+// Getting models from the database
 app.post('/Get_Model', async (req, res) => {
     const db = await connectToDB();
     const bucket = new GridFSBucket(db, {bucketName: 'modelFiles'});
@@ -204,8 +196,3 @@ app.post('/Get_All_Models', async (req, res) => {
 app.get('/',(req, res)=>{
     res.send('Hi');
 })
-
-// app.get('/Factory_Floors', async (req, res) => {
-//     const result = await connectToDB();
-//     res.send(result);
-// })
