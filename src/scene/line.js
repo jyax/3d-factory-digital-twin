@@ -1,15 +1,10 @@
 import {
     Vector3,
-    Ray,
-    Color,
-    MeshRenderer,
-    BoxGeometry,
-    LitMaterial,
-    Object3D,
-    scale
 } from "@orillusion/core";
-import SceneObject from './scene_object'
 
+/**
+ * A visual line object 
+ */
 class Line{
     constructor({manager, points =  []} = {}){
         this._manager = manager;
