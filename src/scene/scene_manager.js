@@ -3,8 +3,6 @@ import {
     Camera3D,
     Color,
     Engine3D,
-    LitMaterial,
-    MeshRenderer,
     Object3D,
     OrbitController,
     PointerEvent3D,
@@ -34,7 +32,6 @@ import CameraControl from "./camera_control.js";
  * Main manager of entire scene. Responsible for managing all currently loaded objects and assets.
  */
 class SceneManager {
-
     static MODELS = {
         "table": "/glb_models/Assembly Warehouse Table.glb",
         "cart": "/glb_models/trolley cart for warehouse.glb",
@@ -90,22 +87,6 @@ class SceneManager {
         this._events = new EventHandler();
 
         this._ctrlPressed = false;
-
-        this.moveInterval = 30;
-
-        this.depth = 0;
-
-        this.lastX = -1;
-
-        this.lastY = -1;
-
-        this.ObjectToMove = undefined;
-
-        this.canMove = false;
-
-        this._dragMult = 200;
-
-        this.count = 0;
 
         this._mqttHandler = new MQTTHandler({
             mgr: this,
@@ -328,14 +309,14 @@ class SceneManager {
         }, this);
     }
 
-    // --------
+    //
     // Getters
-    // --------
+    //
 
     /**
-     *
-     * @param object3D
-     * @returns {null|any}
+     * Find a SceneObject using an Orillusion Object3D
+     * @param {Object3D} object3D Orillusion object to search for
+     * @returns {SceneObject|null} Corresponding SceneObject if found, null if not
      */
     reverseLookup(object3D) {
         if (this.revObjects.has(object3D))
@@ -396,27 +377,27 @@ class SceneManager {
     }
 
     /**
-     *
-     * @returns {any[]}
+     * Get a list of all available model IDs.
+     * @returns {string[]} List of all loaded model IDs
      */
     getModelIDs() {
         return Array.from(this.models.keys());
     }
 
     /**
-     *
-     * @param key
-     * @returns {boolean}
+     * Check if a key is currently pressed.
+     * @param {string} key Key to check
+     * @returns {boolean} Whether key is currently pressed
      */
     isKeyDown(key) {
-        return this._pressedKeys.has(key);
+        return this._pressedKeys.has(key.toLowerCase());
     }
 
 
 
-    // ---------
-    //  Setters
-    // ---------
+    //
+    // Setters
+    //
 
     /**
      * Set the color of the sky in the scene.
@@ -429,25 +410,9 @@ class SceneManager {
     }
 
 
-
-    // ------
+    //
     // Input
-    // ------
-
-    /**
-     * Handle the mouse clicking on the canvas for cursor effects.
-     * @param {MouseEvent} e Mouse event
-     */
-    startDrag(e) {
-        document.body.style.cursor = "grabbing";
-    }
-
-    /**
-     * Handle the mouse button being released for cursor effects.
-     */
-    stopDrag() {
-        document.body.style.cursor = "default";
-    }
+    //
 
     /**
      * Reset the camera position and target the center (0, 0, 0) of the scene.
@@ -464,10 +429,9 @@ class SceneManager {
     }
 
 
-
-    // ----------------
+    //
     // User Interfaces
-    // ----------------
+    //
 
     /**
      * Signal an alert to the event listener.
@@ -480,10 +444,9 @@ class SceneManager {
     }
 
 
-
-    // -----------------
+    //
     // Objects - Access
-    // -----------------
+    //
 
     /**
      * Get an object by its ID.
@@ -506,10 +469,9 @@ class SceneManager {
     }
 
 
-
-    // -------------------
+    //
     // Objects - Creation
-    // -------------------
+    //
 
     /**
      * Create a new basic object and add it to the scene.
@@ -541,8 +503,7 @@ class SceneManager {
 
     /** 
      * Creates new Line object
-     * @param {SceneManager} manager Parent scene manager
-     * @param {[Vector3]} points List of points in the line
+     * @param {Vector3[]} points List of points in the line
     */
     createLine(points=[]) {
         return new Line({manager: this, points: points});
@@ -562,14 +523,13 @@ class SceneManager {
     }
 
 
-
-    // -----------------------
+    //
     // Scene Saving & Loading
-    // -----------------------
+    //
 
     /**
      * Serializes a Scene object into a javascript plain object
-     * @returns {Object}, Plain Object for JSON output
+     * @returns {Object} Plain Object for JSON output
      */
     serializeScene() {
         return this.getAllObjects().map(obj => obj.serializeObject());
@@ -577,7 +537,6 @@ class SceneManager {
 
     /**
      * Save scene information to JSON.
-     * @returns JSON Downloadable JSON file
      */
     async saveScene() {
         let jsonString = JSON.stringify(this.serializeScene(), null, 3);
@@ -667,12 +626,11 @@ class SceneManager {
         }
     }
 
-
     /**
-     * Loads the a JSON file's contents into the scene
+     * Loads a JSON file's contents into the scene
      * @param {string} fileName JSON file name
      * @param {Object} sceneData JSON content
-     * @returns {Promise<void>}
+     * @returns {Promise}
      */
     async loadScene(fileName, sceneData) {
         this.name = fileName;
@@ -686,8 +644,6 @@ class SceneManager {
         for (const object of sceneData)
             if (object.objInfo.model !== "")
                 models.add(object.objInfo.model);
-
-        const local = [];
 
         for (const id of this.models.keys()) {
             if (models.has(id)) {
@@ -796,7 +752,7 @@ class SceneManager {
     /**
      * Gets the factory floor scene from the database
      * @param {string} name
-     * @returns {Promise<void>}
+     * @returns {Promise}
      */
     async getSceneFromDB(name) {
         this.events.do("load_models", 0);
@@ -850,10 +806,9 @@ class SceneManager {
     }
 
 
-
-    // -------------------
+    //
     // Objects - Deletion
-    // -------------------
+    //
 
     /**
      * Remove an object from the scene.
@@ -878,10 +833,9 @@ class SceneManager {
     }
 
 
-
-    // --------------------
+    //
     // Objects - Selection
-    // --------------------
+    //
 
     /**
      * Select an object. Will add to group selection if control is pressed.
@@ -1104,50 +1058,10 @@ class SceneManager {
             object.snapDown();
     }
 
-    _onMouseDown(e) {
-        if (e.mouseCode === 2) {
-            this.lastTime = Date.now();
-            this.canMove = true;
-            const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, 0);
-            this.lastX = pos.x;
-            this.lastY = pos.y;
-            this.lastZ = pos.z;
-        }
-    }
-
-    _onMouseMove(e){
-        // If right mouse is being clicked on a movable object then continue else return
-        if (this.canMove && this.ObjectToMove !== undefined){
-            // Stop camera movement with mouse
-            e.stopImmediatePropagation();
-
-            // Update the position of the selected object to the mouse position
-            const now = Date.now();
-            if (now - this.lastTime > this.moveInterval) {
-                this.lastTime = now;
-                const pos = this.cam.screenPointToWorld(e.mouseX, e.mouseY, 0);
-                this.ObjectToMove.setX(this.ObjectToMove.getObject3D().x + (pos.x - this.lastX) * this._dragMult);
-                this.ObjectToMove.setY(this.ObjectToMove.getObject3D().y + (pos.y - this.lastY) * this._dragMult);
-                this.ObjectToMove.setZ(this.ObjectToMove.getObject3D().z + (pos.z - this.lastZ) * this._dragMult);
-                this.lastX = pos.x;
-                this.lastY = pos.y;
-                this.lastZ = pos.z;
-
-            }
-        }
-    }
-
-
-
-    _onMouseUp(e){
-        this.ObjectToMove = undefined;
-        this.canMove = false;
-    }
-
     /**
      * Displays snap to grid view on the current object
-     * @param center
-     * @param gap
+     * @param {Vector3} center Center of grid (origin and bottom of object)
+     * @param {number} gap Gap between grid lines
      */
     showSnapGrid(center, gap) {
         if (this._prevGridCenter !== null && this._prevGridCenter.equals(center))
