@@ -1,7 +1,6 @@
 .idea/
 .vscode/
-./mqtt-emulator/notes.md
-./mqtt-emulator/__pycache__
+./mqtt-emulator/__pycache__/
 ./node_modules/
 ./vite-project/node_modules/
 ./glb_models/
