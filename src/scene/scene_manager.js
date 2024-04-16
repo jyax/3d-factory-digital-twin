@@ -158,9 +158,6 @@ class SceneManager {
 
 
         this._cameraController = this.camera.addComponent(OrbitController);
-        // this._cameraController.setCamera(new Vector3(0, 50, 50), new Vector3(0, 0, 0));
-
-        // this._cameraController.moveSpeed = 30;
 
         this._cameraController.smooth = 0;
         this._cameraController.panFactor = 1;
@@ -176,70 +173,6 @@ class SceneManager {
         this.view = new View3D();
         this.view.scene = this.scene;
         this.view.camera = this.cam;
-
-        /**
-        const promises = [];
-        const total = Object.keys(SceneManager.MODELS).length;
-        let i = 0;
-
-        for (const id of Object.keys(SceneManager.MODELS)) {
-            const model = Engine3D.res.loadGltf(SceneManager.MODELS[id]);
-            promises.push(model);
-
-            model.then(object => {
-                this.models.set(id, object)
-
-                i++;
-
-                let progress = 0;
-                if (total !== 0)
-                    progress = i / total;
-                this.events.do("load_models", progress);
-            });
-        }
-
-        await Promise.all(promises);
-
-        // this.createNewObject({
-        //     pos: new Vector3(),
-        //     select: false
-        // });
-        this.view.camera = this.cam;
-
-
-
-        for (const id of Object.keys(this.modelsMap)) {
-            const model = await Engine3D.res.loadGltf(this.modelsMap[id]);
-            this.models.set(id, model);
-        }
-
-            */
-
-        // this.createNewObject(new Vector3(), false);
-        // this.createNewObject({select:false,model:"testfactory",pos: new Vector3()})
-        
-
-        
-
-        /**
-         * Event listener for File Input
-         */
-
-        // WAITING ON UPLOAD PAGE
-        // document.getElementById('fileInput').addEventListener('drop', (event) => {
-        //     event.preventDefault()
-        //     let file = event.dataTransfer.files[0]
-        //
-        //     if (file.type.match('application/json')) {
-        //         let reader = new FileReader()
-        //         reader.onloadend = (event) => {
-        //             let jsonString = JSON.parse(String(event.target.result));
-        //             this.LoadScene(jsonString)
-        //         }
-        //         reader.readAsText()
-        //     }
-        //     this.LoadScene()
-        // })
 
         document.addEventListener("keydown", (event) => {
             if (Util.inputFocused())
