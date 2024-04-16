@@ -21,6 +21,7 @@ import KeyboardScript from "./keyboard_script.js";
 // Login/Logout Functionality
 // This is exported to be used in App.vue
 //
+
 const store = createStore({
     state: {
         user: null,
@@ -110,8 +111,9 @@ class SceneObject {
         ];
     }
 
-
+    //
     // Deletion
+    //
 
     /**
      * Delete the object and remove it from the scene manager.
@@ -122,7 +124,11 @@ class SceneObject {
         this._object.destroy();
     }
 
+
+
+    //
     // Getters
+    //
 
     /**
      * Get the scene manager.
@@ -272,18 +278,21 @@ class SceneObject {
     }
 
 
+
+    //
     // Setters
+    //
 
     /**
     * Set the global ID.
     * @param {string} val New global ID
     */
     set id(val) {
-    if (this._id !== "") this.mgr.ids.delete(this._id);
+        if (this._id !== "") this.mgr.ids.delete(this._id);
 
-    this._id = val;
+        this._id = val;
 
-    if (val !== "") this.mgr.ids.set(this._id, this);
+        if (val !== "") this.mgr.ids.set(this._id, this);
     }
 
     /**
@@ -291,7 +300,7 @@ class SceneObject {
     * @param val Whether object should block user edits
     */
     set locked(val) {
-    this._locked = val;
+        this._locked = val;
 
         this.events.do("lock", val);
 
@@ -422,7 +431,7 @@ class SceneObject {
      * @param {string} id ID of imported mesh
      */
     setModel(id) {
-    if (id === "" || !this.mgr.models.has(id)) return;
+        if (id === "" || !this.mgr.models.has(id)) return;
 
         const copy = this.mgr.models.get(id).clone();
         this._object.transform.cloneTo(copy);
@@ -433,9 +442,9 @@ class SceneObject {
         this._object.transform.updateWorldMatrix(true);
         this.mgr.scene.addChild(this._object);
 
-    this.mgr.revObjects.set(this._object, this);
+        this.mgr.revObjects.set(this._object, this);
 
-    if (this.isSelected()) this.mgr.updateSelectBox();
+        if (this.isSelected()) this.mgr.updateSelectBox();
 
         this.modelID = id;
 
@@ -461,7 +470,11 @@ class SceneObject {
         });
     }
 
+
+
+    //
     // Iteration
+    //
 
     /**
      * Iterate through all children of the root object and run a function for each.
@@ -492,7 +505,10 @@ class SceneObject {
     }
 
 
+
+    //
     // Selection
+    //
 
     /**
      * Select this actor.
@@ -505,7 +521,10 @@ class SceneObject {
     }
 
 
+
+    //
     // Duplication
+    //
 
     /**
     * Create and get a copy of the object.
@@ -535,7 +554,10 @@ class SceneObject {
     }
 
 
-    // Interaction
+
+    //
+    //  Interaction
+    //
 
     /**
     * Handle when the mouse hovers over the object.
@@ -603,7 +625,10 @@ class SceneObject {
     }
 
 
-    // Live Data
+
+    // -----------
+    //  Live Data
+    // -----------
 
     /**
      * Handle live data from MQTT.
@@ -638,7 +663,10 @@ class SceneObject {
     }
 
 
-    // Serialization / Save File
+
+    //
+    //  Serialization / Save File
+    //
 
     /**
      * Serialize the object for saving
