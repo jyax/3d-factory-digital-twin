@@ -116,30 +116,7 @@ const Create = () => {
  */
 const Load = () => {
   if (fileInput.value !== '') {
-    // const sceneManager = new SceneManager();
-    // console.log(document.getElementById('fileInput'));
-    // try {
-    //   document.getElementById('fileInput').addEventListener('drop', (event) => {
-    //     event.preventDefault()
-    //     let file = event.dataTransfer.files[0]
-    //
-    //     if (file.type.match('application/json')) {
-    //       let reader = new FileReader()
-    //       reader.onloadend = (event) => {
-    //         let jsonString = JSON.parse(String(event.target.result));
-    //         sceneManager.LoadScene(jsonString)
-    //       }
-    //       reader.readAsText()
-    //     }
-    //     else {
-    //       console.log("please use a valid JSON file")
-    //     }
-    //     //this.LoadScene()
-    //   })
-    // }
-    // catch {
-    //   console.log("error getting file input");
-    // }
+ 
   }
 }
 

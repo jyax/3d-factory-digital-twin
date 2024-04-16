@@ -154,9 +154,6 @@ class SceneManager {
 
 
         this._cameraController = this.camera.addComponent(OrbitController);
-        // this._cameraController.setCamera(new Vector3(0, 50, 50), new Vector3(0, 0, 0));
-
-        // this._cameraController.moveSpeed = 30;
 
         this._cameraController.smooth = 0;
         this._cameraController.panFactor = 1;
@@ -172,12 +169,6 @@ class SceneManager {
         this.view = new View3D();
         this.view.scene = this.scene;
         this.view.camera = this.cam;
-
-
-
-        /**
-         * Event listener for File Input
-         */
 
         document.addEventListener("keydown", (event) => {
             if (Util.inputFocused())
