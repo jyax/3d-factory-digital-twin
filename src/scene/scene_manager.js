@@ -36,7 +36,6 @@ import CameraControl from "./camera_control.js";
 class SceneManager {
 
     static MODELS = {
-        "dragon": "https://cdn.orillusion.com/PBR/DragonAttenuation/DragonAttenuation.gltf",
         "table": "/glb_models/Assembly Warehouse Table.glb",
         "cart": "/glb_models/trolley cart for warehouse.glb",
         "rack": "/glb_models/JM_Rack_A.glb",
@@ -58,9 +57,6 @@ class SceneManager {
         "shelf": "./src/assets/glb_models/shelf.glb",
         "material_bot":  "./src/assets/glb_models/material_bot.glb",
         "storage_tote":  "./src/assets/glb_models/storage_tote.glb"
-        // Hidden models for editor use only
-
-        // ".translation-handle": "/glb_models/translation_handle.glb"
     };
 
     /**
@@ -113,7 +109,7 @@ class SceneManager {
 
         this._mqttHandler = new MQTTHandler({
             mgr: this,
-            server: false
+            server: true
         });
 
         this.editMode = true;
@@ -177,69 +173,11 @@ class SceneManager {
         this.view.scene = this.scene;
         this.view.camera = this.cam;
 
-        /**
-        const promises = [];
-        const total = Object.keys(SceneManager.MODELS).length;
-        let i = 0;
 
-        for (const id of Object.keys(SceneManager.MODELS)) {
-            const model = Engine3D.res.loadGltf(SceneManager.MODELS[id]);
-            promises.push(model);
-
-            model.then(object => {
-                this.models.set(id, object)
-
-                i++;
-
-                let progress = 0;
-                if (total !== 0)
-                    progress = i / total;
-                this.events.do("load_models", progress);
-            });
-        }
-
-        await Promise.all(promises);
-
-        // this.createNewObject({
-        //     pos: new Vector3(),
-        //     select: false
-        // });
-        this.view.camera = this.cam;
-
-
-
-        for (const id of Object.keys(this.modelsMap)) {
-            const model = await Engine3D.res.loadGltf(this.modelsMap[id]);
-            this.models.set(id, model);
-        }
-
-            */
-
-        // this.createNewObject(new Vector3(), false);
-        // this.createNewObject({select:false,model:"testfactory",pos: new Vector3()})
-        
-
-        
 
         /**
          * Event listener for File Input
          */
-
-        // WAITING ON UPLOAD PAGE
-        // document.getElementById('fileInput').addEventListener('drop', (event) => {
-        //     event.preventDefault()
-        //     let file = event.dataTransfer.files[0]
-        //
-        //     if (file.type.match('application/json')) {
-        //         let reader = new FileReader()
-        //         reader.onloadend = (event) => {
-        //             let jsonString = JSON.parse(String(event.target.result));
-        //             this.LoadScene(jsonString)
-        //         }
-        //         reader.readAsText()
-        //     }
-        //     this.LoadScene()
-        // })
 
         document.addEventListener("keydown", (event) => {
             if (Util.inputFocused())
@@ -297,11 +235,6 @@ class SceneManager {
                     event.preventDefault();
                     this.invertSelection();
 
-                    break;
-                }
-
-                case "p": {
-                    this.alert("Temperature above critical threshold.");
                     break;
                 }
 
@@ -408,6 +341,11 @@ class SceneManager {
     // Getters
     // --------
 
+    /**
+     *
+     * @param object3D
+     * @returns {null|any}
+     */
     reverseLookup(object3D) {
         if (this.revObjects.has(object3D))
             return this.revObjects.get(object3D);
@@ -466,17 +404,28 @@ class SceneManager {
         return this.cam.screenPointToRay(input.mouseX, input.mouseY).direction;
     }
 
+    /**
+     *
+     * @returns {any[]}
+     */
     getModelIDs() {
         return Array.from(this.models.keys());
     }
 
+    /**
+     *
+     * @param key
+     * @returns {boolean}
+     */
     isKeyDown(key) {
         return this._pressedKeys.has(key);
     }
 
 
-    // Setters
-    // --------
+
+    // ---------
+    //  Setters
+    // ---------
 
     /**
      * Set the color of the sky in the scene.
@@ -487,6 +436,8 @@ class SceneManager {
         this.sky = this.scene.addComponent(SkyRenderer);
         this.sky.map = colorSky;
     }
+
+
 
     // ------
     // Input
@@ -521,6 +472,8 @@ class SceneManager {
         this.camera.localPosition = pos.add(dir.mul(mag));
     }
 
+
+
     // ----------------
     // User Interfaces
     // ----------------
@@ -534,6 +487,8 @@ class SceneManager {
     alert(description = "", id = "") {
         this.events.do("alert", description, id);
     }
+
+
 
     // -----------------
     // Objects - Access
@@ -558,6 +513,8 @@ class SceneManager {
     getAllObjects() {
         return Array.from(this.objects.values());
     }
+
+
 
     // -------------------
     // Objects - Creation
@@ -613,10 +570,16 @@ class SceneManager {
         this.events.do("add", object);
     }
 
+
+
     // -----------------------
     // Scene Saving & Loading
     // -----------------------
 
+    /**
+     * Serializes a Scene object into a javascript plain object
+     * @returns {Object}, Plain Object for JSON output
+     */
     serializeScene() {
         return this.getAllObjects().map(obj => obj.serializeObject());
     }
@@ -653,6 +616,9 @@ class SceneManager {
         }
     }
 
+    /**
+     * Exports the Factory Floor Scene into a JSON file
+     */
     exportScene() {
         let jsonString = JSON.stringify(this.serializeScene(), null, 3);
 
@@ -679,6 +645,12 @@ class SceneManager {
         URL.revokeObjectURL(blobUrl);
     }
 
+    /**
+     * Uploads the model to the database
+     * @param {string} name Name of the model
+     * @param {file} file Model file
+     * @param {event} onDone event handling after upload is completed
+     */
     uploadModel(name, file, onDone = () => {}) {
         try {
             const formData = new FormData();
@@ -706,7 +678,10 @@ class SceneManager {
 
 
     /**
-     * Load scene information from JSON
+     * Loads the a JSON file's contents into the scene
+     * @param {string} fileName JSON file name
+     * @param {Object} sceneData JSON content
+     * @returns {Promise<void>}
      */
     async loadScene(fileName, sceneData) {
         this.name = fileName;
@@ -827,6 +802,11 @@ class SceneManager {
         this.resetCamera();
     }
 
+    /**
+     * Gets the factory floor scene from the database
+     * @param {string} name
+     * @returns {Promise<void>}
+     */
     async getSceneFromDB(name) {
         this.events.do("load_models", 0);
 
@@ -845,6 +825,11 @@ class SceneManager {
             });
     }
 
+    /**
+     * Gets a specified model from the database
+     * @param {string} id model's ID
+     * @param {event} onDone event handling for when loading the file is completed
+     */
     getModelFromDB(id, onDone = () => {}) {
         this.events.do("load_model", 0);
 
@@ -873,6 +858,8 @@ class SceneManager {
             });
     }
 
+
+
     // -------------------
     // Objects - Deletion
     // -------------------
@@ -898,6 +885,8 @@ class SceneManager {
         for (const object of this.objects.values())
             object.delete();
     }
+
+
 
     // --------------------
     // Objects - Selection
@@ -1073,7 +1062,7 @@ class SceneManager {
 
     /**
      * Get the bounding box containing all the bounding boxes of selected objects.
-     * @returns {BoundingBox}
+     * @returns {BoundingBox} Bounding Box containing all selected objects
      * @private
      */
     getSelectedBounds() {
@@ -1113,6 +1102,9 @@ class SceneManager {
         return bb;
     }
 
+    /**
+     *  Snaps the object to the floor
+     */
     snapSelectedDown() {
         if (this.selectedCount === 0)
             return;
@@ -1154,11 +1146,18 @@ class SceneManager {
         }
     }
 
+
+
     _onMouseUp(e){
         this.ObjectToMove = undefined;
         this.canMove = false;
     }
 
+    /**
+     * Displays snap to grid view on the current object
+     * @param center
+     * @param gap
+     */
     showSnapGrid(center, gap) {
         if (this._prevGridCenter !== null && this._prevGridCenter.equals(center))
             return;
@@ -1196,6 +1195,9 @@ class SceneManager {
         }
     }
 
+    /**
+     * Hides snap to grid view
+     */
     hideSnapGrid() {
         if (this.grid.length > 0) {
             for (const graphic of this.grid)
