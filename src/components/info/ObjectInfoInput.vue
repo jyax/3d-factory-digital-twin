@@ -104,13 +104,11 @@ export default {
 
     switchView() {
         this.enableUpdate = !(this.enableUpdate);
-        console.log("switch", this.enableUpdate);
     }
   },
 
   created() {
     this.val = this.default;
-    // this.mgr.events.on("switch view", this.switchView);
   }
 }
 

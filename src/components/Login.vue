@@ -59,7 +59,6 @@
     import store from '../../src/scene/scene_object';
     
     import {ref, computed, onMounted} from "vue";
-    import {useStore} from "vuex";
     import { createAuth0Client } from '@auth0/auth0-spa-js';
     
     export default {

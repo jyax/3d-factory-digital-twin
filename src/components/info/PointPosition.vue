@@ -1,3 +1,4 @@
+<!-- Input for position within the create line UI -->
 <template>
     <div class="input-vector">
         
@@ -124,6 +125,7 @@
     },
   
     methods: {
+      // Update the x-value of the current point and line
       doX() {
         if(this.enableUpdate && !(this.xVal.trim() == '')){
             var oldVector = this.line.pointMap.get(this.index);
@@ -131,7 +133,8 @@
             this.line.updateLine(this.index, oldVector);
         }
       },
-  
+      
+      // Update the y-value of the current point and line
       doY() {
         if(this.enableUpdate && !(this.yVal.trim() == '')){
             var oldVector = this.line.pointMap.get(this.index);
@@ -139,7 +142,8 @@
             this.line.updateLine(this.index, oldVector);
         }
       },
-  
+      
+      // Update the z-value of the current point and line
       doZ() {
         if(this.enableUpdate && !(this.zVal.trim() == '')){
             var oldVector = this.line.pointMap.get(this.index);
@@ -148,34 +152,15 @@
         }
       },
   
+      // Blur input field 
       blurInput(e) {
         e.target.blur();
       },
-  
-      update(selected) {
-        if(this.enableUpdate){
-          if (selected.length !== 1)
-            this.pos = new Vector3();
-          else
-            this.pos = selected[0].getObject3D().localPosition;
-  
-          this.xVal = Math.floor(this.pos.x * 100) / 100;
-          this.yVal = Math.floor(this.pos.y * 100) / 100;
-          this.zVal = Math.floor(this.pos.z * 100) / 100;
-        }
-      },
-  
+
+      // Switch between view and edit modes
       switchView() {
           this.enableUpdate = !(this.enableUpdate);
-          console.log("switch", this.enableUpdate);
       }
-    },  
-  
-    created() {
-    //   this.mgr.events.on("select", selected => this.update(selected));
-    //   this.mgr.events.on('switch view', this.switchView);
-  
-    //   this.update(this.mgr.getSelected());
     }
   }
   </script>

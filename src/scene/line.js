@@ -1,5 +1,6 @@
 import {
     Vector3,
+    Ray
 } from "@orillusion/core";
 
 /**

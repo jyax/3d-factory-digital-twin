@@ -101,7 +101,6 @@ export default {
 
     switchView() {
         this.enableUpdate = !(this.enableUpdate);
-        console.log("switch 1", this.enableUpdate);
     }
   },
 

@@ -1,3 +1,4 @@
+<!-- Start menu allowing for a file to be loaded locally or from the database -->
 <template>
     <div class="overlay">
 
@@ -229,19 +230,25 @@ export default{
   },
 
   methods: {
+
+    // When file is dropped into input div load the file into a scene
     dropHandler(ev) {
       // prevent default actions
       ev.preventDefault();
 
+      // Check if there are files
       if(ev.dataTransfer.files) {
         const file = ev.dataTransfer.files[0];
+
+        // Ensure it is a JSON
         if (file.type === "application/json") {
           const fr = new FileReader();
 
+          // Parse the JSON into a string, load the file, and disable start menu to show the scene
           fr.onloadend = (event) => {
             const data = JSON.parse(String(fr.result));
             this.mgr.loadScene(file.name, data);
-            this.mgr.events.do('open project');
+            this.displayProject();
           }
           fr.readAsText(ev.dataTransfer.files[0]);
         } else { this.mgr.alert("File is either corrupted or is not JSON") }
@@ -251,12 +258,13 @@ export default{
       }
     },
 
-    dragOverHandler(ev) {},
 
+    // Call event to disable start menu and show scene
     displayProject() {
       this.mgr.events.do('open project');
     },
 
+    // Loads the scene from the database
     loadFile(fileName) {
       this.mgr.getSceneFromDB(fileName);
     },
@@ -273,11 +281,6 @@ export default{
   },
 
   created() {
-    let prevFiles = localStorage.getItem('prev_files');
-    if (prevFiles === null)
-      prevFiles = "";
-
-    this.savedFiles = prevFiles.split(',');
 
     this.loadAllFloors();
   }

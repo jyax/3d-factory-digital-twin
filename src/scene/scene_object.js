@@ -552,7 +552,6 @@ class SceneObject {
    * @param e Event
    */
   mouseDown(e) {
-    // console.log("Down");
     this.mgr.ObjectToMove = this;
   }
 

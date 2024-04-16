@@ -244,7 +244,6 @@ input[type="color"]::-webkit-color-swatch:hover {
 
 <script>
 import SceneManager from "../scene/scene_manager.js";
-import ColorGradient from "../color/color_gradient.js";
 
 export default {
   name: "ObjectInfo",

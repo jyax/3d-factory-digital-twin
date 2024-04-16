@@ -14,10 +14,7 @@ class CameraControl extends ComponentBase {
         this._up = 0;
     }
 
-    start() {
-        //Engine3D.inputSystem.addEventListener(KeyEvent.KEY_UP, this._keyUp, this);
-        //Engine3D.inputSystem.addEventListener(KeyEvent.KEY_DOWN, this._keyDown, this);
-    }
+    start() {}
 
     _keyUp(event) {
         if (Util.inputFocused())

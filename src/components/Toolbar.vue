@@ -413,6 +413,7 @@ button img {
 <script>
   import SceneManager from "../scene/scene_manager.js";
   import { Vector3 } from "@orillusion/core";
+  import Line from "../scene/line.js"
 
   export default {
     props: {
