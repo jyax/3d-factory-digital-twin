@@ -1,9 +1,22 @@
-import {ComponentBase, Engine3D, KeyCode, KeyEvent, OrbitController, Time} from "@orillusion/core";
+import {ComponentBase, Engine3D, KeyCode, KeyEvent, OrbitController, Time, View3D} from "@orillusion/core";
 import Util from "../util/util.js";
 
+/**
+ * @module CameraControl
+ * @fileoverview Contains CameraControl class.
+ */
+
+/**
+ * @class
+ * @extends ComponentBase
+ * Component for handling custom camera movement.
+ */
 class CameraControl extends ComponentBase {
     static SPEED = 2048;
 
+    /**
+     * Create a new camera controller.
+     */
     constructor() {
         super();
 
@@ -14,8 +27,19 @@ class CameraControl extends ComponentBase {
         this._up = 0;
     }
 
-    start() {}
+    /**
+     * Handle initialization of component once added to an object.
+     */
+    start() {
+        Engine3D.inputSystem.addEventListener(KeyEvent.KEY_UP, this._keyUp, this);
+        Engine3D.inputSystem.addEventListener(KeyEvent.KEY_DOWN, this._keyDown, this);
+    }
 
+    /**
+     * Handle the releasing of keys.
+     * @param {KeyEvent} event Event from key release
+     * @private
+     */
     _keyUp(event) {
         if (Util.inputFocused())
             return;
@@ -36,6 +60,11 @@ class CameraControl extends ComponentBase {
             this._up += 1;
     }
 
+    /**
+     * Handle the pressing down of keys.
+     * @param {KeyEvent} event Event from key press
+     * @private
+     */
     _keyDown(event) {
         if (Util.inputFocused())
             return;
@@ -56,28 +85,13 @@ class CameraControl extends ComponentBase {
             this._up -= 1;
     }
 
+    /**
+     * Handle movement of the camera each update frame.
+     * @param {View3D} view View the object is being rendered in
+     */
     onUpdate(view) {
         if (this.mgr.isKeyDown("control"))
             return;
-
-        this._fwd = 0;
-        this._sdw = 0;
-        this._up = 0;
-
-        if (this.mgr.isKeyDown("w"))
-            this._fwd += 1;
-        if (this.mgr.isKeyDown("s"))
-            this._fwd -= 1;
-
-        if (this.mgr.isKeyDown("a"))
-            this._sdw += 1;
-        if (this.mgr.isKeyDown("d"))
-            this._sdw -= 1;
-
-        if (this.mgr.isKeyDown(" "))
-            this._up += 1;
-        if (this.mgr.isKeyDown("z"))
-            this._up -= 1;
 
         const elapsed = Time.delta / 1000;
 

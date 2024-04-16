@@ -1,11 +1,30 @@
 import Subscriber from "./subscriber.js";
 import {Vector3} from "@orillusion/core";
 
+/**
+ * @module SubscriberRotation
+ * @fileoverview Contains SubscriberRotation class.
+ */
+
+/**
+ * @class
+ * @extends Subscriber
+ * Subscriber to handle updating the position of objects
+ * based on live data.
+ */
 class SubscriberRotation extends Subscriber {
+    /**
+     * Create a new rotation subscriber.
+     * @param {SceneObject} object Object to manipulate
+     */
     constructor(object) {
         super(object, "rotation");
     }
 
+    /**
+     * Handle received data.
+     * @param {Object} data JSON data from MQTT
+     */
     handleData(data) {
         super.handleData(data);
 
@@ -24,6 +43,10 @@ class SubscriberRotation extends Subscriber {
         );
     }
 
+    /**
+     * Get the display name of the subscriber.
+     * @returns {string} Display-only name of subscriber.
+     */
     getDisplayName() {
         return "Rotation";
     }
