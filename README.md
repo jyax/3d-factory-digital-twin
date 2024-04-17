@@ -94,7 +94,7 @@ Depending on what you are making, it can be a good idea to include screenshots o
 ## Authors and acknowledgment
 This project was a collaboration between the Michigan State University Computer Science - Senior Capston Design course and Magna International. Student Developers are:
 - Logan Gillis : email
-- Cody Girard : email
+- Cody Girard : girardc101@outloook.com
 - Gabe Kubiak : gabe@gabekubiak.dev
 - Joey Vesche : joeyvesche@yahoo.com
 - Jake Yax : email
