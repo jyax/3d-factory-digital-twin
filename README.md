@@ -92,9 +92,9 @@ The backend is composed of MongoDB, Node.js Package Manager, EMQX MQTT broker an
 
 
 ## Authors and acknowledgment
-This project was a collaboration between the Michigan State University Computer Science - Senior Capston Design course and Magna International. Student Developers are:
+This project was a collaboration between the Michigan State University Computer Science - Senior Capstone Design course and Magna International. Student Developers are:
 - Logan Gillis : loganmgillis@outlook.com
-- Cody Girard : girardc101@outloook.com
+- Cody Girard : girardc101@outlook.com
 - Gabe Kubiak : gabe@gabekubiak.dev
 - Joey Vesche : joeyvesche@yahoo.com
 - Jake Yax : contact@jakeyax.dev
