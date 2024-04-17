@@ -1,6 +1,5 @@
-<template>
-
-</template>
+<!-- Displays information about a rotation subscriber. -->
+<template></template>
 
 <style scoped>
 

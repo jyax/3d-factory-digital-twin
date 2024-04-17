@@ -1,7 +1,4 @@
-<script setup>
-
-</script>
-
+<!-- Visual loading bar for when assets are being imported from the database and local storage. -->
 <template>
 
   <transition name="fade">
@@ -104,6 +101,10 @@ export default {
   },
 
   computed: {
+    /**
+     * Handle the width and color of the loading bar based on current progress.
+     * @returns {string} CSS styling string
+     */
     getFill() {
       const width = "width: " + (Math.floor(this.progress * 100)) + "%;";
       const c = this.gradient.get(this.progress);

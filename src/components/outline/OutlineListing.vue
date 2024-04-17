@@ -1,3 +1,4 @@
+<!-- Listing of a SceneObject in the scene. -->
 <template>
   <div class="listing" @click="this.object.select(); this.object.mouseOff()" :class="dynamicStyle" @mouseover="this.object.mouseOver()"
        @mouseout="this.object.mouseOff()">
@@ -109,6 +110,11 @@
     },
 
     computed: {
+      /**
+       * Get the class, or none, for whether the
+       * object is currently selected.
+       * @returns {string} Class name (or none)
+       */
       dynamicStyle() {
         return this.selected
         ? "listing-selected"
@@ -117,14 +123,13 @@
     },
 
     methods: {
+      /**
+       * Handle changes in regard to the object.
+       */
       update() {
         this.selected = this.object.isSelected();
         this.name = this.object.id;
         this.locked = this.object.locked;
-      },
-
-      doDelete() {
-        this.object.delete();
       }
     },
 

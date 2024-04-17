@@ -3,6 +3,7 @@
 import AssetListing from "./AssetListing.vue";
 </script>
 
+<!-- Displays all available models currently loaded and in the database. -->
 <template>
 
   <input id="upload-model" ref="modelUpload" type="file" @change="fileUploaded" multiple>
@@ -98,25 +99,6 @@ import AssetListing from "./AssetListing.vue";
   margin-bottom: 6px;
 }
 
-.input-parent {
-  display: flex;
-  flex-direction: row;
-
-  margin-bottom: 8px;
-}
-
-.input-label {
-  display: flex;
-  align-items: center;
-
-  margin: 0;
-
-  text-align: left;
-  font-weight: bold;
-
-  flex: 1;
-}
-
 .input {
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 4px;
@@ -192,59 +174,6 @@ import AssetListing from "./AssetListing.vue";
   opacity: 0.8;
 }
 
-.tools-icon {
-  display: flex;
-  align-items: center;
-
-  position: relative;
-
-  padding: 6px;
-}
-
-.drag-icon {
-  background-color: rgba(255, 255, 255, 0.1);
-  outline: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 50em;
-}
-
-.section-header {
-  display: flex;
-  flex-direction: row;
-
-  user-select: none;
-}
-
-.section-header-icon {
-  filter: invert();
-
-  width: 28px;
-}
-
-.section-title {
-  flex: 1;
-
-  font-size: 24px;
-  font-weight: normal;
-  margin: 0 8px 0 8px;
-}
-
-.section-header-button {
-  display: flex;
-  align-items: center;
-
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.section-header-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  outline: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-.section-header-button .section-header-icon {
-  width: 24px;
-}
-
 .tool {
   position: relative;
 
@@ -303,11 +232,6 @@ import AssetListing from "./AssetListing.vue";
   flex-direction: column;
 }
 
-.shortcuts {
-  font-weight: bold;
-  margin-bottom: 6px;
-}
-
 .soft {
   color: rgba(255, 255, 255, 0.4);
   font-style: italic;
@@ -332,11 +256,6 @@ import AssetListing from "./AssetListing.vue";
   width: 1px;
   height: 16px;
   background-color: rgba(255, 255, 255, 0.5);
-}
-
-.just-saved {
-  outline: 2px solid #42ce6c;
-  box-shadow: inset 0 0 4px #42ce6c;
 }
 
 </style>
@@ -370,6 +289,11 @@ export default {
   },
 
   computed: {
+    /**
+     * Get the class, or none, for visual feedback for having
+     * just saved the layout to the database.
+     * @returns {string} Class name (or none)
+     */
     saveClass() {
       if (this.justSaved)
         return "just-saved";
@@ -379,6 +303,10 @@ export default {
   },
 
   methods: {
+    /**
+     * Filter model names based on text input for both loaded models
+     * and those in the database.
+     */
     doFilter() {
       this.filteredModels = this.models.filter(id => id.includes(this.filter)).sort();
 
@@ -387,10 +315,17 @@ export default {
       }).sort();
     },
 
+    /**
+     * Open the file explorer for uploading a model.
+     */
     promptUpload() {
       this.$refs.modelUpload.click();
     },
 
+    /**
+     * Handle the uploading of a model file.
+     * @param event Event
+     */
     fileUploaded(event) {
       for (const file of event.target.files) {
         this.mgr.uploadModel(name, file, () => {
@@ -399,6 +334,9 @@ export default {
       }
     },
 
+    /**
+     * Retrieve a list of all available models from the database.
+     */
     loadExternalModels() {
       fetch("http://localhost:9000/Get_All_Models", {
         method: "POST"
@@ -410,6 +348,9 @@ export default {
       });
     },
 
+    /**
+     * Toggle the visibility of the models list.
+     */
     toggleAssets() {
       this.showAssets = !this.showAssets;
 
@@ -417,6 +358,9 @@ export default {
         this.loadExternalModels();
     },
 
+    /**
+     * Start the timer for ending visual feedback when having just saved.
+     */
     startTimer() {
       if (this.saveTimer !== null) {
         clearTimeout(this.saveTimer);
@@ -429,6 +373,9 @@ export default {
       }, 2500);
     },
 
+    /**
+     * Handle the toggling between view and edit mode.
+     */
     switchView() {
       this.editMode = !this.editMode;
     }

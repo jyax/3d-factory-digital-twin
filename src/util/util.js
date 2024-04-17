@@ -3,17 +3,27 @@
  * @fileoverview Contains Util class.
  */
 
-import {BoundingBox, Vector3} from "@orillusion/core";
+import {BoundingBox, Vector3, Matrix4} from "@orillusion/core";
 
 /**
  * @class
  * Contains globally accessible functions for utility purposes.
  */
 class Util {
+    /**
+     * Check if a string is formatted as a number.
+     * @param {string} string String to check
+     * @returns {boolean} Whether string is formatted to be a number
+     */
     static isNumber(string) {
         return string.match(/^-?\d+(\.\d+)?$|^-?0?\.\d+$/);
     }
 
+    /**
+     * Get a scale value from a bounding box.
+     * @param {BoundingBox} boundingBox Bounding box to get scale from
+     * @returns {number} Scale value
+     */
     static getBoundingBoxScale(boundingBox) {
         const min = boundingBox.min;
         const max = boundingBox.max;
@@ -23,6 +33,12 @@ class Util {
         return diff.length;
     }
 
+    /**
+     * Apply a transformation matrix to a bounding box (will remain axis-aligned).
+     * @param {BoundingBox} box Bounding box to transform
+     * @param {Matrix4} matrix Transformation matrix to apply
+     * @returns {BoundingBox} Transformed bounding box
+     */
     static transformBoundingBox(box, matrix) {
         const dir = box.max.subtract(box.min);
 
@@ -60,6 +76,10 @@ class Util {
         return bb;
     }
 
+    /**
+     * Check if any text inputs are currently in focus.
+     * @returns {boolean} Whether any inputs are focused
+     */
     static inputFocused() {
         const inputs = document.querySelectorAll("input, textarea");
         for (const input of inputs)

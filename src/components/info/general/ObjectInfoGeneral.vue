@@ -8,6 +8,7 @@ import ObjectInfoRotation from "../ObjectInfoRotation.vue";
 import ObjectInfoPosition from "../ObjectInfoPosition.vue";
 </script>
 
+<!-- Main menu for displaying general object information like transformations. -->
 <template>
 
   <div class="section-inner">
@@ -113,6 +114,10 @@ export default {
   },
 
   methods: {
+    /**
+     * Set the scale of an object based on user input.
+     * @param {string} val User input
+     */
     setScale(val) {
       let scale = 1;
       if (val !== "")

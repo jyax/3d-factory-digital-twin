@@ -2,7 +2,7 @@
   import PointPosition from "./info/PointPosition.vue";
 </script>
 
-
+<!-- Main toolbar for relevant tools and controls. -->
 <template>
   <div class="section" id="files">
     <div class="tools-icon" v-if="!dragMode">
@@ -13,6 +13,9 @@
 
         <span>Select all - <span class="soft">Ctrl + A</span></span>
         <span>Invert selection - <span class="soft">Ctrl + I</span></span>
+        <br>
+        <span>Drag object - <span class="soft">E</span></span>
+        <span>Rotate object - <span class="soft">Arrow keys</span></span>
 
       </span>
     </div>
@@ -142,38 +145,10 @@
   border-radius: 50em;
 }
 
-.section-header {
-  display: flex;
-  flex-direction: row;
-
-  user-select: none;
-}
-
 .section-header-icon {
   filter: invert();
 
   width: 28px;
-}
-
-.section-title {
-  flex: 1;
-
-  font-size: 24px;
-  font-weight: normal;
-  margin: 0 8px 0 8px;
-}
-
-.section-header-button {
-  display: flex;
-  align-items: center;
-
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.section-header-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  outline: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .section-header-button .section-header-icon {
@@ -400,14 +375,6 @@ button img {
   filter: invert();
 }
 
-#exit-button {
-  display: flex;
-  align-items: center;
-
-  margin: 0;
-  padding: 8px;
-}
-
 </style>
 
 <script>
@@ -437,7 +404,10 @@ button img {
       }
     },
 
-    methods : {
+    methods: {
+      /**
+       * Toggle the visibility of the line creation menu.
+       */
       ToggleLineWindow() {
         if (this.isLineMenuVisible)
           this.CloseLineMenu();
@@ -445,22 +415,27 @@ button img {
           this.OpenLineWindow();
       },
 
-      // Opens the UI for adding a Line
+      /**
+       * Opens the UI for adding a Line.
+       */
       OpenLineWindow() {
         this.isLineMenuVisible = true;
         this.line = this.mgr.createLine();
         this.lineIndex++;
-      }, 
+      },
 
-      // Closes the UI for adding a Line
+      /**
+       * Closes the UI for adding a Line.
+       */
       CloseLineMenu() {
         this.isLineMenuVisible = false;
       },
 
-      // Adds another point input in the UI
-      // <PointPosition :mgr="mgr" :line="line" :index="index"/>
-      // Also adds point to the line
-      AddPoint(){
+      /**
+       * Adds another point input in the UI.
+       * Also adds point to the line.
+       */
+      AddPoint() {
         this.line.addPoint(new Vector3(0,0,0));
         this.pointIndex++;
       }

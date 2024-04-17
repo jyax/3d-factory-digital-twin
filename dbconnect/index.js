@@ -24,11 +24,11 @@ app.use((req, res, next) => {
 app.listen(port, ()=> console.log(host));
 
 // MongoDB Connection
-const mongodbURL = 'mongodb://35.9.22.105:27017';
+const mongodbURL = 'mongodb://34.162.94.101:27017';
 const client = new MongoClient(mongodbURL, {
     auth: {
-        username: "root",
-        password: "password"
+        username: "admin",
+        password: "m@gn@_2024!"
     }
 });
 

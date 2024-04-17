@@ -1,3 +1,4 @@
+<!-- Handles the displaying and changing of the position of a SceneObject. -->
 <template>
   <p class="input-label">Position</p>
   <div class="input-vector">
@@ -103,28 +104,47 @@ export default {
   },
 
   methods: {
+    /**
+     * Handle the change of the position along the x-axis.
+     */
     doX() {
       this.object.X = parseFloat(this.xVal);
     },
 
+    /**
+     * Handle the change of the position along the y-axis.
+     */
     doY() {
       this.object.Y = parseFloat(this.yVal);
     },
 
+    /**
+     * Handle the change of the position along the z-axis.
+     */
     doZ() {
       this.object.Z = parseFloat(this.zVal);
     },
 
+    /**
+     * Focus out of a text input box.
+     * @param e Event
+     */
     blurInput(e) {
       e.target.blur();
     },
 
+    /**
+     * Update the values of the inputs based on the object's position.
+     */
     update() {
       this.xVal = Math.floor(this.pos.x * 100) / 100;
       this.yVal = Math.floor(this.pos.y * 100) / 100;
       this.zVal = Math.floor(this.pos.z * 100) / 100;
     },
 
+    /**
+     * Handle the toggling between view and edit mode.
+     */
     switchView() {
       this.editMode = !this.editMode;
     }

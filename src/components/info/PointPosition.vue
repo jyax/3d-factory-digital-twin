@@ -125,7 +125,9 @@
     },
   
     methods: {
-      // Update the x-value of the current point and line
+      /**
+       * Update the x-value of the current point and line.
+       */
       doX() {
         if(this.enableUpdate && !(this.xVal.trim() == '')){
             var oldVector = this.line.pointMap.get(this.index);
@@ -133,8 +135,10 @@
             this.line.updateLine(this.index, oldVector);
         }
       },
-      
-      // Update the y-value of the current point and line
+
+      /**
+       * Update the y-value of the current point and line.
+       */
       doY() {
         if(this.enableUpdate && !(this.yVal.trim() == '')){
             var oldVector = this.line.pointMap.get(this.index);
@@ -142,8 +146,10 @@
             this.line.updateLine(this.index, oldVector);
         }
       },
-      
-      // Update the z-value of the current point and line
+
+      /**
+       * Update the z-value of the current point and line.
+       */
       doZ() {
         if(this.enableUpdate && !(this.zVal.trim() == '')){
             var oldVector = this.line.pointMap.get(this.index);
@@ -151,13 +157,18 @@
             this.line.updateLine(this.index, oldVector);
         }
       },
-  
-      // Blur input field 
+
+      /**
+       * Blur input field.
+       * @param e Event
+       */
       blurInput(e) {
         e.target.blur();
       },
 
-      // Switch between view and edit modes
+      /**
+       * Handle the toggling between view and edit mode.
+       */
       switchView() {
           this.enableUpdate = !(this.enableUpdate);
       }

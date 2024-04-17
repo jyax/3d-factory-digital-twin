@@ -1,3 +1,4 @@
+<!-- Root component for displaying information about a subscriber attached to a SceneObject. -->
 <template>
 
   <div class="subscriber" :class="dynamicClass" @click="() => { if (collapsed) collapsed = false; }">
@@ -144,15 +145,35 @@ export default {
   },
 
   computed: {
+    /**
+     * Get the class for single-value subscribers.
+     * @returns {SubscriberSingleValue} Class for single-value subscribers.
+     */
     SubscriberSingleValue() {
       return SubscriberSingleValue
     },
+
+    /**
+     * Get the class for position subscribers.
+     * @returns {SubscriberPosition} Class for position subscribers.
+     */
     SubscriberPosition() {
       return SubscriberPosition
     },
+
+    /**
+     * Get the class for rotation subscribers.
+     * @returns {SubscriberRotation} Class for rotation subscribers.
+     */
     SubscriberRotation() {
       return SubscriberRotation
     },
+
+    /**
+     * Get the class, or none, for determining if the subscriber's
+     * information is collapsed or expanded.
+     * @returns {string} Class name (or none)
+     */
     dynamicClass() {
       if (this.collapsed)
         return "hoverable";

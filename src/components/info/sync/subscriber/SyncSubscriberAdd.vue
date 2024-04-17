@@ -1,3 +1,4 @@
+<!-- Button for adding a new subscriber. -->
 <template>
 
   <div class="subscriber">
