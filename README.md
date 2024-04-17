@@ -97,7 +97,7 @@ This project was a collaboration between the Michigan State University Computer 
 - Cody Girard : girardc101@outloook.com
 - Gabe Kubiak : gabe@gabekubiak.dev
 - Joey Vesche : joeyvesche@yahoo.com
-- Jake Yax : email
+- Jake Yax : contact@jakeyax.dev
 
 These students all graduated Spring 2024 and for any employment or project related inquiies please email them at the above addresses.
 
