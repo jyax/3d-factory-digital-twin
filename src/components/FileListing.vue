@@ -1,3 +1,4 @@
+<!-- Displays a file name in FileSelect -->
 <template>
     <div class="listing">
       <p class="listing-name" v-if="fileName !== ''">{{fileName}}</p>

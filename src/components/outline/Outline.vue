@@ -157,7 +157,6 @@
 <script>
   import OutlineListing from "./OutlineListing.vue";
   import SceneManager from "../../scene/scene_manager.js";
-  import {reactive} from "vue";
 
   export default {
     name: "Outline",

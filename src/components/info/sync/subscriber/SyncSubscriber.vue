@@ -3,7 +3,6 @@
   <div class="subscriber" :class="dynamicClass" @click="() => { if (collapsed) collapsed = false; }">
     <div class="subscriber-header">
       <p>{{label}}</p>
-      <!--<img src="../../../../assets/icon/trash.svg" class="collapse delete" alt="Delete">-->
       <img src="../../../../assets/icon/nav-arrow-down.svg" alt="Expand" v-show="collapsed">
       <img src="../../../../assets/icon/nav-arrow-up.svg" class="collapse" alt="Collapse" v-show="!collapsed" @click.stop="collapsed = true">
     </div>
