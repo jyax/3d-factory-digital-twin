@@ -96,7 +96,7 @@ This project was a collaboration between the Michigan State University Computer 
 - Logan Gillis : email
 - Cody Girard : email
 - Gabe Kubiak : gabe@gabekubiak.dev
-- Joey Vesche : email
+- Joey Vesche : joeyvesche@yahoo.com
 - Jake Yax : email
 
 These students all graduated Spring 2024 and for any employment or project related inquiies please email them at the above addresses.
