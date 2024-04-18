@@ -30,7 +30,7 @@
 - MQTT/ EMQX Debugging tools
 	- On Linux server CLI do `sudo apt-get install mosquitto`
 	- [Documentation](https://mosquitto.org/)
-### Setting up code
+### Server Installation
 -  Install Node on server
 	- `apt-get nodejs`
 
