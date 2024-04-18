@@ -6,7 +6,7 @@ import numpy as np
 
 
 
-
+## Script for Livedata Demo on beta_2.json factory
 def testMain(client):
     seqs = []
 
@@ -217,7 +217,7 @@ def testMain(client):
 
     runAsGroup(seqs,client)
 
-
+## Oscillation test for rotating arms 
 def oscillate(client):
     arm = a.Asset(id='kuka_arm1',x=2350,y=-42,z=-3805)
     arm.liveUpdate(client)
@@ -239,6 +239,7 @@ def oscillate(client):
         arm.liveUpdate(client)
         time.sleep(.05)
 
+## Causes boiler1 to overheat
 def tempSpikeDemo(client):
     seqs = []
     name = 'boiler_1'
@@ -257,6 +258,7 @@ def tempSpikeDemo(client):
     seqs.append(boiler)
     boiler.runSolo(client)
 
+#Makes bot_1 sub follow line
 def followLine(client):
     seqs = []
     subName = 'bot_1'

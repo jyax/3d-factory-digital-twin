@@ -1,32 +1,41 @@
 import time
 
+## Data structure for serializable scheduling of animations 
 class Sequence:
 	def __init__(self,states):
 		self.states = []
 		self.durations = []
 		self.start_times = [0]
-		
+	
+	#appends and asset state to the collection
 	def add_state(self,state):
 		self.states.append(state)
-		
+	
+	# deletes an asset state from schedule
 	def delete_state(self, index):
 		self.states.pop(index)
 	
+	#returns list of states in animatino
 	def get_states(self):
 		return self.states
 	
+	# adds a duration to the list of durations
 	def add_duration(self,duration):
 		self.durations.append(duration)
-		
+	
+	#removes a duration between 2 keyframes
 	def delete_duration(self, index):
 		self.durations.pop(index)
 	
+	#returns a schedule's durations for calculating times
 	def get_durations(self):
 		return self.durations
 
+	#updates state value at index
 	def updateState(self,index,new_state):
 		self.states[index] = new_state
 
+	#updates duration value between 2 asset states
 	def updateDuration(self,index,new_dur):
 		self.durations[index] = new_dur
 
@@ -66,7 +75,8 @@ class Sequence:
 					
 		self.states[len(self.states)-1].liveUpdate(client)
 
-	
+
+# runs a group of sequences together concurrently	
 def runAsGroup(sequences,client):
 
 	#constants
@@ -78,7 +88,7 @@ def runAsGroup(sequences,client):
 		def getTime():
 			return time.perf_counter() - START_TIME
 
-
+# figures out start times based on schedules
 		for seq in sequences:
 			start_times = [0]
 			total = 0
@@ -87,7 +97,7 @@ def runAsGroup(sequences,client):
 				seq.start_times.append(total)
 
 
-	   
+# iterates and updates assets through publishing   
 		while getTime() < LIMIT:
 			for seq in sequences:
 				if sum(seq.durations) < getTime():
@@ -102,7 +112,7 @@ def runAsGroup(sequences,client):
 						if seq.start_times[idx] <= getTime() and getTime() < LIMIT:
 							seq.states[idx].animateSelf(seq.states[len(seq.states)-1],seq.start_times[idx],seq.durations[idx],getTime())
 							seq.states[idx].liveUpdate(client)
-
+			# sleeps so updates are not too frequent
 			time.sleep(CYCLE_TIME)		
 					
 		
