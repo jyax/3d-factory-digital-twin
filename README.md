@@ -90,7 +90,18 @@ The project utilizes WebGPU through Orillusion, Vue and Vite for the front end a
 The backend is composed of MongoDB, Node.js Package Manager, EMQX MQTT broker and can be implemented in many different ways depending on use case.
 
 ## Visuals
-
+### Opening Page View
+Opening Page to upload, create, or load factory floors.
+![Opening Page](./screenshots/opening_page.png)
+### Edit Mode
+Edit Mode to place models and assign live data subscribers
+![Edit Mode](./screenshots/edit_mode.png)
+### Live Data & Alerts
+Menu displaying live data history, options for live data, as well as an alert pop-up when criticality is reached.
+![Live Data & Alerts](./screenshots/live_data_alerts.png)
+### Line Menu
+A line menu to quickly add in lines for robot pathing.
+![Line Menu](./screenshots/line_menu.png)
 
 ## Authors and acknowledgment
 This project was a collaboration between the Michigan State University Computer Science - Senior Capstone Design course and Magna International. Student Developers are:
