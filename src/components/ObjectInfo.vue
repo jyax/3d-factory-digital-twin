@@ -5,6 +5,7 @@ import ObjectInfoSync from "./info/sync/ObjectInfoSync.vue";
 
 </script>
 
+<!-- Root component for displaying information about the currently selected object. -->
 <template>
   <div id="info-parent" v-if="selected.length === 1">
     <div class="section" id="info">
@@ -110,11 +111,6 @@ import ObjectInfoSync from "./info/sync/ObjectInfoSync.vue";
   background-color: rgba(100, 100, 100, 0.15);
 }
 
-.info-tab-current {
-  outline: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.5);
-}
-
 .info-tab img {
   width: 20px;
 
@@ -131,55 +127,8 @@ import ObjectInfoSync from "./info/sync/ObjectInfoSync.vue";
   opacity: 100%;
 }
 
-.section-title {
-  flex: 1;
-
-  font-size: 24px;
-  font-weight: normal;
-  margin: 0 8px 0 8px;
-}
-
-.section-header-button {
-  display: flex;
-  align-items: center;
-
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.section-header-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  outline: 1px solid rgba(255, 255, 255, 0.5);
-}
-
 .section-header-button .section-header-icon {
   width: 24px;
-}
-
-.hint {
-  font-size: 14px;
-  margin: 0 0 12px 0;
-  color: #a2a2a2;
-  font-style: italic;
-}
-
-.single-input {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-
-  margin-top: 16px;
-}
-
-.single-input-left {
-  display: flex;
-  flex-direction: column;
-}
-
-.color-input {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
 }
 
 .color-input p {
@@ -219,27 +168,6 @@ input[type="color"]::-webkit-color-swatch:hover {
   outline: 1px solid white;
 }
 
-.gradient-dots {
-  display: flex;
-  justify-content: end;
-  padding-right: 10px;
-
-  margin-top: 4px;
-  margin-bottom: 4px;
-}
-
-#color-gradient {
-  margin-left: 8px;
-  width: 20px;
-
-  outline: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 50em;
-}
-
-.single-input-input {
-  margin-right: 8px;
-}
-
 </style>
 
 <script>
@@ -266,6 +194,11 @@ export default {
   },
 
   methods: {
+    /**
+     * Get the CSS styling to indicate whether a tab is currently selected.
+     * @param {string} str Tab ID to check
+     * @returns {string} CSS class name
+     */
     tabStyle(str) {
       if (str === this.tab)
         return "info-tab-current";
@@ -273,11 +206,18 @@ export default {
         return "";
     },
 
+    /**
+     * Update currently displayed information upon selecting an object.
+     * @param {SceneObject[]} sel List of currently selected objects
+     */
     update(sel) {
       this.selected = sel;
       this.object = this.mgr.getFirstSelected();
     },
 
+    /**
+     * Handle the toggling between view and edit mode.
+     */
     switchView() {
       this.editMode = !this.editMode;
     }

@@ -1,8 +1,8 @@
 <script setup>
-
 import ObjectInfoInput from "../../ObjectInfoInput.vue";
 </script>
 
+<!-- Displays information about a single-value subscriber. -->
 <template>
 
   <object-info-input :on-change="setID" @focus="this.getTypes(); showSuggestions = true;" @blur="showSuggestions = false"
@@ -64,94 +64,12 @@ import ObjectInfoInput from "../../ObjectInfoInput.vue";
   background-color: #547580;
 }
 
-.section {
-  display: flex;
-  flex-direction: column;
-}
-
-#info-parent {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  min-width: 25%;
-  max-width: 30%;
-  max-height: 75%;
-}
-
-#info {
-  margin-left: 12px;
-  margin-top: 12px;
-}
-
-.section-inner {
-  display: flex;
-  flex-direction: column;
-
-  overflow-y: scroll;
-
-  padding: 12px;
-  border-radius: 8px;
-
-  background-color: rgba(37, 37, 37, 0.67);
-  backdrop-filter: blur(4px);
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
-}
-
-.section-header {
-  display: flex;
-  flex-direction: row;
-
-  margin-bottom: 8px;
-
-  background-color: rgba(37, 37, 37, 0.67);
-  backdrop-filter: blur(4px);
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
-  padding: 8px;
-  border-radius: 8px;
-
-  user-select: none;
-}
-
 .section-header-icon {
   filter: invert();
 
   width: 28px;
 
   margin-left: 4px;
-}
-
-.info-tabs {
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-
-  margin-left: 2px;
-}
-
-.info-tab {
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-
-  margin-left: 6px;
-  padding: 8px;
-
-  border-radius: 4px;
-
-  background-color: rgba(140, 140, 140, 0.15);
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
-
-  cursor: pointer;
-}
-
-.info-tab:hover {
-  background-color: rgba(100, 100, 100, 0.15);
-}
-
-.info-tab-current {
-  outline: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.5);
 }
 
 .info-tab img {
@@ -170,36 +88,8 @@ import ObjectInfoInput from "../../ObjectInfoInput.vue";
   opacity: 100%;
 }
 
-.section-title {
-  flex: 1;
-
-  font-size: 24px;
-  font-weight: normal;
-  margin: 0 8px 0 8px;
-}
-
-.section-header-button {
-  display: flex;
-  align-items: center;
-
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.section-header-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  outline: 1px solid rgba(255, 255, 255, 0.5);
-}
-
 .section-header-button .section-header-icon {
   width: 24px;
-}
-
-.hint {
-  font-size: 14px;
-  margin: 0 0 12px 0;
-  color: #a2a2a2;
-  font-style: italic;
 }
 
 .single-input {
@@ -277,13 +167,6 @@ input[type="color"]::-webkit-color-swatch:hover {
 
 .single-input-input {
   margin-right: 8px;
-}
-
-.label {
-  text-align: left;
-  margin: 4px 4px 8px 0;
-
-  font-weight: bold;
 }
 
 </style>
@@ -390,6 +273,10 @@ export default {
   },
 
   methods: {
+    /**
+     * Update the gradient visualization based on the subscriber's ColorGradient.
+     * @returns {string} CSS styling for a background color gradient
+        */
     makeGradient() {
       const c1 = new Color();
       c1.setHex(this.color_1);
@@ -410,6 +297,9 @@ export default {
       return "background-image: linear-gradient(to bottom, " + this.color_1 + ", " + this.color_2 + ");"
     },
 
+    /**
+     * Get a list of suggested single-value types.
+     */
     getTypes() {
       const all = new Set(SubscriberSingleValue.SUGGESTED_TYPES);
       for (const type of this.subscriber.object.getSubscribers())
@@ -419,11 +309,20 @@ export default {
       this.suggestions = Array.from(all.values()).sort();
     },
 
+    /**
+     * Set the ID of the subscriber based on user input.
+     * @param {string} val New ID of subscriber
+     */
     setID(val) {
       this.subscriber.id = val;
       this.id = val;
     },
 
+    /**
+     * Use a suggested single-value type and
+     * set it as the ID of the subscriber.
+     * @param {string} type Single-value type suggestion to use
+     */
     useSuggestion(type) {
       this.$refs.typeInput.val = type;
 
@@ -432,6 +331,10 @@ export default {
       this.getTypes();
     },
 
+    /**
+     * Update the data currently visible in the
+     * single-value history graph.
+     */
     updateData() {
       this.series[0].data = this.subscriber.history;
     }

@@ -1,3 +1,4 @@
+<!-- Displays alerts for critical single values. -->
 <template>
   <div class="alert-menu-parent" v-if="visible">
     <div class="alert-menu">
@@ -49,27 +50,27 @@
   backdrop-filter: blur(8px);
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
 }
-.object-info-text{
-  text-align: left;
-}
+
 .alert-main {
   display: flex;
   flex-direction: column;
   padding: 2px;
 }
+
 .alert-header {
   display: flex;
   flex-direction: row;
 
   user-select: none;
 }
-.alert-title
-{
+
+.alert-title {
   flex: 1;
   font-size: 24px;
   font-weight: normal;
   margin: 0 8px 0 8px;
 }
+
 .alert-icon {
   filter: invert();
   width: 24px;

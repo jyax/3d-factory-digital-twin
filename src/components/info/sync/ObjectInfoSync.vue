@@ -1,10 +1,10 @@
 <script setup>
-
 import ObjectInfoID from "../ObjectInfoID.vue";
 import SyncSubscriberAdd from "./subscriber/SyncSubscriberAdd.vue";
 import SyncSubscriber from "./subscriber/SyncSubscriber.vue";
 </script>
 
+<!-- Root component for displaying information about all subscribers attached to a SceneObject. -->
 <template>
 
   <div class="section-inner">
@@ -30,26 +30,6 @@ import SyncSubscriber from "./subscriber/SyncSubscriber.vue";
 
 <style scoped>
 
-.section {
-  display: flex;
-  flex-direction: column;
-}
-
-#info-parent {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  min-width: 25%;
-  max-width: 30%;
-  max-height: 75%;
-}
-
-#info {
-  margin-left: 12px;
-  margin-top: 12px;
-}
-
 .section-inner {
   display: flex;
   flex-direction: column;
@@ -64,62 +44,6 @@ import SyncSubscriber from "./subscriber/SyncSubscriber.vue";
   background-color: rgba(37, 37, 37, 0.67);
   backdrop-filter: blur(4px);
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
-}
-
-.section-header {
-  display: flex;
-  flex-direction: row;
-
-  margin-bottom: 8px;
-
-  background-color: rgba(37, 37, 37, 0.67);
-  backdrop-filter: blur(4px);
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
-  padding: 8px;
-  border-radius: 8px;
-
-  user-select: none;
-}
-
-.section-header-icon {
-  filter: invert();
-
-  width: 28px;
-
-  margin-left: 4px;
-}
-
-.info-tabs {
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-
-  margin-left: 2px;
-}
-
-.info-tab {
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-
-  margin-left: 6px;
-  padding: 8px;
-
-  border-radius: 4px;
-
-  background-color: rgba(140, 140, 140, 0.15);
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
-
-  cursor: pointer;
-}
-
-.info-tab:hover {
-  background-color: rgba(100, 100, 100, 0.15);
-}
-
-.info-tab-current {
-  outline: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.5);
 }
 
 .info-tab img {
@@ -138,55 +62,11 @@ import SyncSubscriber from "./subscriber/SyncSubscriber.vue";
   opacity: 100%;
 }
 
-.section-title {
-  flex: 1;
-
-  font-size: 24px;
-  font-weight: normal;
-  margin: 0 8px 0 8px;
-}
-
-.section-header-button {
-  display: flex;
-  align-items: center;
-
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.section-header-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  outline: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-.section-header-button .section-header-icon {
-  width: 24px;
-}
-
 .hint {
   font-size: 14px;
   margin: 0 0 12px 0;
   color: #a2a2a2;
   font-style: italic;
-}
-
-.single-input {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-
-  margin-top: 16px;
-}
-
-.single-input-left {
-  display: flex;
-  flex-direction: column;
-}
-
-.color-input {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
 }
 
 .color-input p {
@@ -226,27 +106,6 @@ input[type="color"]::-webkit-color-swatch:hover {
   outline: 1px solid white;
 }
 
-.gradient-dots {
-  display: flex;
-  justify-content: end;
-  padding-right: 10px;
-
-  margin-top: 4px;
-  margin-bottom: 4px;
-}
-
-#color-gradient {
-  margin-left: 8px;
-  width: 20px;
-
-  outline: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 50em;
-}
-
-.single-input-input {
-  margin-right: 8px;
-}
-
 .label {
   text-align: left;
   margin: 4px 4px 8px 0;
@@ -282,12 +141,20 @@ export default {
   },
 
   methods: {
+    /**
+     * Handle the addition of a new subscriber to the currently
+     * selected object.
+     * @param type Type (class) of subscriber to add
+     */
     addSubscriber(type) {
       this.object.addSubscriber(new type(this.object, ""));
 
       this.load();
     },
 
+    /**
+     * Load the available subscriber types to add to the object.
+     */
     load() {
       this.availableTypes = [];
 

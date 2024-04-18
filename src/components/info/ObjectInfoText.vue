@@ -1,3 +1,4 @@
+<!-- Generalized component to display an attribute of an object and its value. -->
 <template>
   <div class="object-info-text">
     <p class="oit-left">{{name}}</p>

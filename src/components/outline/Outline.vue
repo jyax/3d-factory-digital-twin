@@ -2,6 +2,7 @@
   const title = "Outline";
 </script>
 
+<!-- Root component for displaying all SceneObjects. -->
 <template>
   <div id="outline-parent">
     <div class="section" id="outline">
@@ -180,9 +181,18 @@
     },
 
     methods: {
+      /**
+       * Add an object to the list of all objects.
+       * @param {SceneObject} object Object to add
+       */
       addObject(object) {
         this.list.push(object);
       },
+
+      /**
+       * Remove an object from the list of all objects.
+       * @param {SceneObject} object Object to remove
+       */
       removeObject(object) {
         this.list.splice(this.list.indexOf(object), 1);
       }

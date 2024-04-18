@@ -1,3 +1,5 @@
+<!-- Generalized text input component. -->
+
 <template>
 
   <div class="input-parent">
@@ -94,14 +96,24 @@ export default {
   },
 
   methods: {
+    /**
+     * Focus out of the text input box.
+     * @param e Event
+     */
     blurInput(e) {
       e.target.blur();
     },
 
+    /**
+     * Handle the changing of the value of the text input.
+     */
     doChange() {
       this.onChange(this.val);
     },
 
+    /**
+     * Handle the toggling between view and edit mode.
+     */
     switchView() {
         this.enableUpdate = !(this.enableUpdate);
     }

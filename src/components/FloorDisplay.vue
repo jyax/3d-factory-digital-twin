@@ -48,12 +48,16 @@
     },
     
     methods : {
-      // Switches from view to edit mode
+      /**
+       * Switches from view to edit mode.
+       */
       switchView() {
           this.editOn = !(this.editOn);
       },
 
-      // Show the start menu
+      /**
+       * Show the start menu (opening page).
+       */
       showStartMenu() {
         this.startMenuOn = false;
       }

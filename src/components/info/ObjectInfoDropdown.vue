@@ -1,3 +1,4 @@
+<!-- Generalized dropdown box component. -->
 <template>
 
   <div class="model-parent">
@@ -95,10 +96,16 @@ export default {
   },
 
   methods: {
+    /**
+     * Handle the changing of the selected option.
+     */
     doChange() {
       this.onChange(this.current);
     },
 
+    /**
+     * Handle the toggling between view and edit mode.
+     */
     switchView() {
         this.enableUpdate = !(this.enableUpdate);
     }

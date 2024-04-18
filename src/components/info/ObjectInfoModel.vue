@@ -1,3 +1,4 @@
+<!-- Dropdown for selecting a model for a SceneObject. -->
 <template>
 
   <div class="model-parent">
@@ -80,6 +81,9 @@ export default {
   },
 
   methods: {
+    /**
+     * Handle the changing of the selected model.
+     */
     doChange() {
       this.object.setModel(this.current);
     }

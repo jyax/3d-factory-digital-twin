@@ -1,3 +1,4 @@
+<!-- Input box for changing the ID of a SceneObject. -->
 <script>
 
 import ObjectInfoInput from "./ObjectInfoInput.vue";
@@ -14,6 +15,9 @@ export default {
   },
 
   methods: {
+    /**
+     * Handle the changing of the ID.
+     */
     doChange() {
       this.object.id = this.val;
 

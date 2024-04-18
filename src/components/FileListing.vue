@@ -33,48 +33,6 @@
   text-align: left;
 }
 
-.anonymous {
-  color: rgba(255, 255, 255, 0.5);
-  font-style: italic;
-}
-
-.listing-buttons {
-  display: none;
-  align-items: center;
-}
-
-.listing:hover .listing-buttons {
-  display: flex;
-}
-
-.listing-button {
-  display: flex;
-  align-items: center;
-
-  margin-left: 4px;
-
-  filter: invert();
-  opacity: 30%;
-  width: 18px;
-
-  padding: 4px;
-  border-radius: 4px;
-}
-
-.listing-button:hover {
-  opacity: 60%;
-  background-color: rgba(0, 0, 0, 0.2);
-}
-
-.listing-selected {
-  outline: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.5);
-}
-
-.listing-selected .listing-buttons {
-  display: flex;
-}
-
 </style>
 
 <script>

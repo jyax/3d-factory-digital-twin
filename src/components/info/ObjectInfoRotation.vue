@@ -1,3 +1,4 @@
+<!-- Handles the displaying and changing of the rotation of a SceneObject. -->
 <template>
   <p class="input-label">Rotation</p>
   <div class="input-vector">
@@ -104,43 +105,71 @@ export default {
   },
 
   methods: {
+    /**
+     * Handle the change of the rotation around the x-axis.
+     */
     doX() {
       if (this.xVal.length > 0 && Util.isNumber(this.xVal))
         this.object.rotX = parseFloat(this.xVal);
     },
 
+    /**
+     * Handle when the x-value input is no longer focused.
+     */
     blurX() {
       this.xVal = this.object.rotX;
     },
 
+    /**
+     * Handle the change of the rotation around the y-axis.
+     */
     doY() {
       if (this.yVal.length > 0 && Util.isNumber(this.yVal))
         this.object.rotY = parseFloat(this.yVal);
     },
 
+    /**
+     * Handle when the y-value input is no longer focused.
+     */
     blurY() {
       this.yVal = this.object.rotY;
     },
 
+    /**
+     * Handle the change of the rotation around the z-axis.
+     */
     doZ() {
       if (this.zVal.length > 0 && Util.isNumber(this.zVal))
         this.object.rotZ = parseFloat(this.zVal);
     },
 
+    /**
+     * Handle when the z-value input is no longer focused.
+     */
     blurZ() {
       this.zVal = this.object.rotZ;
     },
 
+    /**
+     * Focus out of a text input box.
+     * @param e Event
+     */
     blurInput(e) {
       e.target.blur();
     },
 
+    /**
+     * Update the values of the inputs based on the object's rotation.
+     */
     update() {
       this.xVal = Math.floor(this.rot.x * 100) / 100;
       this.yVal = Math.floor(this.rot.y * 100) / 100;
       this.zVal = Math.floor(this.rot.z * 100) / 100;
     },
 
+    /**
+     * Handle the toggling between view and edit mode.
+     */
     switchView() {
       this.editMode = !this.editMode;
     }

@@ -1,4 +1,5 @@
-<template> 
+<!-- Menu for logging in and out of an account. -->
+<template>
     <div class="login-section">
       <p v-if="authenticated">
         You are logged in {{ user.name }}

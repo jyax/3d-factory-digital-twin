@@ -1,20 +1,20 @@
 # Factory Digital Twin
 
-# Getting Started / Prerequisites 
-## On Workstation/ PC
+## Getting Started / Prerequisites
+### On Workstation / PC
 - [Install Node](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 - [Install MongoDB](https://www.mongodb.com/docs/manual/installation/)
 - Navigate to project directory
     - `npm install`
 
 - Clone this repository
-    - `git remote add origin https:// gitlab.msu.edu/cse-498-magna-spring-24/factory-digital-twin.git`
+    - `git remote add origin https://gitlab.msu.edu/cse-498-magna-spring-24/factory-digital-twin.git`
 
     - `git branch -M main`
     - `git pull origin`
         
 
-## On Ubuntu Server
+### On Ubuntu Server
 - When setting up check box for adding docker daemon to server
 	- otherwise `apt-get docker` in CLI
 ### Port forwarding
@@ -26,11 +26,11 @@
 		- `8883`
 	- Firewall settings
 		- `ufw allow <PORT #>` for all ports you want public
-> REQUIRES root/admin privelidge or prefix with `sudo`
+> REQUIRES root/admin privilege or prefix with `sudo`
 - MQTT/ EMQX Debugging tools
 	- On Linux server CLI do `sudo apt-get install mosquitto`
 	- [Documentation](https://mosquitto.org/)
-### Setting up code
+### Server Installation
 -  Install Node on server
 	- `apt-get nodejs`
 
@@ -39,19 +39,21 @@
 ## Run Locally
 ### Containerization 
 - [Install Docker Desktop](https://www.docker.com/products/personal)
-> For commercial use you may need alternate liscencing
-- Make sure Docker Desktop is OPEN
+> For commercial use you may need alternate licensing
+- Make sure Docker Desktop is open and spun up
 - Run with these commands: (from project directory)
 	- `cd ./mqtt-emulator/setup`
 	- `docker-compose -f compose-mongo-emqx.yaml up --build --force-recreate -d`
+- Note: The application is configured to retrieve files from MongoDB hosted in Google Cloud. If this is not working, change the MongoDB URL in dbconnect/index.js to localhost.
 
 
 ## Live-Data Emulator 
 ### Python and Packages
 #### Windows
-- In CLI/ Terminal`install python3`
-	- If not installed this will take you to the windows store download of python
-- to get mqtt- emqx plugin
+- In CLI/ Terminal 
+    - `install python3`
+      - If not installed this will take you to the Windows store download of python
+- Get the MQTT-EMQX plugin
 	- `pip install paho-mqtt==1.6.1`
 - Python Image Library for UI
 	- `pip install pillow`	
@@ -59,7 +61,7 @@
 #### MacOS / Linux
 - [Install Python](https://www.python.org/)
 - In CLI/ Terminal
-	- To get mqtt-emqx plugin
+	- Get the MQTT-EMQX plugin
 		- `pip install paho-mqtt==1.6.1`
 	- Python Image Library for UI
 		- `pip install pillow`	
@@ -70,7 +72,7 @@
 ### Running the Web Application
 - Navigate to project directory in  terminal
 - `npm run dev`
-    - View [app](localhost:5173) in Chrome Browser
+    - View [app](localhost:5173) in a Chromium Web Browser
         - localhost from vite address in terminal
 - In a second CLI/ Terminal `cd ./dbconnnect`
     - `nodemon` to launch database connection
@@ -81,25 +83,35 @@
 
 
 ## Description
-Magna's Factory Digital Twin is a senior thesis(Capstone) project developed by Michigan State University Computer Science students to allow for 3D live-monitoring of assets in an industrial production environment.
+Magna's Factory Digital Twin is a senior thesis (Capstone) project developed by Michigan State University Computer Science students to allow for 3D live-monitoring of assets in an industrial production environment.
 
-The project utilizes WebGPU through Orillusion, Vue and Vite for its' front end and runs in a chrome-based browser.
+The project utilizes WebGPU through Orillusion, Vue and Vite for the front end and runs in a Chromium-based browser.
 
-The backend is comprised of MongoDB, Node.js Package Manager, EMQX MQTT broker and can be implemented in many different ways depending on use case.
+The backend is composed of MongoDB, Node.js Package Manager, EMQX MQTT broker and can be implemented in many different ways depending on use case.
 
 ## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
+### Opening Page View
+Opening Page to upload, create, or load factory floors.
+![Opening Page](./screenshots/opening_page.png)
+### Edit Mode
+Edit Mode to place models and assign live data subscribers
+![Edit Mode](./screenshots/edit_mode.png)
+### Live Data & Alerts
+Menu displaying live data history, options for live data, as well as an alert pop-up when criticality is reached.
+![Live Data & Alerts](./screenshots/live_data_alerts.png)
+### Line Menu
+A line menu to quickly add in lines for robot pathing.
+![Line Menu](./screenshots/line_menu.png)
 
 ## Authors and acknowledgment
-This project was a collaboration between the Michigan State University Computer Science - Senior Capston Design course and Magna International. Student Developers are:
-- Logan Gillis : email
-- Cody Girard : email
+This project was a collaboration between the Michigan State University Computer Science - Senior Capstone Design course and Magna International. Student Developers are:
+- Logan Gillis : loganmgillis@outlook.com
+- Cody Girard : girardc101@outlook.com
 - Gabe Kubiak : gabe@gabekubiak.dev
-- Joey Vesche : email
-- Jake Yax : email
+- Joey Vesche : joeyvesche@yahoo.com
+- Jake Yax : contact@jakeyax.dev
 
-These students all graduated Spring 2024 and for any employment or project related inquiies please email them at the above addresses.
+These students all graduated Spring 2024 and for any employment or project related inquiries please email them at the above addresses.
 
 ## Project status
-This project is far from complete. It was developed using WebGPU and Orrilusion which at the time of writing are relatively new libraries and technologies. This was a proof of concept for 3D factory live monitoring. If you wish to develop further please contact Sundar Selvaraj at Sundareswaran.Selvaraj@magna.com
+This project is far from complete. It was developed using WebGPU and Orillusion which at the time of writing are relatively new libraries and technologies. This was a proof of concept for 3D factory live monitoring. If you wish to develop further please contact Sundar Selvaraj at Sundareswaran.Selvaraj@magna.com

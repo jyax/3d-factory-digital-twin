@@ -1,6 +1,5 @@
-<template>
-
-</template>
+<!-- Displays information about a position subscriber. -->
+<template></template>
 
 <style scoped>
 

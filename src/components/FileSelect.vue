@@ -170,6 +170,7 @@ p {
   margin: 5% 1% 1% 1%;
 
   background-color: rgba(140, 140, 140, 0.15);
+  color: white;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
   border-radius: 4px;
 
@@ -181,6 +182,8 @@ p {
 
 #create-button:disabled {
   cursor: default;
+
+  color: rgba(255, 255, 255, 0.2);
 }
 
 #create-button:hover:enabled {
@@ -221,6 +224,11 @@ export default{
   },
 
   computed: {
+    /**
+     * Get the class, or none, for visual feedback for dragging
+     * a file over the file input box.
+     * @returns {string} Class name (or none)
+     */
     dragClass() {
       if (this.fileOver)
         return "file-over";
@@ -230,8 +238,10 @@ export default{
   },
 
   methods: {
-
-    // When file is dropped into input div load the file into a scene
+    /**
+     * When file is dropped into input div load the file into a scene.
+     * @param ev Event
+     */
     dropHandler(ev) {
       // prevent default actions
       ev.preventDefault();
@@ -258,17 +268,24 @@ export default{
       }
     },
 
-
-    // Call event to disable start menu and show scene
+    /**
+     * Call event to disable start menu and show scene.
+     */
     displayProject() {
       this.mgr.events.do('open project');
     },
 
-    // Loads the scene from the database
+    /**
+     * Call event to disable start menu and show scene.
+     * @param {string} fileName Name of file
+     */
     loadFile(fileName) {
       this.mgr.getSceneFromDB(fileName);
     },
 
+    /**
+     * Retrieve a list of all available floors in the database.
+     */
     loadAllFloors() {
       fetch("http://localhost:9000/Get_All_Floors", {
         method: "POST"
