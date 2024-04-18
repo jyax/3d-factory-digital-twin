@@ -8,7 +8,7 @@
     - `npm install`
 
 - Clone this repository
-    - `git remote add origin https:// gitlab.msu.edu/cse-498-magna-spring-24/factory-digital-twin.git`
+    - `git remote add origin https://gitlab.msu.edu/cse-498-magna-spring-24/factory-digital-twin.git`
 
     - `git branch -M main`
     - `git pull origin`
@@ -44,6 +44,7 @@
 - Run with these commands: (from project directory)
 	- `cd ./mqtt-emulator/setup`
 	- `docker-compose -f compose-mongo-emqx.yaml up --build --force-recreate -d`
+- Note: The application is configured to retrieve files from MongoDB hosted in Google Cloud. If this is not working, change the MongoDB URL in dbconnect/index.js to localhost.
 
 
 ## Live-Data Emulator 
